@@ -1,7 +1,7 @@
 package com.app4.project.timelapseserver.configuration;
 
-import com.app4.project.timelapseserver.model.Command;
-import com.app4.project.timelapseserver.model.Execution;
+import com.app4.project.timelapse.model.Command;
+import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapseserver.repository.LocalUserRepository;
 import com.app4.project.timelapseserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;

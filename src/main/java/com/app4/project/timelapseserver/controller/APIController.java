@@ -1,10 +1,10 @@
 package com.app4.project.timelapseserver.controller;
 
+import com.app4.project.timelapse.model.CameraState;
+import com.app4.project.timelapse.model.Command;
+import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapseserver.exception.BadRequestException;
-import com.app4.project.timelapseserver.model.CameraState;
 
-import com.app4.project.timelapseserver.model.Command;
-import com.app4.project.timelapseserver.model.Execution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -78,7 +78,6 @@ public class APIController {
 
   @GetMapping("/state")
   public ResponseEntity getState() {
-    System.out.println("HANDLE");
     return ResponseEntity.ok().body(state);
   }
 
