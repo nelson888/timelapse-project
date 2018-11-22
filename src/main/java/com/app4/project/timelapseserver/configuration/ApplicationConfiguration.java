@@ -2,13 +2,13 @@ package com.app4.project.timelapseserver.configuration;
 
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.Execution;
+import com.app4.project.timelapse.model.User;
 import com.app4.project.timelapseserver.repository.LocalUserRepository;
 import com.app4.project.timelapseserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.PriorityBlockingQueue;
 
 @Configuration
 public class ApplicationConfiguration {
@@ -28,7 +29,7 @@ public class ApplicationConfiguration {
 
   @Bean
   public Queue<Execution> executionsQueue() {
-    return new ArrayBlockingQueue<>(MAX_EXECUTIONS);
+    return new PriorityBlockingQueue<>(MAX_EXECUTIONS);
   }
 
   @Bean
@@ -48,6 +49,6 @@ public class ApplicationConfiguration {
 
   @Bean
   public UserRepository userRepository() {
-    return new LocalUserRepository(Arrays.asList());
+    return new LocalUserRepository(Arrays.asList(new User("android", "android"), new User("timelapse", "timelapse")));
   }
 }

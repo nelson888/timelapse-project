@@ -3,6 +3,7 @@ package com.app4.project.timelapseserver.controller;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.Execution;
+import com.app4.project.timelapse.model.GlobalState;
 import com.app4.project.timelapseserver.exception.BadRequestException;
 
 import org.slf4j.Logger;
@@ -21,9 +22,9 @@ import java.util.Queue;
 @RequestMapping("/api")
 public class APIController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(APIController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(APIController.class);
 
-    private final Queue<Execution> executions;
+  private final Queue<Execution> executions;
   private final Queue<Command> commands;
   private CameraState state;
 
@@ -39,7 +40,7 @@ public class APIController {
       throw new BadRequestException("Max number of executions reached");
     }
     LOGGER.info("New execution was added: {}", execution);
-    return ResponseEntity.ok().body(execution);
+    return ResponseEntity.ok(execution);
   }
 
   @GetMapping("/executions/consume")
@@ -57,8 +58,8 @@ public class APIController {
     if (commands.offer(command)) {
       throw new BadRequestException("Max number of commands reached");
     }
-      LOGGER.info("New command was added: {}", command);
-    return ResponseEntity.ok().body(command);
+    LOGGER.info("New command was added: {}", command);
+    return ResponseEntity.ok(command);
   }
 
   @GetMapping("/commands/consume")
@@ -78,14 +79,21 @@ public class APIController {
 
   @GetMapping("/state")
   public ResponseEntity getState() {
-    return ResponseEntity.ok().body(state);
+    return ResponseEntity.ok(state);
   }
 
   @PutMapping("/state")
   public ResponseEntity updateMapping(@RequestBody CameraState state) {
     this.state = state;
     LOGGER.info("Updated camera state: {}", state);
-    return ResponseEntity.ok().body(state);
+    return ResponseEntity.ok(state);
+  }
+
+  @GetMapping("/globalState")
+  public ResponseEntity globalState() {
+    GlobalState globalState = new GlobalState(state, this.executions.toArray(new Execution[0]),
+        commands.toArray(new Command[0]));
+    return ResponseEntity.ok(globalState);
   }
 
 }
