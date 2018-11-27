@@ -3,6 +3,7 @@ package com.app4.project.timelapseserver.configuration;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapse.model.User;
+import com.app4.project.timelapseserver.model.JwtConfig;
 import com.app4.project.timelapseserver.repository.LocalUserRepository;
 import com.app4.project.timelapseserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,5 +51,10 @@ public class ApplicationConfiguration {
   @Bean
   public UserRepository userRepository() {
     return new LocalUserRepository(Arrays.asList(new User("android", "android"), new User("timelapse", "timelapse")));
+  }
+
+  @Bean
+  JwtConfig jwtConfig() {
+    return new JwtConfig();
   }
 }
