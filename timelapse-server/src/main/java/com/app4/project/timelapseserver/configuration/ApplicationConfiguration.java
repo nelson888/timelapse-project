@@ -39,7 +39,7 @@ public class ApplicationConfiguration {
 
   @Bean
   public Path rootPath() {
-    return Paths.get(rootPath);
+    return Paths.get(rootPath.replaceFirst("^~", System.getProperty("user.home")));
   }
 
   @Bean

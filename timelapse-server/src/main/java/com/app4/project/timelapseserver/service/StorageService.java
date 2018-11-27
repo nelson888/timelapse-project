@@ -37,7 +37,7 @@ public class StorageService {
     File root = rootPath.toFile();
     if (!Files.exists(rootPath) && !root.mkdir()) {
       LOGGER.error("Couldn't find or create root directory");
-      throw new RuntimeException(rootPath + "doesn't exists and couldn't be created");
+      throw new RuntimeException(rootPath + " doesn't exists and couldn't be created");
     }
     for (int i = 0; i < ApplicationConfiguration.MAX_EXECUTIONS; i++) {
       File execDir = new File(root, FOLDER_PREFIX + i);
