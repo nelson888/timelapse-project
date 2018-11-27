@@ -47,6 +47,9 @@
 
 
 
+		<!--
+		tutorial link: https://medium.com/omarelgabrys-blog/microservices-with-spring-boot-authentication-with-jwt-part-3-fafc9d7187e8
+		-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
