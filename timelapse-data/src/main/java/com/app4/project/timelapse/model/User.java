@@ -12,7 +12,11 @@ public class User {
     this.role = role;
   }
 
-  public String getUsername() {
+  public User(String username, String password) {
+    this(username, password, null);
+  }
+
+    public String getUsername() {
     return username;
   }
 
