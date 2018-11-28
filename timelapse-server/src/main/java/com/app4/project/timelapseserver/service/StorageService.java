@@ -28,6 +28,7 @@ public class StorageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StorageService.class);
   private static final String FOLDER_PREFIX = "execution_";
+  private static final String IMAGE_FORMAT = ".png";
 
   private final Path rootPath;
   private final Map<Integer, Path> fileMap = new ConcurrentHashMap<>();
@@ -39,6 +40,7 @@ public class StorageService {
       LOGGER.error("Couldn't find or create root directory");
       throw new RuntimeException(rootPath + " doesn't exists and couldn't be created");
     }
+    LOGGER.info("Checking/Creating executions directories...");
     for (int i = 0; i < ApplicationConfiguration.MAX_EXECUTIONS; i++) {
       File execDir = new File(root, FOLDER_PREFIX + i);
       if (!execDir.exists() && !execDir.mkdir()) {
@@ -46,33 +48,31 @@ public class StorageService {
         throw new RuntimeException(rootPath + "couldn't create directory " + execDir.getName());
       }
     }
+    LOGGER.info("Storage Service was successfully instantiated");
   }
 
-  public void store(int executionId, MultipartFile file) {
-    LOGGER.info("attempting to store {} for executionId {}...", file.getOriginalFilename(), executionId);
-    if (file.isEmpty()) {
-      LOGGER.info("Cannot store an empty file");
-      return;
-    }
+  public File store(int executionId, MultipartFile multipartFile) {
+    LOGGER.info("attempting to store {} for executionId {}...", multipartFile.getOriginalFilename(), executionId);
 
-    Path executionPath = rootPath.resolve(FOLDER_PREFIX + String.valueOf(executionId));
+    Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
 
-    try (InputStream inputStream = file.getInputStream()) {
+    try (InputStream inputStream = multipartFile.getInputStream()) {
       int key = getKey(executionId, fileMap.size());
-      Path filePath = executionPath.resolve(file.getOriginalFilename());
-      LOGGER.info("Creating file file in path {}", filePath);
-      if (!filePath.toFile().createNewFile()) {
+      Path filePath = executionPath.resolve("image_" + key + IMAGE_FORMAT);
+      LOGGER.info("Creating file in path {}", filePath);
+      File file = filePath.toFile();
+      if (!file.createNewFile()) {
         LOGGER.error("Couldn't create new file (unknown error)");
-        throw new FileStorageException("Error while creating new file");
-      } else {
-        Files.copy(inputStream, filePath,
-            StandardCopyOption.REPLACE_EXISTING);
-        fileMap.put(key, filePath);
-        LOGGER.info("Saved file successfully");
+        throw new FileStorageException("Error while creating new file (unknown error)");
       }
+      Files.copy(inputStream, filePath,
+          StandardCopyOption.REPLACE_EXISTING);
+      fileMap.put(key, filePath);
+      LOGGER.info("Saved file successfully");
+      return file;
     } catch (IOException e) {
       LOGGER.error("Error while writing file", e);
-      throw new FileStorageException("Couldn't create new file", e);
+      throw new FileStorageException(e.getMessage(), e);
     }
   }
 

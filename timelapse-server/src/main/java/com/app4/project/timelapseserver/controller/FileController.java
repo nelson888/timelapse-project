@@ -1,5 +1,7 @@
 package com.app4.project.timelapseserver.controller;
 
+import com.app4.project.timelapse.model.ErrorResponse;
+import com.app4.project.timelapse.model.FileResponse;
 import com.app4.project.timelapseserver.service.StorageService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+
 @RestController
 @RequestMapping("/files")
 public class FileController {
@@ -26,9 +30,10 @@ public class FileController {
   }
 
   @PutMapping("/{executionId}")
-  public ResponseEntity uploadImage(@PathVariable int executionId, @RequestParam MultipartFile file) {
-    storageService.store(executionId, file);
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+  public ResponseEntity uploadImage(@PathVariable int executionId, @RequestParam MultipartFile multipartFile) {
+    File file = storageService.store(executionId, multipartFile);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(new FileResponse(file.length(), file.getName()));
   }
 
   @GetMapping("/{executionId}/count")

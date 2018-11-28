@@ -10,7 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,9 +26,10 @@ public class APIController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(APIController.class);
 
+  //thread-safe queue
   private final Queue<Execution> executions;
   private final Queue<Command> commands;
-  private CameraState state;
+  private volatile CameraState state;
 
   public APIController(Queue<Execution> executions, Queue<Command> commands) {
     this.executions = executions;
@@ -43,14 +46,22 @@ public class APIController {
     return ResponseEntity.ok(execution);
   }
 
-  @GetMapping("/executions/consume")
+  @GetMapping("/executions/get")
   public ResponseEntity consumeExecution() {
     if (executions.isEmpty()) {
       throw new BadRequestException("There isn't any execution to get");
     }
-    Execution execution = executions.remove();
-      LOGGER.info("Consumed execution with id execution {}", execution.getId());
+    Execution execution = executions.element();
     return ResponseEntity.ok(execution);
+  }
+
+  @DeleteMapping("/executions/remove/{id}")
+  public ResponseEntity removeExecution(@PathVariable int id) {
+    if (executions.removeIf(e -> e.getId() == id)) {
+      LOGGER.info("Execution with id {} was removed", id);
+      return ResponseEntity.ok(Boolean.TRUE);
+    }
+    return ResponseEntity.ok(Boolean.FALSE);
   }
 
   @PutMapping("/commands/new")

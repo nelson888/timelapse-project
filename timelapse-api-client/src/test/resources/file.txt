@@ -1,0 +1,4 @@
+day 2018/10/29
+HLL		9 218 Unique Users in US
+SIMPLE		10 205 Unique Users in US
+
