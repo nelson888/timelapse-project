@@ -29,7 +29,8 @@ public class FileController {
   }
 
   @PutMapping("/{executionId}")
-  public ResponseEntity uploadImage(@PathVariable int executionId, @RequestParam MultipartFile multipartFile) {
+  public ResponseEntity uploadImage(@PathVariable int executionId,
+      @RequestParam("image") MultipartFile multipartFile) {
     File file = storageService.store(executionId, multipartFile);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(new FileResponse(file.length(), file.getName()));
@@ -43,10 +44,7 @@ public class FileController {
   @GetMapping("/{executionId}/{fileId}")
   @ResponseBody
   public ResponseEntity<Resource> serveFile(@PathVariable int executionId, @PathVariable int fileId) {
-
-    System.err.println(executionId + " " + fileId);
     Resource file = storageService.loadAsResource(executionId, fileId);
-    System.err.println(file);
     return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
         "attachment; filename=\"" + file.getFilename() + "\"").body(file);
   }
