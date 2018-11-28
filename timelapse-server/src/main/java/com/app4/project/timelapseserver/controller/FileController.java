@@ -1,6 +1,5 @@
 package com.app4.project.timelapseserver.controller;
 
-import com.app4.project.timelapse.model.ErrorResponse;
 import com.app4.project.timelapse.model.FileResponse;
 import com.app4.project.timelapseserver.service.StorageService;
 import org.springframework.core.io.Resource;
