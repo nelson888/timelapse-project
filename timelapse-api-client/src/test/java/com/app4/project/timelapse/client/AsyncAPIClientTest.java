@@ -5,11 +5,14 @@ import com.app4.project.timelapse.api.client.TimelapseClient;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.app4.project.timelapse.model.FileResponse;
+import com.tambapps.http.restclient.request.handler.response.ResponseHandlers;
+import com.tambapps.http.restclient.util.ISSupplier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
+import java.io.InputStream;
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +31,7 @@ public class AsyncAPIClientTest {
 
   @Before
   public void init() {
-    client = new TimelapseClient(null);
+    client = new TimelapseClient("http://localhost:8080/", null);
      latch = new CountDownLatch(1);
   }
 
@@ -81,61 +84,63 @@ public class AsyncAPIClientTest {
       public void onSuccess(int responseCode, CameraState data) {
         assertNotNull("Shouldn't be null", data);
         assertEquals("Should be equal", state, data);
-        System.err.println(data);
         latch.countDown();
       }
 
       @Override
       public void onError(int responseCode, ErrorResponse response) {
-
+        System.err.println(response.getMessage());
       }
     });
     assertTrue("Should be true", latch.await(TIMEOUT, TimeUnit.SECONDS));
   }
 
+  private InputStream getResourceStream() {
+    return AsyncAPIClientTest.class.getResourceAsStream("/file.txt");
+  }
   @Test
   public void putFile() throws InterruptedException {
-    String filePath = "/home/nelson/test.txt";
-    client.putImage(new File(filePath), new Callback<FileResponse>() {
-      @Override
-      public void onSuccess(int responseCode, FileResponse data) {
+    client.putImage(
+        new ISSupplier() {
+          @Override
+          public InputStream get() {
+            return getResourceStream();
+          }
+        },
+        new Callback<FileResponse>() {
+          @Override
+          public void onSuccess(int responseCode, FileResponse data) {
+            assertNotNull("Shouldn't be null", data);
+            latch.countDown();
 
-      }
+          }
 
-      @Override
-      public void onError(int responseCode, ErrorResponse response) {
-
-      }
-    }, 0);
+          @Override
+          public void onError(int responseCode, ErrorResponse response) {
+            System.err.println(response.getMessage());
+          }
+        }, 0);
 
     assertTrue("Should be true", latch.await(TIMEOUT, TimeUnit.SECONDS));
   }
 
   @Test
   public void getFile() throws InterruptedException {
-    /*
-    client.getFile("0/0", new APIClient.Callback<InputStream>() {
-      @Override
-      public void onSuccess(int responseCode, InputStream data) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(data));
-        String line;
-        try {
-          while((line = reader.readLine()) != null) {
-            System.out.println(line);
+    final String fileData = new Scanner(getResourceStream()).useDelimiter("\\A").next();
+    client.getImage(ResponseHandlers.stringHandler(),
+        new Callback<String>() {
+          @Override
+          public void onSuccess(int responseCode, String data) {
+            assertNotNull("Shouldn't be null", data);
+            assertEquals("Should be equal", fileData, data);
+            latch.countDown();
           }
-        } catch (Exception e) {
-          System.out.println(e);
-        }
-        latch.countDown();
-      }
 
-      @Override
-      public void onError(int responseCode, ErrorResponse response) {
-
-      }
-    });
-
+          @Override
+          public void onError(int responseCode, ErrorResponse response) {
+            System.err.println(response.getMessage());
+          }
+        }, 0, 0);
     assertTrue("Should be true", latch.await(TIMEOUT, TimeUnit.SECONDS));
-    */
   }
 }

@@ -15,20 +15,20 @@ import com.tambapps.http.restclient.request.handler.output.BodyHandlers;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandlers;
 import com.tambapps.http.restclient.response.RestResponse;
+import com.tambapps.http.restclient.util.ISSupplier;
 
 import java.io.File;
 
 public class TimelapseClient {
 
-  private static final String BASE_URL = "http://localhost:8080/";
   private static final String API_ENDPOINT = "api/";
   private static final String FILE_STORAGE_ENDPOINT = "files/";
   private final RestClient client;
   private final Gson gson = new Gson();
 
   //TODO handle authentication with server and jwt
-  public TimelapseClient(User user) {
-    client = new RestClient(BASE_URL);
+  public TimelapseClient(String baseUrl, User user) {
+    client = new RestClient(baseUrl);
     //TODO authenticate handle jwt
     /*
     RestResponse<String, String> response = client.execute(RestRequest.builder()
@@ -81,16 +81,20 @@ public class TimelapseClient {
     getObject(API_ENDPOINT + "state", CameraState.class, callback);
   }
 
-  public void putImage(File file, Callback<FileResponse> callback, int executionId) {
+  public void putImage(ISSupplier isSupplier, Callback<FileResponse> callback, int executionId) {
+    RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId)
+        .PUT()
+        .output(BodyHandlers.multipartStream(isSupplier, "image"))
+        .build();
+    client.executeAsync(request, ResponseHandlers.stringHandler(),
+        generateRestCallback(callback, FileResponse.class));
+  }
+
+    public void putImage(File file, Callback<FileResponse> callback, int executionId) {
     RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId)
         .PUT()
         .output(BodyHandlers.multipartFile(file))
         .build();
-    if (true) {
-      RestResponse<String, String> response = client.execute(request, ResponseHandlers.stringHandler());
-      generateRestCallback(callback, FileResponse.class).call(response);
-      return;
-    }
     client.executeAsync(request, ResponseHandlers.stringHandler(),
         generateRestCallback(callback, FileResponse.class));
   }
@@ -98,7 +102,7 @@ public class TimelapseClient {
   //RestResponseHandler: InputStream -> Bitmap avec BitmapFactory.decodeStream(is)
   public <T> void getImage(ResponseHandler<T> responseHandler, final Callback<T> callback, int executionId, int fileId) {
     RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId + "/" + fileId)
-        .PUT()
+        .GET()
         .build();
     client.executeAsync(request, responseHandler, ResponseHandlers.stringHandler(),
         new RestClient.Callback<T, String>() {
@@ -160,10 +164,12 @@ public class TimelapseClient {
     return new RestClient.Callback<String, String>() {
       @Override
       public void call(RestResponse<String, String> response) {
-        if (response.isSuccessful() && !response.isErrorResponse()) {
+        if (response.isSuccessful()) {
           callback.onSuccess(response.getResponseCode(), gson.fromJson(response.getSuccessData(), clazz));
-        } else {
+        } else if (response.isErrorResponse()) {
           callback.onError(response.getResponseCode(), gson.fromJson(response.getErrorData(), ErrorResponse.class));
+        } else { //has exception
+          callback.onError(RestResponse.REQUEST_NOT_SENT, new ErrorResponse(response.getException().getMessage()));
         }
       }
     };
