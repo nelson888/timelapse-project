@@ -73,6 +73,7 @@ public class ApplicationConfiguration {
     Set<User> set = new HashSet<>();
     set.add(new User("android", passwordEncoder.encode("android"), Roles.ANDROID));
     set.add(new User("raspberry", passwordEncoder.encode("raspberry"), Roles.TIMELAPSE));
+    set.add(new User("test", passwordEncoder.encode("test"), Roles.ANDROID)); //TODO remove (just for testing)
     return Collections.unmodifiableSet(set);
   }
 
