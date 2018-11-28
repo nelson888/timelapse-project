@@ -2,11 +2,13 @@ package com.app4.project.timelapseserver.security;
 
 import com.app4.project.timelapse.model.User;
 import com.app4.project.timelapseserver.exception.BadRequestException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.authentication.UserCredentials;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,13 +25,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+
 import java.util.stream.Collectors;
 
 public class JwtUsernameAndPasswordAuthenticationFilter extends
     UsernamePasswordAuthenticationFilter {
   private static final Logger LOOGER =
       LoggerFactory.getLogger(JwtUsernameAndPasswordAuthenticationFilter.class);
-  private static final User NOBODY = new User("", "");
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
   // We use auth manager to validate the user credentials
   private final AuthenticationManager authManager;
   private final String jwtSecret;
@@ -45,29 +48,35 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends
 
   }
 
+  /**
+   *
+   * 401 -> wrong credentials
+   *  -> good credentials and token in header Authorization
+   */
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
       throws AuthenticationException {
 
-    User user;
+    UserCredentials credentials;
     try {
-      // 1. Get credentials from request TODO it never works
-      user  = new ObjectMapper().readValue(request.getInputStream(), User.class);
+      // 1. Get credentials from request
+      JsonNode jsonNode = OBJECT_MAPPER.readTree(request.getInputStream());
+      credentials = new UserCredentials(jsonNode.get("username").asText(),
+          jsonNode.get("password").asText());
     } catch (IOException e) {
-     // LOOGER.info("Credentials were malformed", e);
       throw new MalformedAuthentication("Credentials were malformed", e);
     }
     // 2. Create auth object (contains credentials) which will be used by auth manager
     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-        user.getUsername(), user.getPassword(), Collections.emptyList());
+        credentials.getUsername(), credentials.getPassword(), Collections.emptyList());
 
-    // 3. Authentication manager authenticate the user, and use UserDetialsServiceImpl::loadUserByUsername() method to load the user.
+    // 3. Authentication manager authenticate the user
     return authManager.authenticate(authToken);
   }
 
   private class MalformedAuthentication extends AuthenticationException {
 
-    public MalformedAuthentication(String msg, Throwable t) {
+    MalformedAuthentication(String msg, Throwable t) {
       super(msg, t);
     }
 
