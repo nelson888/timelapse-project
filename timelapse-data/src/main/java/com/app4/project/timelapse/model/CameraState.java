@@ -7,6 +7,16 @@ public class CameraState {
   private Execution currentExecution;
   private boolean sleeping;
 
+  public CameraState() {
+  }
+
+  public CameraState(boolean cameraWorking,
+      Execution currentExecution, boolean sleeping) {
+    this.cameraWorking = cameraWorking;
+    this.currentExecution = currentExecution;
+    this.sleeping = sleeping;
+  }
+
   public boolean isCameraWorking() {
     return cameraWorking;
   }

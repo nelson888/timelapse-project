@@ -7,8 +7,20 @@ public class Execution implements Comparable<Execution> {
   private String title;
   private long startTime;
   private long endTime;
-  private long id;
+  private int id;
   private long frequency;
+
+  public Execution(String title, long startTime, long endTime, int id, long frequency) {
+    this.title = title;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.id = id;
+    this.frequency = frequency;
+  }
+
+  public Execution(String title, long startTime, long endTime, long frequency) {
+    this(title, startTime, endTime, 0, frequency);
+  }
 
   public long getStartTime() {
     return startTime;
@@ -26,11 +38,11 @@ public class Execution implements Comparable<Execution> {
     this.endTime = endTime;
   }
 
-  public long getId() {
+  public int getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(int id) {
     this.id = id;
   }
 

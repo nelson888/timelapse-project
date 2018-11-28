@@ -5,6 +5,11 @@ public class FileResponse {
   private Long size;
   private String name;
 
+  public FileResponse(Long size, String name) {
+    this.size = size;
+    this.name = name;
+  }
+
   public Long getSize() {
     return size;
   }
