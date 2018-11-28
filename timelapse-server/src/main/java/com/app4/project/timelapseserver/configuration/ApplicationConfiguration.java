@@ -13,8 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -28,12 +28,12 @@ public class ApplicationConfiguration {
   private static final int MAX_COMMANDS = 10;
 
   @Bean
-  public Queue<Execution> executionsQueue() {
+  public BlockingQueue<Execution> executionsQueue() {
     return new PriorityBlockingQueue<>(MAX_EXECUTIONS);
   }
 
   @Bean
-  public Queue<Command> commandsQueue() {
+  public BlockingQueue<Command> commandsQueue() {
     return new ArrayBlockingQueue<>(MAX_COMMANDS);
   }
 

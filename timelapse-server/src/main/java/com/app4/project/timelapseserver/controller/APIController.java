@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 
 @RestController
 @RequestMapping("/api")
@@ -27,11 +27,11 @@ public class APIController {
   private static final Logger LOGGER = LoggerFactory.getLogger(APIController.class);
 
   //thread-safe queue
-  private final Queue<Execution> executions;
-  private final Queue<Command> commands;
+  private final BlockingQueue<Execution> executions;
+  private final BlockingQueue<Command> commands;
   private volatile CameraState state;
 
-  public APIController(Queue<Execution> executions, Queue<Command> commands) {
+  public APIController(BlockingQueue<Execution> executions, BlockingQueue<Command> commands) {
     this.executions = executions;
     this.commands = commands;
     state = new CameraState();
