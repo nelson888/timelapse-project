@@ -32,7 +32,7 @@ public interface TimelapseClient {
 
   <T> void getImage(ResponseHandler<T> responseHandler, final Callback<T> callback, int executionId, int fileId);
 
-  Integer getImagesCount(int executionId, final Callback<Integer> callback);
+  void getImagesCount(int executionId, final Callback<Integer> callback); //TODO not compatible with async
 
   public void shutdown();
 }
