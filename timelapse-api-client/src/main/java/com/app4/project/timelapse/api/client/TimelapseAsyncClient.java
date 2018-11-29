@@ -15,7 +15,7 @@ public class TimelapseAsyncClient extends AbstractTimelapseClient {
   @Override
   <T> void executeRequest(RestClient client, RestRequest request,
       ResponseHandler<T> responseHandler, RestClient.Callback<T, T> callback) {
-    client.executeAsync(request);
+    client.executeAsync(request, responseHandler, callback);
   }
 
 }

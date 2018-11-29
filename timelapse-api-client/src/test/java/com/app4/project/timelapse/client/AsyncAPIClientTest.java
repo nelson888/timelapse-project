@@ -76,11 +76,11 @@ public class AsyncAPIClientTest {
   }
 
   @Test
-  public void putTest() throws InterruptedException {
+  public void postTest() throws InterruptedException {
     final CameraState state = new CameraState();
     state.setCameraWorking(true);
     state.setSleeping(true);
-    client.putCameraState(state, new Callback<CameraState>() {
+    client.postCameraState(state, new Callback<CameraState>() {
       @Override
       public void onSuccess(int responseCode, CameraState data) {
         assertNotNull("Shouldn't be null", data);

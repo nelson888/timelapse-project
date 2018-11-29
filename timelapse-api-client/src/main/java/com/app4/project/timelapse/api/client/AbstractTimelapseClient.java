@@ -49,8 +49,8 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
     postObject(API_ENDPOINT + "command", command, callback);
   }
 
-  public void putCameraState(CameraState cameraState, Callback<CameraState> callback) {
-    putObject(API_ENDPOINT + "state", cameraState, callback);
+  public void postCameraState(CameraState cameraState, Callback<CameraState> callback) {
+    postObject(API_ENDPOINT + "state", cameraState, callback);
   }
 
   public void postExecution(Execution execution, Callback<Execution> callback) {
