@@ -10,7 +10,7 @@ import com.tambapps.http.restclient.util.ISSupplier;
 
 import java.io.File;
 
-public interface TimelapseAPIClient {
+public interface TimelapseClient {
 
   void postCommand(Command command, Callback<Command> callback);
 
