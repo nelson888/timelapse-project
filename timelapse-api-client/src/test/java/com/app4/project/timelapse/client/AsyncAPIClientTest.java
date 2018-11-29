@@ -1,6 +1,7 @@
 package com.app4.project.timelapse.client;
 
 import com.app4.project.timelapse.api.client.Callback;
+import com.app4.project.timelapse.api.client.TimelapseAsyncClient;
 import com.app4.project.timelapse.api.client.TimelapseClient;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.ErrorResponse;
@@ -31,7 +32,7 @@ public class AsyncAPIClientTest {
 
   @Before
   public void init() {
-    client = new TimelapseClient("http://localhost:8080/", null);
+    client = new TimelapseAsyncClient("http://localhost:8080/", null);
      latch = new CountDownLatch(1);
   }
 
