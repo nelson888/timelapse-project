@@ -19,7 +19,7 @@ import com.tambapps.http.restclient.util.ISSupplier;
 
 import java.io.File;
 
-public class TimelapseClient {
+public class TimelapseClient implements TimelapseAPIClient {
 
   private static final String API_ENDPOINT = "api/";
   private static final String FILE_STORAGE_ENDPOINT = "files/";
@@ -45,20 +45,12 @@ public class TimelapseClient {
     client.setJwt(jwt);*/
   }
 
-  public void putCommand(Command command, Callback<Command> callback) {
-    putObject(API_ENDPOINT + "command", command, callback);
-  }
-
   public void postCommand(Command command, Callback<Command> callback) {
     postObject(API_ENDPOINT + "command", command, callback);
   }
 
   public void putCameraState(CameraState cameraState, Callback<CameraState> callback) {
     putObject(API_ENDPOINT + "state", cameraState, callback);
-  }
-
-  public void putExecution(Execution execution, Callback<Execution> callback) {
-    putObject(API_ENDPOINT + "execution", execution, callback);
   }
 
   public void postExecution(Execution execution, Callback<Execution> callback) {
@@ -90,7 +82,7 @@ public class TimelapseClient {
         generateRestCallback(callback, FileResponse.class));
   }
 
-    public void putImage(File file, Callback<FileResponse> callback, int executionId) {
+  public void putImage(File file, Callback<FileResponse> callback, int executionId) {
     RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId)
         .PUT()
         .output(BodyHandlers.multipartFile(file))
