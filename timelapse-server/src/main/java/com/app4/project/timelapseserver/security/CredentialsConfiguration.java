@@ -2,6 +2,7 @@ package com.app4.project.timelapseserver.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,7 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.servlet.http.HttpServletResponse;
 
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+@Order(99)
+public class CredentialsConfiguration  extends WebSecurityConfigurerAdapter  {
 
   @Autowired
   private UserDetailsService userDetailsService;
@@ -41,7 +43,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // What's the authenticationManager()?
         // An object provided by WebSecurityConfigurerAdapter, used to authenticate the user passing user's credentials
         // The filter needs this auth manager to authenticate the user.
-        .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtSecret, expirationTimeInMillis))
+        .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(),
+            jwtSecret, expirationTimeInMillis))
         .authorizeRequests()
         // allow all POST requests
         .antMatchers(HttpMethod.POST, "/auth").permitAll()
@@ -49,8 +52,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .anyRequest().authenticated();
   }
 
+  // Spring has UserDetailsService interface, which can be overriden to provide our implementation for fetching user from database (or any other source).
+  // The UserDetailsService object is used by the auth manager to load the user from database.
+  // In addition, we need to define the password encoder also. So, auth manager can compare and verify passwords.
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
   }
+
 }
