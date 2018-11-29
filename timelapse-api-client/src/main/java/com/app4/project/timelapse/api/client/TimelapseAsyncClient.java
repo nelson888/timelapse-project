@@ -8,8 +8,6 @@ import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 
 public class TimelapseAsyncClient extends AbstractTimelapseClient {
 
-
-
   public TimelapseAsyncClient(String baseUrl, User user) {
     super(baseUrl, user);
   }
@@ -20,7 +18,4 @@ public class TimelapseAsyncClient extends AbstractTimelapseClient {
     client.executeAsync(request);
   }
 
-  @Override public void shutdown() {
-
-  }
 }
