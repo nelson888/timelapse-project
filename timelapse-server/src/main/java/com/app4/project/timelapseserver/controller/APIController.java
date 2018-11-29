@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +38,7 @@ public class APIController {
     state = new CameraState();
   }
 
-  @PutMapping("/executions/new")
+  @PostMapping("/executions/new")
   public ResponseEntity addExecution(Execution execution) {
     if (executions.offer(execution)) {
       throw new BadRequestException("Max number of executions reached");
@@ -64,7 +65,7 @@ public class APIController {
     return ResponseEntity.ok(Boolean.FALSE);
   }
 
-  @PutMapping("/commands/new")
+  @PostMapping("/commands/new")
   public ResponseEntity addCommand(Command command) {
     if (commands.offer(command)) {
       throw new BadRequestException("Max number of commands reached");
