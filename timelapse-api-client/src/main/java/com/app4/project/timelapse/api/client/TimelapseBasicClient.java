@@ -17,7 +17,6 @@ public class TimelapseBasicClient {
   //just use a sync client and returns result
   private final TimelapseSyncClient client;
 
-
   public TimelapseBasicClient(String baseUrl, User user) {
     this.client = new TimelapseSyncClient(baseUrl, user);
   }
@@ -93,8 +92,6 @@ public class TimelapseBasicClient {
     client.deleteExecution(executionId, callback(responseRef));
     return responseRef.response;
   }
-
-
 
   private <T> Callback<T> callback(final ResponseRef<T> responseRef) {
     return new Callback<T>() {
