@@ -21,6 +21,9 @@ import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Pour les tests, il faut faire tourner le serveur localement
+ */
 abstract class APIClientTest {
 
   private static final int TIMEOUT = 4;
