@@ -38,8 +38,9 @@ public class APIController {
     state = new CameraState();
   }
 
-  @PostMapping("/executions/new")
+  @PostMapping("/executions")
   public ResponseEntity addExecution(Execution execution) {
+    execution.setId(executions.size());
     if (executions.offer(execution)) {
       throw new BadRequestException("Max number of executions reached");
     }
@@ -47,16 +48,20 @@ public class APIController {
     return ResponseEntity.ok(execution);
   }
 
-  @GetMapping("/executions/get")
-  public ResponseEntity consumeExecution() {
+  @GetMapping("/executions/{id}")
+  public ResponseEntity getExecution(@PathVariable int id) {
     if (executions.isEmpty()) {
       throw new BadRequestException("There isn't any execution to get");
     }
-    Execution execution = executions.element();
-    return ResponseEntity.ok(execution);
+    return ResponseEntity.ok(executions
+        .stream()
+        .filter(e -> e.getId() == id)
+        .findFirst()
+        .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"))
+    );
   }
 
-  @DeleteMapping("/executions/remove/{id}")
+  @DeleteMapping("/executions/{id}")
   public ResponseEntity removeExecution(@PathVariable int id) {
     if (executions.removeIf(e -> e.getId() == id)) {
       LOGGER.info("Execution with id {} was removed", id);
@@ -65,7 +70,7 @@ public class APIController {
     return ResponseEntity.ok(Boolean.FALSE);
   }
 
-  @PostMapping("/commands/new")
+  @PostMapping("/commands")
   public ResponseEntity addCommand(Command command) {
     if (commands.offer(command)) {
       throw new BadRequestException("Max number of commands reached");
