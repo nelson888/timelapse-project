@@ -18,7 +18,7 @@ public interface TimelapseClient {
 
   void postExecution(Execution execution, Callback<Execution> callback);
 
-  void getCommand(Callback<Command> callback);
+  void consumeCommand(Callback<Command> callback);
 
   void getExecution(Callback<Execution> callback);
 
@@ -33,6 +33,8 @@ public interface TimelapseClient {
   <T> void getImage(ResponseHandler<T> responseHandler, final Callback<T> callback, int executionId, int fileId);
 
   void getImagesCount(int executionId, final Callback<Integer> callback);
+
+  void deleteExecution(int executionId, Callback<Boolean> callback);
 
   void shutdown();
 }

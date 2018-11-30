@@ -46,7 +46,7 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   public void postCommand(Command command, Callback<Command> callback) {
-    postObject(API_ENDPOINT + "command", command, callback);
+    postObject(API_ENDPOINT + "commands", command, callback);
   }
 
   public void putCameraState(CameraState cameraState, Callback<CameraState> callback) {
@@ -54,11 +54,11 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   public void postExecution(Execution execution, Callback<Execution> callback) {
-    postObject(API_ENDPOINT + "execution", execution, callback);
+    postObject(API_ENDPOINT + "executions", execution, callback);
   }
 
-  public void getCommand(Callback<Command> callback) {
-    getObject(API_ENDPOINT + "command", Command.class, callback);
+  public void consumeCommand(Callback<Command> callback) {
+    getObject(API_ENDPOINT + "command/consume", Command.class, callback);
   }
 
   public void getExecution(Callback<Execution> callback) {
@@ -112,11 +112,11 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   public void getImagesCount(int executionId, final Callback<Integer> callback) {
-    RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId + "/count")
-        .GET()
-        .build();
-    executeRequest(client, request, ResponseHandlers.stringHandler(),
-        generateRestCallback(callback, Integer.class));
+    request(RestRequest.GET, FILE_STORAGE_ENDPOINT + executionId + "/count", Integer.class, callback);
+  }
+
+  public void deleteExecution(int executionId, Callback<Boolean> callback) {
+    request(RestRequest.DELETE, "executions/" + executionId, Boolean.class, callback);
   }
 
   public void shutdown() {
@@ -124,14 +124,22 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   private <T> void getObject(String endpoint, Class<T> clazz, Callback<T> callback) {
+    request(RestRequest.GET, endpoint, clazz, callback);
+  }
+
+  private <T> void deleteetObject(String endpoint, Class<T> clazz, Callback<T> callback) {
+    request(RestRequest.DELETE, endpoint, clazz, callback);
+  }
+
+  private <T> void request(String method, String endpoint, Class<T> clazz, Callback<T> callback) {
     RestRequest request = RestRequest.builder(endpoint)
-        .GET()
+        .method(method)
         .build();
     executeRequest(client, request, ResponseHandlers.stringHandler(),
         generateRestCallback(callback, clazz));
   }
 
-  private <T> void putObject(String endpoint, T object, Callback<T> callback) {
+    private <T> void putObject(String endpoint, T object, Callback<T> callback) {
     requestObject(RestRequest.PUT, endpoint, object, callback);
   }
 
