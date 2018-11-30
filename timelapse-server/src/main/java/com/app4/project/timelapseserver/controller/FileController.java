@@ -43,7 +43,7 @@ public class FileController {
 
   @GetMapping("/{executionId}/{fileId}")
   @ResponseBody
-  public ResponseEntity<Resource> serveFile(@PathVariable int executionId, @PathVariable int fileId) {
+  public ResponseEntity serveFile(@PathVariable int executionId, @PathVariable int fileId) {
     Resource file = storageService.loadAsResource(executionId, fileId);
     return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
         "attachment; filename=\"" + file.getFilename() + "\"").body(file);

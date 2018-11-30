@@ -1,8 +1,8 @@
 package com.app4.project.timelapseserver.service;
 
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
+import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.app4.project.timelapseserver.exception.FileStorageException;
-import com.app4.project.timelapseserver.exception.StorageFileNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +85,7 @@ public class StorageService {
       Path file = fileMap.get(getKey(executionId, fileId));
       if (file == null) {
         LOGGER.error("Couldn't get file with id " + fileId + " for execution with id " + executionId);
-        throw new StorageFileNotFoundException("Couldn't get file with id " + fileId + " for execution with id " + executionId);
+        throw new FileNotFoundException("Couldn't get file with id " + fileId + " for execution with id " + executionId);
       }
       Resource resource = new UrlResource(file.toUri());
       if (resource.exists() || resource.isReadable()) {
