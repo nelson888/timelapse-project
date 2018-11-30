@@ -92,7 +92,8 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   //RestResponseHandler: InputStream -> Bitmap avec BitmapFactory.decodeStream(is)
-  public <T> void getImage(ResponseHandler<T> responseHandler, final Callback<T> callback, int executionId, int fileId) {
+  public <T> void getImage(ResponseHandler<T> responseHandler, final Callback<T> callback,
+      int executionId, int fileId) {
     RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId + "/" + fileId)
         .GET()
         .build();
@@ -103,7 +104,8 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
             if (response.isSuccessful() && !response.isErrorResponse()) {
               callback.onSuccess(response.getResponseCode(), response.getSuccessData());
             } else {
-              callback.onError(response.getResponseCode(), new ErrorResponse(response.getErrorData()));
+              callback.onError(response.getResponseCode(),
+                  gson.fromJson(response.getErrorData(), ErrorResponse.class));
             }
           }
         });
@@ -125,7 +127,8 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
     RestRequest request = RestRequest.builder(endpoint)
         .GET()
         .build();
-    executeRequest(client, request, ResponseHandlers.stringHandler(), generateRestCallback(callback, clazz));
+    executeRequest(client, request, ResponseHandlers.stringHandler(),
+        generateRestCallback(callback, clazz));
   }
 
   private <T> void putObject(String endpoint, T object, Callback<T> callback) {
@@ -152,16 +155,20 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
       RestRequest request, ResponseHandler<T1> responseHandler,
       ResponseHandler<T2> errorHandler, RestClient.Callback<T1, T2> callback);
 
-  private <T> RestClient.Callback<String, String> generateRestCallback(final Callback<T> callback, final Class<T> clazz) {
+  private <T> RestClient.Callback<String, String> generateRestCallback(final Callback<T> callback,
+      final Class<T> clazz) {
     return new RestClient.Callback<String, String>() {
       @Override
       public void call(RestResponse<String, String> response) {
         if (response.isSuccessful()) {
-          callback.onSuccess(response.getResponseCode(), gson.fromJson(response.getSuccessData(), clazz));
+          callback.onSuccess(response.getResponseCode(),
+              gson.fromJson(response.getSuccessData(), clazz));
         } else if (response.isErrorResponse()) {
-          callback.onError(response.getResponseCode(), gson.fromJson(response.getErrorData(), ErrorResponse.class));
+          callback.onError(response.getResponseCode(), gson.fromJson(response.getErrorData(),
+              ErrorResponse.class));
         } else { //has exception
-          callback.onError(RestResponse.REQUEST_NOT_SENT, new ErrorResponse(response.getException().getMessage()));
+          callback.onError(RestResponse.REQUEST_NOT_SENT,
+              new ErrorResponse("Request failed to be sent", response.getException().getMessage()));
         }
       }
     };
