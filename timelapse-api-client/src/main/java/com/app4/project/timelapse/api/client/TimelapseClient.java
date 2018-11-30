@@ -20,7 +20,7 @@ public interface TimelapseClient {
 
   void consumeCommand(Callback<Command> callback);
 
-  void getExecution(Callback<Execution> callback);
+  void getExecution(int executionId, Callback<Execution> callback);
 
   void getGlobalState(Callback<GlobalState> callback);
 

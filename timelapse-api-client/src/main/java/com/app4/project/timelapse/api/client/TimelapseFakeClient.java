@@ -2,11 +2,11 @@ package com.app4.project.timelapse.api.client;
 
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
+import com.app4.project.timelapse.model.ErrorResponse;
 import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapse.model.FileResponse;
 import com.app4.project.timelapse.model.GlobalState;
-import com.google.gson.Gson;
-import com.tambapps.http.restclient.RestClient;
+
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 import com.tambapps.http.restclient.util.ISSupplier;
 
@@ -14,19 +14,13 @@ import java.io.File;
 import java.util.ArrayDeque;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 
 public class TimelapseFakeClient implements TimelapseClient {
-  private static final String API_ENDPOINT = "api/";
-  private static final String FILE_STORAGE_ENDPOINT = "files/";
   private static final int RESPONSE_SUCCESS = 200;
-  private final Gson gson = new Gson();
 
   private final Queue<Execution> executions = new PriorityQueue<>(10);
   private final Queue<Command> commands = new ArrayDeque<>();
   private CameraState cameraState = new CameraState();
-
 
   public void putCommand(Command command, Callback<Command> callback) {
     commands.add(command);
@@ -52,11 +46,21 @@ public class TimelapseFakeClient implements TimelapseClient {
   }
 
   public void consumeCommand(Callback<Command> callback) {
-    //TODO
+    if (commands.isEmpty()) {
+      callback.onError(23423, new ErrorResponse("Bad Request", "There isn't any command to get"));
+    } else {
+      callback.onSuccess(RESPONSE_SUCCESS, commands.remove());
+    }
   }
 
-  public void getExecution(Callback<Execution> callback) {
-    //TODO
+  public void getExecution(int executionId, Callback<Execution> callback) {
+    Execution e = findExecution(executionId);
+    if (e == null) {
+      callback.onError(324234,
+          new ErrorResponse("Bad Request", "Execution with id " + executionId + "doesn't exists"));
+    } else {
+      callback.onSuccess(RESPONSE_SUCCESS, e);
+    }
   }
 
   public void getGlobalState(Callback<GlobalState> callback) {
@@ -71,40 +75,43 @@ public class TimelapseFakeClient implements TimelapseClient {
 
   @Override
   public void putImage(ISSupplier isSupplier, Callback<FileResponse> callback, int executionId) {
-    //do nothing
+    putImage((File)null, callback, 0);
   }
 
   @Override
   public void putImage(File file, Callback<FileResponse> callback, int executionId) {
-    //do nothing
+    callback.onError(23424, new ErrorResponse("Fake client", "You cannot put any images"));
   }
 
   @Override
   public <T> void getImage(ResponseHandler<T> responseHandler, Callback<T> callback,
       int executionId, int fileId) {
-    //TODO store images locally
+    callback.onError(23424, new ErrorResponse("Fake client", "There isn't any images"));
   }
 
   @Override
   public void getImagesCount(int executionId, Callback<Integer> callback) {
-    //TODO
+    callback.onSuccess(RESPONSE_SUCCESS, 0);
   }
 
   @Override
   public void deleteExecution(int executionId, Callback<Boolean> callback) {
-    Execution toRemove = null;
-    for (Execution e : executions) {
-      if (e.getId() == executionId) {
-        toRemove = e;
-      }
-    }
-
-    callback.onSuccess(200, toRemove != null && executions.remove(toRemove));
+    Execution e = findExecution(executionId);
+    callback.onSuccess(200, e != null && executions.remove(e));
   }
 
 
 
   public void shutdown() {
 
+  }
+
+  private Execution findExecution(int id) {
+    for (Execution e : executions) {
+      if (e.getId() == id) {
+        return e;
+      }
+    }
+    return null;
   }
 }
