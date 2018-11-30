@@ -16,7 +16,7 @@ public class TimelapseResponse<T> {
 
   public TimelapseResponse(ErrorResponse response, int responseCode) {
     this.data = response;
-    this.isError = false;
+    this.isError = true;
     this.responseCode = responseCode;
   }
 
