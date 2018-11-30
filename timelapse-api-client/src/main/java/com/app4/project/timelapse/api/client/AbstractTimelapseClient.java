@@ -49,8 +49,8 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
     postObject(API_ENDPOINT + "command", command, callback);
   }
 
-  public void postCameraState(CameraState cameraState, Callback<CameraState> callback) {
-    postObject(API_ENDPOINT + "state", cameraState, callback);
+  public void putCameraState(CameraState cameraState, Callback<CameraState> callback) {
+    putObject(API_ENDPOINT + "state", cameraState, callback);
   }
 
   public void postExecution(Execution execution, Callback<Execution> callback) {
@@ -78,7 +78,7 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
         .PUT()
         .output(BodyHandlers.multipartStream(isSupplier, "image"))
         .build();
-    client.executeAsync(request, ResponseHandlers.stringHandler(),
+    executeRequest(client, request, ResponseHandlers.stringHandler(),
         generateRestCallback(callback, FileResponse.class));
   }
 
@@ -87,7 +87,7 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
         .PUT()
         .output(BodyHandlers.multipartFile(file))
         .build();
-    client.executeAsync(request, ResponseHandlers.stringHandler(),
+    executeRequest(client, request, ResponseHandlers.stringHandler(),
         generateRestCallback(callback, FileResponse.class));
   }
 
@@ -96,7 +96,7 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
     RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId + "/" + fileId)
         .GET()
         .build();
-    client.executeAsync(request, responseHandler, ResponseHandlers.stringHandler(),
+    executeRequest(client, request, responseHandler, ResponseHandlers.stringHandler(),
         new RestClient.Callback<T, String>() {
           @Override
           public void call(RestResponse<T, String> response) {
@@ -110,7 +110,11 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   public void getImagesCount(int executionId, final Callback<Integer> callback) {
-    //TODO
+    RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId + "/count")
+        .GET()
+        .build();
+    executeRequest(client, request, ResponseHandlers.stringHandler(),
+        generateRestCallback(callback, Integer.class));
   }
 
   public void shutdown() {
@@ -143,6 +147,10 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
 
   abstract <T> void executeRequest(RestClient client,
       RestRequest request, ResponseHandler<T> responseHandler, RestClient.Callback<T, T> callback);
+
+  abstract <T1, T2> void executeRequest(RestClient client,
+      RestRequest request, ResponseHandler<T1> responseHandler,
+      ResponseHandler<T2> errorHandler, RestClient.Callback<T1, T2> callback);
 
   private <T> RestClient.Callback<String, String> generateRestCallback(final Callback<T> callback, final Class<T> clazz) {
     return new RestClient.Callback<String, String>() {

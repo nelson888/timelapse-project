@@ -80,7 +80,7 @@ public class AsyncAPIClientTest {
     final CameraState state = new CameraState();
     state.setCameraWorking(true);
     state.setSleeping(true);
-    client.postCameraState(state, new Callback<CameraState>() {
+    client.putCameraState(state, new Callback<CameraState>() {
       @Override
       public void onSuccess(int responseCode, CameraState data) {
         assertNotNull("Shouldn't be null", data);
@@ -90,7 +90,7 @@ public class AsyncAPIClientTest {
 
       @Override
       public void onError(int responseCode, ErrorResponse response) {
-        System.err.println(response.getMessage());
+
       }
     });
     assertTrue("Should be true", latch.await(TIMEOUT, TimeUnit.SECONDS));
@@ -99,6 +99,7 @@ public class AsyncAPIClientTest {
   private InputStream getResourceStream() {
     return AsyncAPIClientTest.class.getResourceAsStream("/file.txt");
   }
+
   @Test
   public void putFile() throws InterruptedException {
     client.putImage(

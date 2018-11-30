@@ -14,7 +14,7 @@ public interface TimelapseClient {
 
   void postCommand(Command command, Callback<Command> callback);
 
-  void postCameraState(CameraState cameraState, Callback<CameraState> callback);
+  void putCameraState(CameraState cameraState, Callback<CameraState> callback);
 
   void postExecution(Execution execution, Callback<Execution> callback);
 
