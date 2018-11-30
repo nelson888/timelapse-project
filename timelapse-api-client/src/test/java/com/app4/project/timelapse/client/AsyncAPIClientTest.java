@@ -7,8 +7,8 @@ import com.app4.project.timelapse.model.User;
 public class AsyncAPIClientTest extends APIClientTest {
 
   @Override
-  TimelapseClient newClient(String baseUrl, User user) {
-    return new TimelapseAsyncClient(baseUrl, user);
+  TimelapseClient newClient(String baseUrl) {
+    return new TimelapseAsyncClient(baseUrl);
   }
 
 }

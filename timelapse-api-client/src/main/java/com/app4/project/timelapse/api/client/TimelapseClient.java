@@ -5,12 +5,15 @@ import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapse.model.FileResponse;
 import com.app4.project.timelapse.model.GlobalState;
+import com.app4.project.timelapse.model.User;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 import com.tambapps.http.restclient.util.ISSupplier;
 
 import java.io.File;
 
 public interface TimelapseClient {
+
+  void authenticate(User user, Callback<Boolean> callback); //TODO
 
   void postCommand(Command command, Callback<Command> callback);
 

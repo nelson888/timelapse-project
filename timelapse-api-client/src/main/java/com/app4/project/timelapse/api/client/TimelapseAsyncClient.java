@@ -1,15 +1,13 @@
 package com.app4.project.timelapse.api.client;
 
-import com.app4.project.timelapse.model.User;
-
 import com.tambapps.http.restclient.RestClient;
 import com.tambapps.http.restclient.request.RestRequest;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 
 public class TimelapseAsyncClient extends AbstractTimelapseClient {
 
-  public TimelapseAsyncClient(String baseUrl, User user) {
-    super(baseUrl, user);
+  public TimelapseAsyncClient(String baseUrl) {
+    super(baseUrl);
   }
 
   @Override

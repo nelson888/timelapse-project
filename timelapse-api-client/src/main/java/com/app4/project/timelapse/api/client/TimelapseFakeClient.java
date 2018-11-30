@@ -7,6 +7,7 @@ import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapse.model.FileResponse;
 import com.app4.project.timelapse.model.GlobalState;
 
+import com.app4.project.timelapse.model.User;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 import com.tambapps.http.restclient.util.ISSupplier;
 
@@ -100,7 +101,10 @@ public class TimelapseFakeClient implements TimelapseClient {
     callback.onSuccess(200, e != null && executions.remove(e));
   }
 
-
+  @Override
+  public void authenticate(User user, Callback<Boolean> callback) {
+    callback.onSuccess(200, true);
+  }
 
   public void shutdown() {
 

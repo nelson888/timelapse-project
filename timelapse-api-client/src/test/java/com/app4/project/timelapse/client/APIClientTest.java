@@ -29,10 +29,10 @@ abstract class APIClientTest {
 
   private static final Gson GSON = new Gson();
   private static final int TIMEOUT = 4;
-  private TimelapseClient client = newClient("http://localhost:8080/", null);
+  private TimelapseClient client = newClient("http://localhost:8080/");
   private CountDownLatch latch; //allows to wait until async code is executed
 
-  abstract TimelapseClient newClient(String baseUrl, User user);
+  abstract TimelapseClient newClient(String baseUrl);
 
   @Before
   public void init() {
