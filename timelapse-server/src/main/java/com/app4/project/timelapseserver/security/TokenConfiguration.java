@@ -35,10 +35,12 @@ public class TokenConfiguration extends WebSecurityConfigurerAdapter {
         .addFilterAfter(new JwtAuthFilter(jwtSecret), UsernamePasswordAuthenticationFilter.class)
         // authorization requests config
         .authorizeRequests()
-        // Any other request must be authenticated
-        .anyRequest().authenticated()
+        // allow all who are accessing "auth" service
+        .antMatchers(HttpMethod.POST, "/api/auth").permitAll()
         //TODO add other matchers ? or in the other?
-        .antMatchers(HttpMethod.PUT, "api/commands/new").hasAnyAuthority(Roles.ANDROID, Roles.ADMIN);
+        .antMatchers(HttpMethod.PUT, "api/commands/new").hasAnyAuthority(Roles.ANDROID, Roles.ADMIN)
+        // Any other request must be authenticated
+        .anyRequest().authenticated();
   }
 
 }

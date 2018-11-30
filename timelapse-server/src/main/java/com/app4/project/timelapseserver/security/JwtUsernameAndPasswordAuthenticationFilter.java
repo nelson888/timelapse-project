@@ -1,14 +1,11 @@
 package com.app4.project.timelapseserver.security;
 
-import com.app4.project.timelapse.model.User;
-import com.app4.project.timelapseserver.exception.BadRequestException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.authentication.UserCredentials;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -61,6 +58,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends
     try {
       // 1. Get credentials from request
       JsonNode jsonNode = OBJECT_MAPPER.readTree(request.getInputStream());
+      if (jsonNode == null) throw new IOException("There is no data");
       credentials = new UserCredentials(jsonNode.get("username").asText(),
           jsonNode.get("password").asText());
     } catch (IOException e) {
@@ -88,6 +86,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends
       FilterChain chain, Authentication auth) throws IOException, ServletException {
 
     Long now = System.currentTimeMillis();
+    Date expirationDate = new Date(now + expirationTimeInMillis);
     String token = Jwts.builder()
         .setSubject(auth.getName())
         // Convert to list of strings.
@@ -95,10 +94,11 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends
         .claim("authorities", auth.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
         .setIssuedAt(new Date(now))
-        .setExpiration(new Date(now + expirationTimeInMillis * 1000))
+        .setExpiration(expirationDate)
         .signWith(SignatureAlgorithm.HS512, jwtSecret.getBytes())
         .compact();
 
+    LOOGER.info("User " + auth.getName() + " successfully authenticated and its token will expire at " + String.format("%tc", expirationDate));
     // Add token to header
     response.addHeader(JwtAuthFilter.AUTHORIZATION, JwtAuthFilter.BEARER + " " + token);
   }

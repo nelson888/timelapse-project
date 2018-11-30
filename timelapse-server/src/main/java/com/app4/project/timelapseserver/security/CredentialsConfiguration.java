@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.servlet.http.HttpServletResponse;
 
-@EnableWebSecurity
+//@EnableWebSecurity
 @Order(99)
 public class CredentialsConfiguration  extends WebSecurityConfigurerAdapter  {
 
