@@ -55,7 +55,7 @@ abstract class APIClientTest {
 
       @Override
       public void onError(int responseCode, ErrorResponse response) {
-        System.err.println("Response code: " + response);
+        System.err.println("Response code: " + responseCode);
         System.err.println(GSON.toJson(response));
       }
     });
@@ -73,7 +73,7 @@ abstract class APIClientTest {
 
       @Override
       public void onError(int responseCode, ErrorResponse response) {
-        System.err.println("Response code: " + response);
+        System.err.println("Response code: " + responseCode);
         System.err.println(GSON.toJson(response));
       }
     });
@@ -95,7 +95,7 @@ abstract class APIClientTest {
 
       @Override
       public void onError(int responseCode, ErrorResponse response) {
-        System.err.println("Response code: " + response);
+        System.err.println("Response code: " + responseCode);
         System.err.println(GSON.toJson(response));
       }
     });
@@ -125,7 +125,7 @@ abstract class APIClientTest {
 
           @Override
           public void onError(int responseCode, ErrorResponse response) {
-            System.err.println("Response code: " + response);
+            System.err.println("Response code: " + responseCode);
             System.err.println(GSON.toJson(response));
           }
         }, 0);
@@ -147,7 +147,7 @@ abstract class APIClientTest {
 
           @Override
           public void onError(int responseCode, ErrorResponse response) {
-            System.err.println("Response code: " + response);
+            System.err.println("Response code: " + responseCode);
             System.err.println(GSON.toJson(response));
           }
         }, 0, 0);
