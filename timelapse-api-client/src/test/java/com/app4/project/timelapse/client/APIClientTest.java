@@ -10,6 +10,7 @@ import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.app4.project.timelapse.model.FileResponse;
 import com.app4.project.timelapse.model.User;
+import com.google.gson.Gson;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandlers;
 import com.tambapps.http.restclient.util.ISSupplier;
 import org.junit.After;
@@ -26,6 +27,7 @@ import java.util.concurrent.TimeUnit;
  */
 abstract class APIClientTest {
 
+  private static final Gson GSON = new Gson();
   private static final int TIMEOUT = 4;
   private TimelapseClient client = newClient("http://localhost:8080/", null);
   private CountDownLatch latch; //allows to wait until async code is executed
@@ -53,7 +55,8 @@ abstract class APIClientTest {
 
       @Override
       public void onError(int responseCode, ErrorResponse response) {
-
+        System.err.println("Response code: " + response);
+        System.err.println(GSON.toJson(response));
       }
     });
     assertTrue("Should be true", latch.await(TIMEOUT, TimeUnit.SECONDS));
@@ -70,7 +73,8 @@ abstract class APIClientTest {
 
       @Override
       public void onError(int responseCode, ErrorResponse response) {
-
+        System.err.println("Response code: " + response);
+        System.err.println(GSON.toJson(response));
       }
     });
     assertTrue("Should be true", latch.await(TIMEOUT, TimeUnit.SECONDS));
@@ -91,7 +95,8 @@ abstract class APIClientTest {
 
       @Override
       public void onError(int responseCode, ErrorResponse response) {
-
+        System.err.println("Response code: " + response);
+        System.err.println(GSON.toJson(response));
       }
     });
     assertTrue("Should be true", latch.await(TIMEOUT, TimeUnit.SECONDS));
@@ -120,7 +125,8 @@ abstract class APIClientTest {
 
           @Override
           public void onError(int responseCode, ErrorResponse response) {
-            System.err.println(response.getMessage());
+            System.err.println("Response code: " + response);
+            System.err.println(GSON.toJson(response));
           }
         }, 0);
 
@@ -141,7 +147,8 @@ abstract class APIClientTest {
 
           @Override
           public void onError(int responseCode, ErrorResponse response) {
-            System.err.println(response.getMessage());
+            System.err.println("Response code: " + response);
+            System.err.println(GSON.toJson(response));
           }
         }, 0, 0);
     assertTrue("Should be true", latch.await(TIMEOUT, TimeUnit.SECONDS));
