@@ -5,6 +5,7 @@ import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.app4.project.timelapseserver.exception.FileStorageException;
 
+import com.tambapps.common.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -60,7 +61,7 @@ public class StorageService {
 
     try (InputStream inputStream = multipartFile.getInputStream()) {
       int key = hash(executionId, fileMap.size());
-      Path filePath = executionPath.resolve("image_" + key + IMAGE_FORMAT);
+      Path filePath = executionPath.resolve("image_" + StringUtils.nDigitsNumber(key, 3) + IMAGE_FORMAT);
       LOGGER.info("Creating file in path {}", filePath);
       File file = filePath.toFile();
       if (!file.createNewFile()) {
@@ -81,7 +82,7 @@ public class StorageService {
   }
 
   private int hash(int executionId, int fileId) {
-    return Objects.hash(executionId, fileId);
+    return Objects.hash(executionId, fileId) - 961; //so that it starts at 0
   }
 
   public Resource loadAsResource(int executionId, int fileId) {
