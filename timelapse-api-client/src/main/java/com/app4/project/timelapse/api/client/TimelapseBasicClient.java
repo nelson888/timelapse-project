@@ -16,73 +16,73 @@ public class TimelapseBasicClient {
     this.client = new TimelapseSyncClient(baseUrl);
   }
 
-  TimelapseResponse<Command> postCommand(Command command) {
+  public TimelapseResponse<Command> postCommand(Command command) {
     final ResponseRef<Command> responseRef = new ResponseRef<>();
     client.postCommand(command, callback(responseRef));
     return responseRef.response;
   }
 
-  TimelapseResponse<CameraState> putCameraState(CameraState cameraState) {
+  public TimelapseResponse<CameraState> putCameraState(CameraState cameraState) {
     final ResponseRef<CameraState> responseRef = new ResponseRef<>();
     client.putCameraState(cameraState, callback(responseRef));
     return responseRef.response;
   }
 
-  TimelapseResponse<Execution> postExecution(Execution execution) {
+  public TimelapseResponse<Execution> postExecution(Execution execution) {
     final ResponseRef<Execution> responseRef = new ResponseRef<>();
     client.postExecution(execution, callback(responseRef));
     return responseRef.response;
   }
 
-  TimelapseResponse<Command> consumeCommand() {
+  public TimelapseResponse<Command> consumeCommand() {
     final ResponseRef<Command> responseRef = new ResponseRef<>();
     client.consumeCommand(callback(responseRef));
     return responseRef.response;
   }
 
-  TimelapseResponse<Execution> getExecution(int executionId) {
+  public TimelapseResponse<Execution> getExecution(int executionId) {
     final ResponseRef<Execution> responseRef = new ResponseRef<>();
     client.getExecution(executionId, callback(responseRef));
     return responseRef.response;
   }
 
-  TimelapseResponse<GlobalState> getGlobalState() {
+  public TimelapseResponse<GlobalState> getGlobalState() {
     final ResponseRef<GlobalState> responseRef = new ResponseRef<>();
     client.getGlobalState(callback(responseRef));
     return responseRef.response;
   }
 
-  TimelapseResponse<CameraState> getCameraState() {
+  public TimelapseResponse<CameraState> getCameraState() {
     final ResponseRef<CameraState> responseRef = new ResponseRef<>();
     client.getCameraState(callback(responseRef));
     return responseRef.response;
   }
 
-  TimelapseResponse<FileData> putImage(ISSupplier isSupplier, int executionId) {
+  public TimelapseResponse<FileData> putImage(ISSupplier isSupplier, int executionId) {
     final ResponseRef<FileData> responseRef = new ResponseRef<>();
     client.putImage(isSupplier, callback(responseRef), executionId);
     return responseRef.response;
   }
 
-  TimelapseResponse<FileData> putImage(File file, int executionId) {
+  public TimelapseResponse<FileData> putImage(File file, int executionId) {
     final ResponseRef<FileData> responseRef = new ResponseRef<>();
     client.putImage(file, callback(responseRef), executionId);
     return responseRef.response;
   }
 
-  <T> TimelapseResponse<T> getImage(ResponseHandler<T> responseHandler, int executionId, int fileId) {
+  public <T> TimelapseResponse<T> getImage(ResponseHandler<T> responseHandler, int executionId, int fileId) {
     final ResponseRef<T> responseRef = new ResponseRef<>();
     client.getImage(responseHandler, callback(responseRef), executionId, fileId);
     return responseRef.response;
   }
 
-  TimelapseResponse<Integer> getImagesCount(int executionId) {
+  public TimelapseResponse<Integer> getImagesCount(int executionId) {
     final ResponseRef<Integer> responseRef = new ResponseRef<>();
     client.getImagesCount(executionId, callback(responseRef));
     return responseRef.response;
   }
 
-  TimelapseResponse<Boolean> deleteExecution(int executionId) {
+  public TimelapseResponse<Boolean> deleteExecution(int executionId) {
     final ResponseRef<Boolean> responseRef = new ResponseRef<>();
     client.deleteExecution(executionId, callback(responseRef));
     return responseRef.response;

@@ -9,7 +9,6 @@ import com.app4.project.timelapse.api.client.TimelapseClient;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.app4.project.timelapse.model.FileData;
-import com.app4.project.timelapse.model.User;
 import com.google.gson.Gson;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandlers;
 import com.tambapps.http.restclient.util.ISSupplier;
@@ -27,12 +26,13 @@ import java.util.concurrent.TimeUnit;
  */
 abstract class APIClientTest {
 
+  static final String BASE_URL = "http://localhost:8080/";
   private static final Gson GSON = new Gson();
   private static final int TIMEOUT = 4;
-  private TimelapseClient client = newClient("http://localhost:8080/", null);
+  private TimelapseClient client = newClient(BASE_URL);
   private CountDownLatch latch; //allows to wait until async code is executed
 
-  abstract TimelapseClient newClient(String baseUrl, User user);
+  abstract TimelapseClient newClient(String baseUrl);
 
   @Before
   public void init() {

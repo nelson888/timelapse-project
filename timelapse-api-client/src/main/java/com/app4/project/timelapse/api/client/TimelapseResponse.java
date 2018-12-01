@@ -24,6 +24,10 @@ public class TimelapseResponse<T> {
     return isError;
   }
 
+  public boolean isSuccessful() {
+    return !isError();
+  }
+
   public T getData() {
     return (T) data;
   }
