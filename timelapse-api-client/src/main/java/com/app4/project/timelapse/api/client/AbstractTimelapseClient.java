@@ -22,7 +22,7 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   private final Gson gson = new Gson();
 
   //TODO handle authentication with server and jwt
-  public AbstractTimelapseClient(String baseUrl, User user) {
+  public AbstractTimelapseClient(String baseUrl) {
     client = new RestClient(baseUrl);
     //TODO authenticate handle jwt
     /*
@@ -118,6 +118,11 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
     client.shutDown();
   }
 
+  @Override
+  public void authenticate(User user, Callback<Boolean> callback) {
+    //TODO
+  }
+
   private <T> void getObject(String endpoint, Class<T> clazz, Callback<T> callback) {
     request(RestRequest.GET, endpoint, clazz, callback);
   }
@@ -134,7 +139,7 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
         generateRestCallback(callback, clazz));
   }
 
-    private <T> void putObject(String endpoint, T object, Callback<T> callback) {
+  private <T> void putObject(String endpoint, T object, Callback<T> callback) {
     requestObject(RestRequest.PUT, endpoint, object, callback);
   }
 

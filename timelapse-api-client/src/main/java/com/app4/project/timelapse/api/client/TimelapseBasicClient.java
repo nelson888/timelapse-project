@@ -12,8 +12,8 @@ public class TimelapseBasicClient {
   //just use a sync client and returns result
   private final TimelapseSyncClient client;
 
-  public TimelapseBasicClient(String baseUrl, User user) {
-    this.client = new TimelapseSyncClient(baseUrl, user);
+  public TimelapseBasicClient(String baseUrl) {
+    this.client = new TimelapseSyncClient(baseUrl);
   }
 
   TimelapseResponse<Command> postCommand(Command command) {

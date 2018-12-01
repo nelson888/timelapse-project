@@ -1,16 +1,14 @@
 package com.app4.project.timelapse.api.client;
 
-import com.app4.project.timelapse.model.CameraState;
-import com.app4.project.timelapse.model.Command;
-import com.app4.project.timelapse.model.Execution;
-import com.app4.project.timelapse.model.FileData;
-import com.app4.project.timelapse.model.GlobalState;
+import com.app4.project.timelapse.model.*;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 import com.tambapps.http.restclient.util.ISSupplier;
 
 import java.io.File;
 
 public interface TimelapseClient {
+
+  void authenticate(User user, Callback<Boolean> callback); //TODO
 
   void postCommand(Command command, Callback<Command> callback);
 

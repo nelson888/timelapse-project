@@ -1,11 +1,6 @@
 package com.app4.project.timelapse.api.client;
 
-import com.app4.project.timelapse.model.CameraState;
-import com.app4.project.timelapse.model.Command;
-import com.app4.project.timelapse.model.ErrorResponse;
-import com.app4.project.timelapse.model.Execution;
-import com.app4.project.timelapse.model.FileData;
-import com.app4.project.timelapse.model.GlobalState;
+import com.app4.project.timelapse.model.*;
 
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 import com.tambapps.http.restclient.util.ISSupplier;
@@ -16,6 +11,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class TimelapseFakeClient implements TimelapseClient {
+
   private static final int RESPONSE_SUCCESS = 200;
 
   private final Queue<Execution> executions = new PriorityQueue<>(10);
@@ -101,6 +97,10 @@ public class TimelapseFakeClient implements TimelapseClient {
   }
 
 
+  @Override
+  public void authenticate(User user, Callback<Boolean> callback) {
+    callback.onSuccess(RESPONSE_SUCCESS, true);
+  }
 
   public void shutdown() {
 
