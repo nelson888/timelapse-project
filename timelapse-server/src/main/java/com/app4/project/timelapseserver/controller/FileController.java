@@ -1,6 +1,6 @@
 package com.app4.project.timelapseserver.controller;
 
-import com.app4.project.timelapse.model.FileResponse;
+import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.service.StorageService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-
 @RestController
 @RequestMapping("/files")
 public class FileController {
@@ -31,9 +29,9 @@ public class FileController {
   @PutMapping("/{executionId}")
   public ResponseEntity uploadImage(@PathVariable int executionId,
       @RequestParam("image") MultipartFile multipartFile) {
-    File file = storageService.store(executionId, multipartFile);
+    FileData fileData = storageService.store(executionId, multipartFile);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(new FileResponse(file.length(), file.getName()));
+        .body(fileData);
   }
 
   @GetMapping("/{executionId}/count")
@@ -46,7 +44,16 @@ public class FileController {
   public ResponseEntity serveFile(@PathVariable int executionId, @PathVariable int fileId) {
     Resource file = storageService.loadAsResource(executionId, fileId);
     return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-        "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+      "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+  }
+
+  @GetMapping("/{executionId}/{fileId}")
+  @ResponseBody
+  public ResponseEntity getFileData(@PathVariable int executionId, @PathVariable int fileId) {
+    FileData fileData = storageService.getFileData(executionId, fileId);
+    return ResponseEntity
+      .ok()
+      .body(fileData);
   }
 
 }

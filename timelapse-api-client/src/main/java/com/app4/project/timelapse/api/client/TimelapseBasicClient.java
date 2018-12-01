@@ -1,12 +1,7 @@
 package com.app4.project.timelapse.api.client;
 
-import com.app4.project.timelapse.model.CameraState;
-import com.app4.project.timelapse.model.Command;
-import com.app4.project.timelapse.model.ErrorResponse;
-import com.app4.project.timelapse.model.Execution;
-import com.app4.project.timelapse.model.FileResponse;
-import com.app4.project.timelapse.model.GlobalState;
-import com.app4.project.timelapse.model.User;
+import com.app4.project.timelapse.model.*;
+import com.app4.project.timelapse.model.FileData;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 import com.tambapps.http.restclient.util.ISSupplier;
 
@@ -63,14 +58,14 @@ public class TimelapseBasicClient {
     return responseRef.response;
   }
 
-  TimelapseResponse<FileResponse> putImage(ISSupplier isSupplier, int executionId) {
-    final ResponseRef<FileResponse> responseRef = new ResponseRef<>();
+  TimelapseResponse<FileData> putImage(ISSupplier isSupplier, int executionId) {
+    final ResponseRef<FileData> responseRef = new ResponseRef<>();
     client.putImage(isSupplier, callback(responseRef), executionId);
     return responseRef.response;
   }
 
-  TimelapseResponse<FileResponse> putImage(File file, int executionId) {
-    final ResponseRef<FileResponse> responseRef = new ResponseRef<>();
+  TimelapseResponse<FileData> putImage(File file, int executionId) {
+    final ResponseRef<FileData> responseRef = new ResponseRef<>();
     client.putImage(file, callback(responseRef), executionId);
     return responseRef.response;
   }

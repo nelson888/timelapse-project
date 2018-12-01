@@ -1,5 +1,6 @@
 package com.app4.project.timelapseserver.service;
 
+import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.app4.project.timelapseserver.exception.FileStorageException;
@@ -32,6 +33,7 @@ public class StorageService {
 
   private final Path rootPath;
   private final Map<Integer, Path> fileMap = new ConcurrentHashMap<>();
+  private final Map<Integer, FileData> fileDataMap = new ConcurrentHashMap<>();
 
   public StorageService(Path rootPath) {
     this.rootPath = rootPath;
@@ -51,13 +53,13 @@ public class StorageService {
     LOGGER.info("Storage Service was successfully instantiated");
   }
 
-  public File store(int executionId, MultipartFile multipartFile) {
+  public FileData store(int executionId, MultipartFile multipartFile) {
     LOGGER.info("attempting to store {} for executionId {}...", multipartFile.getOriginalFilename(), executionId);
 
     Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
 
     try (InputStream inputStream = multipartFile.getInputStream()) {
-      int key = getKey(executionId, fileMap.size());
+      int key = hash(executionId, fileMap.size());
       Path filePath = executionPath.resolve("image_" + key + IMAGE_FORMAT);
       LOGGER.info("Creating file in path {}", filePath);
       File file = filePath.toFile();
@@ -68,24 +70,25 @@ public class StorageService {
       Files.copy(inputStream, filePath,
           StandardCopyOption.REPLACE_EXISTING);
       fileMap.put(key, filePath);
+      FileData fileData = new FileData(file.length(), file.getName(), System.currentTimeMillis(), executionId, key);
+      fileDataMap.put(key, fileData);
       LOGGER.info("Saved file successfully");
-      return file;
+      return fileData;
     } catch (IOException e) {
       LOGGER.error("Error while writing file", e);
       throw new FileStorageException(e.getMessage(), e);
     }
   }
 
-  private int getKey(int executionId, int fileId) {
+  private int hash(int executionId, int fileId) {
     return Objects.hash(executionId, fileId);
   }
 
   public Resource loadAsResource(int executionId, int fileId) {
     try {
-      Path file = fileMap.get(getKey(executionId, fileId));
+      Path file = fileMap.get(hash(executionId, fileId));
       if (file == null) {
-        LOGGER.error("Couldn't get file with id " + fileId + " for execution with id " + executionId);
-        throw new FileNotFoundException("Couldn't get file with id " + fileId + " for execution with id " + executionId);
+        throw new FileNotFoundException(String.format("The file with id %d for execution %d doesn't exists", fileId, executionId));
       }
       Resource resource = new UrlResource(file.toUri());
       if (resource.exists() || resource.isReadable()) {
@@ -103,5 +106,14 @@ public class StorageService {
 
   public int nbFiles(int executionId) {
     return Objects.requireNonNull(rootPath.resolve(FOLDER_PREFIX + executionId).toFile().list()).length;
+  }
+
+  public FileData getFileData(int executionId, int fileId) {
+    FileData fileData =  fileDataMap.get(hash(executionId, fileId));
+    if (fileData == null) {
+      throw new FileNotFoundException(
+        String.format("The file with id %d for execution %d doesn't exists", fileId, executionId));
+    }
+    return fileData;
   }
 }

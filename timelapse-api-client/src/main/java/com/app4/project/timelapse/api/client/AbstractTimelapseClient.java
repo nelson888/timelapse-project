@@ -1,12 +1,7 @@
 package com.app4.project.timelapse.api.client;
 
-import com.app4.project.timelapse.model.CameraState;
-import com.app4.project.timelapse.model.Command;
-import com.app4.project.timelapse.model.ErrorResponse;
-import com.app4.project.timelapse.model.Execution;
-import com.app4.project.timelapse.model.FileResponse;
-import com.app4.project.timelapse.model.GlobalState;
-import com.app4.project.timelapse.model.User;
+import com.app4.project.timelapse.model.*;
+import com.app4.project.timelapse.model.FileData;
 import com.google.gson.Gson;
 import com.tambapps.http.restclient.RestClient;
 import com.tambapps.http.restclient.request.RestRequest;
@@ -73,22 +68,22 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
     getObject(API_ENDPOINT + "state", CameraState.class, callback);
   }
 
-  public void putImage(ISSupplier isSupplier, Callback<FileResponse> callback, int executionId) {
+  public void putImage(ISSupplier isSupplier, Callback<FileData> callback, int executionId) {
     RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId)
         .PUT()
         .output(BodyHandlers.multipartStream(isSupplier, "image"))
         .build();
     executeRequest(client, request, ResponseHandlers.stringHandler(),
-        generateRestCallback(callback, FileResponse.class));
+        generateRestCallback(callback, FileData.class));
   }
 
-  public void putImage(File file, Callback<FileResponse> callback, int executionId) {
+  public void putImage(File file, Callback<FileData> callback, int executionId) {
     RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId)
         .PUT()
         .output(BodyHandlers.multipartFile(file))
         .build();
     executeRequest(client, request, ResponseHandlers.stringHandler(),
-        generateRestCallback(callback, FileResponse.class));
+        generateRestCallback(callback, FileData.class));
   }
 
   //RestResponseHandler: InputStream -> Bitmap avec BitmapFactory.decodeStream(is)

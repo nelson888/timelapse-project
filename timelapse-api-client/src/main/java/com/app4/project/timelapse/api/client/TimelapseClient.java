@@ -3,7 +3,7 @@ package com.app4.project.timelapse.api.client;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.Execution;
-import com.app4.project.timelapse.model.FileResponse;
+import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapse.model.GlobalState;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 import com.tambapps.http.restclient.util.ISSupplier;
@@ -26,9 +26,9 @@ public interface TimelapseClient {
 
   void getCameraState(Callback<CameraState> callback);
 
-  void putImage(ISSupplier isSupplier, Callback<FileResponse> callback, int executionId);
+  void putImage(ISSupplier isSupplier, Callback<FileData> callback, int executionId);
 
-  void putImage(File file, Callback<FileResponse> callback, int executionId);
+  void putImage(File file, Callback<FileData> callback, int executionId);
 
   <T> void getImage(ResponseHandler<T> responseHandler, final Callback<T> callback, int executionId, int fileId);
 

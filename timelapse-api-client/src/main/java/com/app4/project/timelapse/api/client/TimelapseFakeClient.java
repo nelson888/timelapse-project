@@ -4,7 +4,7 @@ import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.app4.project.timelapse.model.Execution;
-import com.app4.project.timelapse.model.FileResponse;
+import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapse.model.GlobalState;
 
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
@@ -74,12 +74,12 @@ public class TimelapseFakeClient implements TimelapseClient {
   }
 
   @Override
-  public void putImage(ISSupplier isSupplier, Callback<FileResponse> callback, int executionId) {
+  public void putImage(ISSupplier isSupplier, Callback<FileData> callback, int executionId) {
     putImage((File)null, callback, 0);
   }
 
   @Override
-  public void putImage(File file, Callback<FileResponse> callback, int executionId) {
+  public void putImage(File file, Callback<FileData> callback, int executionId) {
     callback.onError(23424, new ErrorResponse("Fake client", "You cannot put any images"));
   }
 

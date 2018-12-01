@@ -8,7 +8,7 @@ import com.app4.project.timelapse.api.client.Callback;
 import com.app4.project.timelapse.api.client.TimelapseClient;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.ErrorResponse;
-import com.app4.project.timelapse.model.FileResponse;
+import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapse.model.User;
 import com.google.gson.Gson;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandlers;
@@ -115,9 +115,9 @@ abstract class APIClientTest {
             return getResourceStream();
           }
         },
-        new Callback<FileResponse>() {
+        new Callback<FileData>() {
           @Override
-          public void onSuccess(int responseCode, FileResponse data) {
+          public void onSuccess(int responseCode, FileData data) {
             assertNotNull("Shouldn't be null", data);
             latch.countDown();
 
