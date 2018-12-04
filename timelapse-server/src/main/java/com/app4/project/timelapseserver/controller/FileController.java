@@ -47,7 +47,7 @@ public class FileController {
       "attachment; filename=\"" + file.getFilename() + "\"").body(file);
   }
 
-  @GetMapping("/{executionId}/{fileId}")
+  @GetMapping("/{executionId}/{fileId}/data")
   @ResponseBody
   public ResponseEntity getFileData(@PathVariable int executionId, @PathVariable int fileId) {
     FileData fileData = storageService.getFileData(executionId, fileId);
