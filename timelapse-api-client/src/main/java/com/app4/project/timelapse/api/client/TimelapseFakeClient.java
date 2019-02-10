@@ -7,6 +7,7 @@ import com.tambapps.http.restclient.util.ISSupplier;
 
 import java.io.File;
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -15,8 +16,20 @@ public class TimelapseFakeClient implements TimelapseClient {
   private static final int RESPONSE_SUCCESS = 200;
 
   private final Queue<Execution> executions = new PriorityQueue<>(10);
-  private final Queue<Command> commands = new ArrayDeque<>();
+  private final Queue<Command> commands = new PriorityQueue<>();
   private CameraState cameraState = new CameraState();
+
+  public TimelapseFakeClient() {
+    long now = new Date().getTime();
+    long eightHours = 8 * 60 * 60 * 1000;
+    executions.add(new Execution("Pop corne qui explose", now, now + eightHours, 250));
+    executions.add(new Execution("Eclosion d'une fleur", now + eightHours * 4, now + eightHours * 6, 500));
+    executions.add(new Execution("Execution 3", now + eightHours * 25, now + eightHours * 26, 150));
+
+
+    commands.add(new Command("SLEEP", null));
+    cameraState.setCameraWorking(true);
+  }
 
   public void putCommand(Command command, Callback<Command> callback) {
     commands.add(command);
