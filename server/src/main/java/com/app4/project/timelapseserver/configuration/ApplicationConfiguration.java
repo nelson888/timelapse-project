@@ -5,6 +5,8 @@ import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapse.model.User;
 import com.app4.project.timelapseserver.repository.LocalUserRepository;
 import com.app4.project.timelapseserver.repository.UserRepository;
+import com.app4.project.timelapseserver.service.FirebaseStorageService;
+import com.app4.project.timelapseserver.service.StorageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,9 +23,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 @Configuration
 public class ApplicationConfiguration {
 
-  @Value("${storage.root.path}")
-  private String rootPath;
-
   public static final int MAX_EXECUTIONS = 10;
   private static final int MAX_COMMANDS = 10;
 
@@ -38,8 +37,8 @@ public class ApplicationConfiguration {
   }
 
   @Bean
-  public Path rootPath() {
-    return Paths.get(rootPath.replaceFirst("^~", System.getProperty("user.home")));
+  public StorageService storageService() {
+    return new FirebaseStorageService();
   }
 
   @Bean
