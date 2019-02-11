@@ -6,3 +6,4 @@ target/*
 *.iml
 **/target/
 .attach_pid*
+server_heroku_build/
