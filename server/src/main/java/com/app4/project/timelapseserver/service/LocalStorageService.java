@@ -5,12 +5,10 @@ import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.app4.project.timelapseserver.exception.FileStorageException;
 
-import com.tambapps.commons.string.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -61,7 +59,7 @@ public class LocalStorageService implements StorageService {
 
     try (InputStream inputStream = multipartFile.getInputStream()) {
       int key = hash(executionId, fileMap.size());
-      Path filePath = executionPath.resolve("image_" + StringUtils.nDigitsNumber(key, 3) + IMAGE_FORMAT);
+      Path filePath = executionPath.resolve("image_" + nDigitsNumber(key, 3) + IMAGE_FORMAT);
       LOGGER.info("Creating file in path {}", filePath);
       File file = filePath.toFile();
       if (!file.createNewFile()) {
@@ -119,5 +117,15 @@ public class LocalStorageService implements StorageService {
         String.format("The file with id %d for execution %d doesn't exists", fileId, executionId));
     }
     return fileData;
+  }
+
+  private static String nDigitsNumber(int number, int n) {
+    StringBuilder sNumber = (new StringBuilder()).append(number);
+
+    while(sNumber.length() < n) {
+      sNumber.insert(0, '0');
+    }
+
+    return sNumber.toString();
   }
 }
