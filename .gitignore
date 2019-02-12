@@ -8,3 +8,4 @@ target/*
 **/target/
 .attach_pid*
 server/src/main/java/com/app4/project/timelapse
+firebase-adminsdk.json
