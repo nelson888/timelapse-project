@@ -9,4 +9,6 @@ public class Command {
     this.arguments = arguments;
   }
 
+  public Command() {
+  }
 }

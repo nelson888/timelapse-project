@@ -16,6 +16,9 @@ public class FileData {
     this.fileId = fileId;
   }
 
+  public FileData() {
+  }
+
   public Long getSize() {
     return size;
   }

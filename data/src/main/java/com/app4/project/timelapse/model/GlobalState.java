@@ -13,6 +13,9 @@ public class GlobalState {
     this.commandsPending = commandsPending;
   }
 
+  public GlobalState() {
+  }
+
   public CameraState getState() {
     return state;
   }

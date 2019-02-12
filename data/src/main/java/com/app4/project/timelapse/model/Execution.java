@@ -22,6 +22,8 @@ public class Execution implements Comparable<Execution> {
     this(title, startTime, endTime, 0, frequency);
   }
 
+  public Execution() { }
+
   public long getStartTime() {
     return startTime;
   }
