@@ -7,12 +7,17 @@ import com.app4.project.timelapseserver.repository.LocalUserRepository;
 import com.app4.project.timelapseserver.repository.UserRepository;
 import com.app4.project.timelapseserver.service.FirebaseStorageService;
 import com.app4.project.timelapseserver.service.StorageService;
-import org.springframework.beans.factory.annotation.Value;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Bucket;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.StorageClient;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -37,8 +42,8 @@ public class ApplicationConfiguration {
   }
 
   @Bean
-  public StorageService storageService() {
-    return new FirebaseStorageService();
+  public StorageService storageService(Bucket bucket) {
+    return new FirebaseStorageService(bucket);
   }
 
   @Bean
@@ -49,5 +54,20 @@ public class ApplicationConfiguration {
   @Bean
   public UserRepository userRepository() {
     return new LocalUserRepository(Arrays.asList(new User("android", "android"), new User("timelapse", "timelapse")));
+  }
+
+  @Bean
+  public StorageClient storageClient() throws IOException {
+    FirebaseOptions options = new FirebaseOptions.Builder()
+      .setCredentials(GoogleCredentials.fromStream(ApplicationConfiguration.class.getResourceAsStream("/private/firebase-adminsdk.json")))
+      .setDatabaseUrl("https://timelapse-server.firebaseio.com")
+      .build();
+    FirebaseApp.initializeApp(options);
+    return StorageClient.getInstance();
+  }
+
+  @Bean
+  public Bucket bucket(StorageClient storageClient) {
+    return storageClient.bucket();
   }
 }
