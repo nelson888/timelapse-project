@@ -81,4 +81,16 @@ public class Execution implements Comparable<Execution> {
   public int compareTo(Execution execution) {
     return (int) (execution.startTime - startTime);
   }
+
+
+  @Override
+  public String toString() {
+    return "Execution{" +
+      "title='" + title + '\'' +
+      ", startTime=" + startTime +
+      ", endTime=" + endTime +
+      ", id=" + id +
+      ", frequency=" + frequency +
+      '}';
+  }
 }
