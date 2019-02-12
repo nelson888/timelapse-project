@@ -41,7 +41,7 @@ public class APIController {
   @PostMapping("/executions")
   public ResponseEntity addExecution(Execution execution) {
     execution.setId(executions.size());
-    if (executions.offer(execution)) {
+    if (!executions.offer(execution)) {
       throw new BadRequestException("Max number of executions reached");
     }
     LOGGER.info("New execution was added: {}", execution);
