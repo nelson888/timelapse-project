@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "data.h"
+#include "src/data.h"
 
 using namespace std;
 
