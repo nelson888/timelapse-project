@@ -3,7 +3,8 @@ bin/*
 target/*
 **/*.jar
 .idea/
+.mvn/
 *.iml
 **/target/
 .attach_pid*
-server_heroku_build/
+server/src/main/java/com/app4/project/timelapse
