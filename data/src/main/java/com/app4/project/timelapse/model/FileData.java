@@ -47,4 +47,14 @@ public class FileData {
     return fileId;
   }
 
+  @Override
+  public String toString() {
+    return "FileData{" +
+      "size=" + size +
+      ", name='" + name + '\'' +
+      ", uploadTimestamp=" + uploadTimestamp +
+      ", executionId=" + executionId +
+      ", fileId=" + fileId +
+      '}';
+  }
 }
