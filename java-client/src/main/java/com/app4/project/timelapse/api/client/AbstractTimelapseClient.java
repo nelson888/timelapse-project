@@ -17,7 +17,7 @@ import java.io.File;
 abstract class AbstractTimelapseClient implements TimelapseClient {
 
   private static final String API_ENDPOINT = "api/";
-  private static final String FILE_STORAGE_ENDPOINT = "files/";
+  private static final String FILE_STORAGE_ENDPOINT = "storage/";
   private final RestClient client;
   private final Gson gson = new Gson();
 

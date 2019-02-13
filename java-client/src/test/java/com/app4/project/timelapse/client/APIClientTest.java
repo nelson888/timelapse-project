@@ -10,8 +10,11 @@ import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.ErrorResponse;
 import com.app4.project.timelapse.model.FileData;
 import com.google.gson.Gson;
+
 import com.tambapps.http.restclient.request.handler.response.ResponseHandlers;
+import com.tambapps.http.restclient.util.BytesContainer;
 import com.tambapps.http.restclient.util.ISSupplier;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -136,12 +139,11 @@ abstract class APIClientTest {
   @Test
   public void getFile() throws InterruptedException {
     final String fileData = new Scanner(getResourceStream()).useDelimiter("\\A").next();
-    client.getImage(ResponseHandlers.stringHandler(),
-        new Callback<String>() {
+    client.getImage(ResponseHandlers.multipartBytesHandler(),
+        new Callback<BytesContainer>() {
           @Override
-          public void onSuccess(int responseCode, String data) {
+          public void onSuccess(int responseCode, BytesContainer data) {
             assertNotNull("Shouldn't be null", data);
-            assertEquals("Should be equal", fileData, data);
             latch.countDown();
           }
 
