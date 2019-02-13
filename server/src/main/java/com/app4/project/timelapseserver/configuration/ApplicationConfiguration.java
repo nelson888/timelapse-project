@@ -68,6 +68,6 @@ public class ApplicationConfiguration {
 
   @Bean
   public Bucket bucket(StorageClient storageClient) {
-    return storageClient.bucket();
+    return storageClient.bucket("timelapse-server.appspot.com");
   }
 }

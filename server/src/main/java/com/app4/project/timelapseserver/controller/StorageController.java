@@ -16,19 +16,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
-@RequestMapping("/files")
-public class FileController {
+@RequestMapping("/storage")
+public class StorageController {
 
   private final StorageService storageService;
 
-  public FileController(StorageService storageService) {
+  public StorageController(StorageService storageService) {
     this.storageService = storageService;
   }
 
   @PutMapping("/{executionId}")
   public ResponseEntity uploadImage(@PathVariable int executionId,
-      @RequestParam("image") MultipartFile multipartFile) {
+      @RequestParam("image") MultipartFile multipartFile) throws IOException {
     FileData fileData = storageService.store(executionId, multipartFile);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(fileData);

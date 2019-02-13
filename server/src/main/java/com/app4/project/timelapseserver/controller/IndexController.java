@@ -8,7 +8,7 @@ public class IndexController {
 
   @GetMapping("/")
   public String index() {
-    return "I WORK";
+    return "Go to \n\tapi/ for api end point and\n\tstorage/ for storage endpoint";
   }
 
 }
