@@ -79,7 +79,7 @@ public class Execution implements Comparable<Execution> {
 
   @Override
   public int compareTo(Execution execution) {
-    return (int) (execution.startTime - startTime);
+    return (int) (startTime - execution.startTime);
   }
 
 

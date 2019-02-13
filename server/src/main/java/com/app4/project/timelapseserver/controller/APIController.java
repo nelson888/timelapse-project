@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 
 @RestController
@@ -49,16 +50,24 @@ public class APIController {
     return ResponseEntity.ok(execution);
   }
 
+  @GetMapping("/executions/closest")
+  public ResponseEntity lastExecution() {
+    if (executions.isEmpty()) {
+      throw new BadRequestException("There isn't any execution to get");
+    }
+    return ResponseEntity.ok(executions.peek());
+  }
+
   @GetMapping("/executions/{id}")
   public ResponseEntity getExecution(@PathVariable int id) {
     if (executions.isEmpty()) {
       throw new BadRequestException("There isn't any execution to get");
     }
     return ResponseEntity.ok(executions
-        .stream()
-        .filter(e -> e.getId() == id)
-        .findFirst()
-        .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"))
+      .stream()
+      .filter(e -> e.getId() == id)
+      .findFirst()
+      .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"))
     );
   }
 
@@ -109,12 +118,14 @@ public class APIController {
 
   @GetMapping("/globalState")
   public ResponseEntity globalState() {
-    GlobalState globalState = new GlobalState(state, this.executions.toArray(new Execution[0]),
+    Execution[] executions = this.executions.toArray(new Execution[0]);
+    Arrays.sort(executions); //sort in startTime order (the soon to far)
+    GlobalState globalState = new GlobalState(state, executions,
         commands.toArray(new Command[0]));
     return ResponseEntity.ok(globalState);
   }
 
-  @PostConstruct
+  @PostConstruct //TODO TO REMOVE ONCE WE HAVE REAL DATA
   public void fillWithFakeData() {
     LOGGER.info("Filling the server with fake data");
     long now = System.currentTimeMillis();

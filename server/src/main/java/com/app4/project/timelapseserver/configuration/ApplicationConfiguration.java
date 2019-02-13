@@ -13,12 +13,14 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.StorageClient;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -30,6 +32,11 @@ public class ApplicationConfiguration {
 
   public static final int MAX_EXECUTIONS = 10;
   private static final int MAX_COMMANDS = 10;
+
+  @Value("${firebase.database.url}")
+  private String databaseUrl;
+  @Value("${firebase.storage.bucket}")
+  private String storageBucket;
 
   @Bean
   public BlockingQueue<Execution> executionsQueue() {
@@ -60,7 +67,7 @@ public class ApplicationConfiguration {
   public StorageClient storageClient() throws IOException {
     FirebaseOptions options = new FirebaseOptions.Builder()
       .setCredentials(GoogleCredentials.fromStream(ApplicationConfiguration.class.getResourceAsStream("/private/firebase-adminsdk.json")))
-      .setDatabaseUrl("https://timelapse-server.firebaseio.com")
+      .setDatabaseUrl(databaseUrl)
       .build();
     FirebaseApp.initializeApp(options);
     return StorageClient.getInstance();
@@ -68,6 +75,6 @@ public class ApplicationConfiguration {
 
   @Bean
   public Bucket bucket(StorageClient storageClient) {
-    return storageClient.bucket("timelapse-server.appspot.com");
+    return storageClient.bucket(storageBucket);
   }
 }
