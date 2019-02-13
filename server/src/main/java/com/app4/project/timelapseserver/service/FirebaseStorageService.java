@@ -8,6 +8,8 @@ import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,12 +24,13 @@ import java.util.stream.StreamSupport;
 
 public class FirebaseStorageService implements StorageService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(FirebaseStorageService.class);
   private final Bucket bucket;
   private final Map<Integer, Integer> executionFileCount = new ConcurrentHashMap<>();
 
   public FirebaseStorageService(Bucket bucket) {
     this.bucket = bucket;
-
+    LOGGER.info("Starting Firebase Storage Service...");
     for (int i = 0; i < MAX_EXECUTIONS; i++) {
       executionFileCount.put(i, 0);
     }
@@ -44,14 +47,16 @@ public class FirebaseStorageService implements StorageService {
         fileId++;
       }
     }
+    LOGGER.info("Started Firebase Storage Service successfully");
   }
 
   @Override
   public FileData store(int executionId, MultipartFile multipartFile) throws IOException {
     int fileId = executionFileCount.get(executionId);
-    String fileName = "" + hash(executionId, fileId);
-    Blob blob = bucket.create("executions/" + executionId + "/" + fileName,
+    String fileName = String.valueOf(hash(executionId, fileId));
+    Blob blob = bucket.create(fileName,
       multipartFile.getBytes());
+    executionFileCount.put(executionId, fileId + 1);
     return new FileData(blob.getSize(), fileName, blob.getCreateTime(), executionId, fileId);
   }
 

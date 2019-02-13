@@ -2,6 +2,8 @@ package com.app4.project.timelapseserver.controller;
 
 import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.service.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
