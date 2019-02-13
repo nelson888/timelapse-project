@@ -128,4 +128,15 @@ public class LocalStorageService implements StorageService {
 
     return sNumber.toString();
   }
+
+  @Override
+  public void deleteForExecution(final int executionId) {
+    int h;
+    int fileId = 0;
+    while (fileMap.containsKey(h = hash(executionId, fileId))) {
+      fileMap.remove(h).toFile().delete();
+      fileDataMap.remove(h);
+      fileId++;
+    }
+  }
 }

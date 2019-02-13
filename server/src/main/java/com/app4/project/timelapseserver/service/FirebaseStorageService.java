@@ -86,4 +86,13 @@ public class FirebaseStorageService implements StorageService {
   private int hash(int executionId, int fileId) {
     return Objects.hash(executionId, fileId) - 961; //so that it starts at 0
   }
+  @Override
+  public void deleteForExecution(int executionId) {
+    int nbFiles = executionFileCount.get(executionId);
+    for (int i = 0; i < nbFiles; i++) {
+      Blob blob = bucket.get(String.valueOf(hash(executionId, i)));
+      blob.delete();
+    }
+    executionFileCount.put(executionId, 0);
+  }
 }

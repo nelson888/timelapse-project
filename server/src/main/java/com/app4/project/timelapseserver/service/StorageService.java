@@ -16,4 +16,6 @@ public interface StorageService {
 
   FileData getFileData(int executionId, int fileId);
 
+  void deleteForExecution(int executionId);
+
 }

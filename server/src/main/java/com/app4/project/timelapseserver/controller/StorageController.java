@@ -1,6 +1,8 @@
 package com.app4.project.timelapseserver.controller;
 
 import com.app4.project.timelapse.model.FileData;
+import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
+import com.app4.project.timelapseserver.exception.BadRequestException;
 import com.app4.project.timelapseserver.service.StorageService;
 
 import org.slf4j.Logger;
@@ -43,12 +45,14 @@ public class StorageController {
 
   @GetMapping("/{executionId}/count")
   public ResponseEntity nbImages(@PathVariable int executionId) {
+    idCheck(executionId);
     return ResponseEntity.ok().body(storageService.nbFiles(executionId));
   }
 
   @GetMapping("/{executionId}/{fileId}")
   @ResponseBody
   public ResponseEntity serveFile(@PathVariable int executionId, @PathVariable int fileId) {
+    idCheck(executionId);
     Resource file = storageService.loadAsResource(executionId, fileId);
     return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
       "attachment; filename=\"" + file.getFilename() + "\"").body(file);
@@ -57,10 +61,16 @@ public class StorageController {
   @GetMapping("/{executionId}/{fileId}/data")
   @ResponseBody
   public ResponseEntity getFileData(@PathVariable int executionId, @PathVariable int fileId) {
+    idCheck(executionId);
     FileData fileData = storageService.getFileData(executionId, fileId);
     return ResponseEntity
       .ok()
       .body(fileData);
   }
 
+  private void idCheck(int executionId) {
+    if (executionId < 0 || executionId >= ApplicationConfiguration.MAX_EXECUTIONS) {
+      throw new BadRequestException("Execution with id " + executionId + " cannot exist");
+    }
+  }
 }
