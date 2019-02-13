@@ -2,6 +2,7 @@ package com.app4.project.timelapseserver.controller;
 
 import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.service.StorageService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -24,6 +25,7 @@ import java.io.IOException;
 @RequestMapping("/storage")
 public class StorageController {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(StorageController.class);
   private final StorageService storageService;
 
   public StorageController(StorageService storageService) {
@@ -34,6 +36,7 @@ public class StorageController {
   public ResponseEntity uploadImage(@PathVariable int executionId,
       @RequestParam("image") MultipartFile multipartFile) throws IOException {
     FileData fileData = storageService.store(executionId, multipartFile);
+    LOGGER.info("Uploaded new image: {}", fileData);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(fileData);
   }
