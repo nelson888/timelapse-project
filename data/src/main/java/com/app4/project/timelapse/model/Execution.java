@@ -8,7 +8,7 @@ public class Execution implements Comparable<Execution> {
   private long startTime;
   private long endTime;
   private int id;
-  private long frequency;
+  private long frequency; // in seconds
 
   public Execution(String title, long startTime, long endTime, int id, long frequency) {
     this.title = title;
@@ -93,4 +93,10 @@ public class Execution implements Comparable<Execution> {
       ", frequency=" + frequency +
       '}';
   }
+
+  public boolean isRunning() {
+    long now = System.currentTimeMillis();
+    return now >= startTime && now <= endTime;
+  }
+
 }
