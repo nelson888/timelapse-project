@@ -1,3 +1,5 @@
+package com.app4.project.timelapse.camera
+
 import com.app4.project.timelapse.api.client.TimelapseBasicClient
 import com.app4.project.timelapse.api.client.TimelapseResponse
 import com.app4.project.timelapse.model.Command
@@ -16,10 +18,9 @@ SLEEP_DELAY = 2 * DELAY
 running = new AtomicBoolean(true)
 sleeping = new AtomicBoolean(false) //en veille
 Executor executor = Executors.newFixedThreadPool(3)
+println("Starting app")
 executor.submit({ -> processExecutions() })
 //executor.submit({ -> checkState() })
-
-executor.shutdown()
 
 void processExecutions() {
     long lastPictureTime = System.currentTimeMillis()

@@ -33,3 +33,25 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
 }
+
+// Use this task to generate the stand-alone excutable jar of groovy
+task uberjar( type: Jar, dependsOn: [':compileJava',':compileGroovy'] ) {
+    manifest {
+        attributes 'Main-Class': 'com.app4.project.timelapse.camera.App'
+    }
+
+    from files(sourceSets.main.output)
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+        configurations.runtime.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    with jar
+
+    sourceSets.main.groovy {
+        srcDirs = [ 'src/main/groovy' ] //Was missing/wrong
+    }
+}
