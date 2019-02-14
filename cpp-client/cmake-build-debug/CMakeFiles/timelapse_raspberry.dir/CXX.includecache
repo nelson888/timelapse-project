@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+.././src/data.h
+iostream
+-
+string
+-
+
+/home/nelson/workspace/timelapse-project/cpp-client/main.cpp
+iostream
+-
+string
+-
+time.h
+-
+unistd.h
+-
+data.h
+/home/nelson/workspace/timelapse-project/cpp-client/data.h
+cpprest/http_client.h
+-
+cpprest/filestream.h
+-
+
