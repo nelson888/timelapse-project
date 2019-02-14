@@ -55,7 +55,7 @@ int main() {
 
     bool running = true;
     cout << "Camera ready\nStarting processing\n";
-    while (running) {
+    while (running) { //TODO Nelson: check for commands to run
         Execution* e = getCurrentExecution();
         if (!isRunning(e)) {
             cout << "No execution running, waiting...\n";
