@@ -58,6 +58,23 @@ public class LocalStorageService implements StorageService {
     Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
 
     try (InputStream inputStream = multipartFile.getInputStream()) {
+      return writeInputStream(inputStream, executionId, executionPath);
+    } catch (IOException e) {
+      LOGGER.error("Error while writing file", e);
+      throw new FileStorageException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public FileData store(int executionId, InputStream inputStream) {
+    LOGGER.info("attempting to store file for executionId {}...", executionId);
+
+    Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
+    return writeInputStream(inputStream, executionId, executionPath);
+  }
+
+  private FileData writeInputStream(InputStream inputStream, int executionId, Path executionPath) {
+    try {
       int key = hash(executionId, fileMap.size());
       Path filePath = executionPath.resolve("image_" + nDigitsNumber(key, 3) + IMAGE_FORMAT);
       LOGGER.info("Creating file in path {}", filePath);
@@ -67,7 +84,7 @@ public class LocalStorageService implements StorageService {
         throw new FileStorageException("Error while creating new file (unknown error)");
       }
       Files.copy(inputStream, filePath,
-          StandardCopyOption.REPLACE_EXISTING);
+        StandardCopyOption.REPLACE_EXISTING);
       fileMap.put(key, filePath);
       FileData fileData = new FileData(file.length(), file.getName(), System.currentTimeMillis(), executionId, key);
       fileDataMap.put(key, fileData);

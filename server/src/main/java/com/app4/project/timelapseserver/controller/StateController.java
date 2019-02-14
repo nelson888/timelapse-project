@@ -57,23 +57,4 @@ public class StateController {
     return ResponseEntity.ok(globalState);
   }
 
-  @PostConstruct //TODO TO REMOVE ONCE WE HAVE REAL DATA
-  public void fillWithFakeData() {
-    LOGGER.info("Filling the server with fake data");
-    long now = System.currentTimeMillis();
-    long day = 1000 * 60 * 60 * 24;
-    String[] titles = new String[] {
-      "Pop corn qui explose dans un micro-onde",
-      "floraison tulipe",
-      "couché de soleil"
-    };
-
-    for (int i = 0; i < titles.length; i++) {
-      long startTime = now + (i + 1) * day;
-      long endTime = startTime + day / 4;
-      executions.add(new Execution(titles[i], startTime, endTime, (long) (Math.random() * 100)));
-    }
-
-    LOGGER.info("Executions: {}", executions);
-  }
 }

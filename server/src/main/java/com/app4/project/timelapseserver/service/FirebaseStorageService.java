@@ -15,6 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,11 +42,13 @@ public class FirebaseStorageService implements StorageService {
       .collect(Collectors.toList());
     for (int executionId = 0; executionId < MAX_EXECUTIONS; executionId++) {
       int fileId = 0;
-      int fileHash;
-      while (blobIds.contains(fileHash = hash(executionId, fileId))) {
-        executionFileCount.compute(fileHash, (key, nb) -> nb + 1);
+      while (blobIds.contains(hash(executionId, fileId))) {
+        executionFileCount.compute(executionId, (key, nb) -> nb + 1);
         fileId++;
       }
+    }
+    for (int i = 0; i < 4; i++) {
+      System.out.println(hash(0, i));
     }
     LOGGER.info("Started Firebase Storage Service successfully");
   }
@@ -56,6 +59,16 @@ public class FirebaseStorageService implements StorageService {
     String fileName = String.valueOf(hash(executionId, fileId));
     Blob blob = bucket.create(fileName,
       multipartFile.getBytes());
+    executionFileCount.put(executionId, fileId + 1);
+    return new FileData(blob.getSize(), fileName, blob.getCreateTime(), executionId, fileId);
+  }
+
+  @Override
+  public FileData store(int executionId, InputStream inputStream) throws IOException {
+    int fileId = executionFileCount.get(executionId);
+    String fileName = String.valueOf(hash(executionId, fileId));
+    Blob blob = bucket.create(fileName,
+      inputStream);
     executionFileCount.put(executionId, fileId + 1);
     return new FileData(blob.getSize(), fileName, blob.getCreateTime(), executionId, fileId);
   }
