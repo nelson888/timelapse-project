@@ -72,6 +72,11 @@ public class TimelapseFakeClient implements TimelapseClient {
     }
   }
 
+  @Override
+  public void getSoonestExecution(Callback<Execution> callback) {
+    callback.onSuccess(200, executions.peek());
+  }
+
   public void getGlobalState(Callback<GlobalState> callback) {
     callback.onSuccess(RESPONSE_SUCCESS,
         new GlobalState(cameraState, this.executions.toArray(new Execution[0]),
