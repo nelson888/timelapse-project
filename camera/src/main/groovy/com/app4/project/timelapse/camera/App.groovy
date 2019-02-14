@@ -5,7 +5,7 @@ import com.app4.project.timelapse.api.client.TimelapseResponse
 import com.app4.project.timelapse.model.Command
 import com.app4.project.timelapse.model.ErrorResponse
 import com.app4.project.timelapse.model.Execution
-import sun.awt.image.ByteArrayImageSource
+
 import uk.co.caprica.picam.ByteArrayPictureCaptureHandler
 import uk.co.caprica.picam.Camera
 import uk.co.caprica.picam.CameraConfiguration
