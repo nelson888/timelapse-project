@@ -20,6 +20,8 @@ public interface TimelapseClient {
 
   void getExecution(int executionId, Callback<Execution> callback);
 
+  void getSoonestExecution(Callback<Execution> callback);
+
   void getGlobalState(Callback<GlobalState> callback);
 
   void getCameraState(Callback<CameraState> callback);

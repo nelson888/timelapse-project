@@ -46,6 +46,12 @@ public class TimelapseBasicClient {
     return responseRef.response;
   }
 
+  public TimelapseResponse<Execution> getSoonestExecution() {
+    final ResponseRef<Execution> responseRef = new ResponseRef<>();
+    client.getSoonestExecution(callback(responseRef));
+    return responseRef.response;
+  }
+
   public TimelapseResponse<GlobalState> getGlobalState() {
     final ResponseRef<GlobalState> responseRef = new ResponseRef<>();
     client.getGlobalState(callback(responseRef));

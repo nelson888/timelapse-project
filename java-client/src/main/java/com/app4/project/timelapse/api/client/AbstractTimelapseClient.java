@@ -60,6 +60,10 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
     getObject(API_ENDPOINT + "executions/" + executionId, Execution.class, callback);
   }
 
+  public void getSoonestExecution(Callback<Execution> callback) {
+    getObject(API_ENDPOINT + "executions/soonest/", Execution.class, callback);
+  }
+
   public void getGlobalState(Callback<GlobalState> callback) {
     getObject(API_ENDPOINT + "globalState", GlobalState.class, callback);
   }
