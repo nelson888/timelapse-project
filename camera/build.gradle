@@ -25,6 +25,9 @@ dependencies {
 
     // Use the awesome Spock testing and specification framework
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+    
+    //raspberry cam api
+    compile group: 'uk.co.caprica', name: 'picam', version: '0.1.1'
 }
 
 // In this section you declare where to find the dependencies of your project
@@ -52,6 +55,7 @@ task uberjar( type: Jar, dependsOn: [':compileJava',':compileGroovy'] ) {
     with jar
 
     sourceSets.main.groovy {
-        srcDirs = [ 'src/main/groovy' ] //Was missing/wrong
+        srcDirs = [ 'src/main/groovy' ]
     }
+    source
 }
