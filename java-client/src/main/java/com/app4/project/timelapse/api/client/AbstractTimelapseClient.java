@@ -144,6 +144,9 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   private <T> void postObject(String endpoint, T object, Callback<T> callback) {
+    if (!endpoint.endsWith("/")) {
+      endpoint = endpoint + "/";
+    }
     requestObject(RestRequest.POST, endpoint, object, callback);
   }
 
