@@ -3,6 +3,7 @@ package com.app4.project.timelapse.api.client;
 import com.app4.project.timelapse.model.*;
 
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
+import com.tambapps.http.restclient.util.BytesContainer;
 import com.tambapps.http.restclient.util.ISSupplier;
 
 import java.io.File;
@@ -94,6 +95,11 @@ public class TimelapseFakeClient implements TimelapseClient {
 
   @Override
   public void putImage(File file, Callback<FileData> callback, int executionId) {
+    callback.onError(23424, new ErrorResponse("Fake client", "You cannot put any images"));
+  }
+
+  @Override
+  public void putImage(byte[] bytes, Callback<FileData> callback, int executionId) {
     callback.onError(23424, new ErrorResponse("Fake client", "You cannot put any images"));
   }
 

@@ -9,6 +9,7 @@ import com.tambapps.http.restclient.request.handler.output.BodyHandlers;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandlers;
 import com.tambapps.http.restclient.response.RestResponse;
+import com.tambapps.http.restclient.util.BytesContainer;
 import com.tambapps.http.restclient.util.ISSupplier;
 
 import java.io.File;
@@ -79,6 +80,15 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
         .build();
     executeRequest(client, request, ResponseHandlers.stringHandler(),
         generateRestCallback(callback, FileData.class));
+  }
+
+  public void putImage(byte[] bytes, Callback<FileData> callback, int executionId) {
+    RestRequest request = RestRequest.builder(FILE_STORAGE_ENDPOINT + executionId)
+      .PUT()
+      .output(BodyHandlers.multipartBytes(new BytesContainer(bytes), "image"))
+      .build();
+    executeRequest(client, request, ResponseHandlers.stringHandler(),
+      generateRestCallback(callback, FileData.class));
   }
 
   public void putImage(File file, Callback<FileData> callback, int executionId) {

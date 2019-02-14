@@ -3,6 +3,7 @@ package com.app4.project.timelapse.api.client;
 import com.app4.project.timelapse.model.*;
 import com.app4.project.timelapse.model.FileData;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
+import com.tambapps.http.restclient.util.BytesContainer;
 import com.tambapps.http.restclient.util.ISSupplier;
 
 import java.io.File;
@@ -73,6 +74,12 @@ public class TimelapseBasicClient {
   public TimelapseResponse<FileData> putImage(File file, int executionId) {
     final ResponseRef<FileData> responseRef = new ResponseRef<>();
     client.putImage(file, callback(responseRef), executionId);
+    return responseRef.response;
+  }
+
+  public TimelapseResponse<FileData> putImage(byte[] bytes, int executionId) {
+    final ResponseRef<FileData> responseRef = new ResponseRef<>();
+    client.putImage(bytes, callback(responseRef), executionId);
     return responseRef.response;
   }
 

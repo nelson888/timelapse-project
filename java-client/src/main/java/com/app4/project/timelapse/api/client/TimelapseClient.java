@@ -28,6 +28,8 @@ public interface TimelapseClient {
 
   void putImage(ISSupplier isSupplier, Callback<FileData> callback, int executionId);
 
+  void putImage(byte[] bytes, Callback<FileData> callback, int executionId);
+
   void putImage(File file, Callback<FileData> callback, int executionId);
 
   <T> void getImage(ResponseHandler<T> responseHandler, final Callback<T> callback, int executionId, int fileId);
