@@ -30,10 +30,10 @@ public class StateController {
   private final BlockingQueue<Command> commands;
   private volatile CameraState state;
 
-  public StateController(BlockingQueue<Execution> executions, BlockingQueue<Command> commands) {
+  public StateController(BlockingQueue<Execution> executions, BlockingQueue<Command> commands, CameraState state) {
     this.executions = executions;
     this.commands = commands;
-    state = new CameraState();
+    this.state = state;
   }
 
   @GetMapping("/state")

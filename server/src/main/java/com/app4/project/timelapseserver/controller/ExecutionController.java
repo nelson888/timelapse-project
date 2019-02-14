@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 
 @RestController
@@ -25,22 +26,13 @@ public class ExecutionController {
   }
 
   @PostMapping("/")
-  public ResponseEntity addExecution(Execution execution) {
+  public ResponseEntity addExecution(@RequestBody Execution execution) {
     execution.setId(executions.size());
     if (!executions.offer(execution)) {
       throw new BadRequestException("Max number of executions reached");
     }
     LOGGER.info("New execution was added: {}", execution);
     return ResponseEntity.ok(execution);
-  }
-
-
-  @GetMapping("/")
-  public ResponseEntity soonestExecution() {
-    if (executions.isEmpty()) {
-      throw new BadRequestException("There isn't any execution to get");
-    }
-    return ResponseEntity.ok(executions.peek());
   }
 
   @GetMapping("/{id}")
@@ -71,6 +63,21 @@ public class ExecutionController {
   @GetMapping("/count")
   public ResponseEntity nbExecutions() {
     return ResponseEntity.ok().body(executions.size());
+  }
+
+  @GetMapping("/soonest")
+  public ResponseEntity soonestExecution() {
+    if (executions.isEmpty()) {
+      throw new BadRequestException("There isn't any execution to get");
+    }
+    return ResponseEntity.ok(executions.peek());
+  }
+
+  @GetMapping("/")
+  public Execution[] allExecutions() {
+    Execution[] executions = this.executions.toArray(new Execution[0]);
+    Arrays.sort(executions); //sort in startTime order (the soon to far)
+    return executions;
   }
 
   private void idCheck(int executionId) {

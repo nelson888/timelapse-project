@@ -1,5 +1,6 @@
 package com.app4.project.timelapseserver.configuration;
 
+import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapse.model.User;
@@ -20,7 +21,6 @@ import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -46,6 +46,11 @@ public class ApplicationConfiguration {
   @Bean
   public BlockingQueue<Command> commandsQueue() {
     return new ArrayBlockingQueue<>(MAX_COMMANDS);
+  }
+
+  @Bean
+  public CameraState cameraState() {
+    return new CameraState();
   }
 
   @Bean
@@ -77,4 +82,6 @@ public class ApplicationConfiguration {
   public Bucket bucket(StorageClient storageClient) {
     return storageClient.bucket(storageBucket);
   }
+
+
 }

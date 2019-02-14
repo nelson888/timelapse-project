@@ -1,3 +1,3 @@
-Pour push sur heroku, faire
+Pour push sur heroku, faire 
 
 git push heroku master
