@@ -6,11 +6,10 @@ import com.app4.project.timelapse.model.CameraState
 import com.app4.project.timelapse.model.Command
 import com.app4.project.timelapse.model.ErrorResponse
 import com.app4.project.timelapse.model.Execution
-
+import com.app4.project.timelapse.model.FileData
 import uk.co.caprica.picam.ByteArrayPictureCaptureHandler
 import uk.co.caprica.picam.Camera
 import uk.co.caprica.picam.CameraConfiguration
-import uk.co.caprica.picam.FilePictureCaptureHandler
 import uk.co.caprica.picam.enums.Encoding
 
 import java.util.concurrent.Executor
@@ -22,7 +21,7 @@ DELAY = 1000
 SLEEP_DELAY = 2 * DELAY
 running = new AtomicBoolean(true)
 sleeping = new AtomicBoolean(false) //en veille
-//state = new CameraState(false, null, sleeping.get(), running.get())
+state = new CameraState(false, null, sleeping.get(), running.get())
 Executor executor = Executors.newFixedThreadPool(4)
 executor.submit({ -> processExecutions() })
 //executor.submit({ -> checkState() })
@@ -31,48 +30,58 @@ void processExecutions() {
     println('Building camera object...')
     Camera camera = buildCamera()
     println('Camera built. Waiting for camera to take focus...')
-    wait(5000) //wait 5s
+    Thread.sleep(5000) //wait 5s
     println('Camera ready. Starting processing executions')
     state.cameraWorking = true
 
-    if (true) {
-        println("TEST")
-        camera.takePicture(new FilePictureCaptureHandler(new File("test.jpg")))
-        println("TEST FINI")
-        return
-    }
     long lastPictureTime = System.currentTimeMillis()
     while (running.get()) {
         if (sleeping.get()) {
-            wait(2 * DELAY)
+            Thread.sleep(2 * DELAY)
             continue
         }
         TimelapseResponse<Execution> executionResponse = client.getSoonestExecution()
-        if (executionResponse.isError()) {
-            println('Got error while getting soonest execution')
-            ErrorResponse error = executionResponse.getError()
-            println("$error.title: $error.message")
-            wait(DELAY)
+        if (handleError(executionResponse, 'Got error while getting soonest execution')) {
+            Thread.sleep(DELAY)
             continue
         }
         Execution execution = executionResponse.data
         if (!execution || !execution.isRunning()) {
             println('No execution running, waiting')
-            wait(DELAY)
+            Thread.sleep(DELAY)
             continue
         }
         long time0 = System.currentTimeMillis()
         long delaySinceLastPicture = time0 - lastPictureTime
         if (delaySinceLastPicture >= execution.getFrequency()) {
-            byte[] picture = takePicture(camera)
-            client.putImage(picture, execution.id)
+            println("Taking picture...")
+            byte[] picture
+            try {
+                picture = takePicture(camera)
+            } catch (IOException e) {
+                println('Error while taking picture:')
+                println("$e.message")
+                Thread.sleep(DELAY)
+                continue
+            }
+            println("Picture took. Sending it")
+            TimelapseResponse<FileData> response = client.putImage(picture, execution.id)
+            handleError(response, 'Error while sending picture')
         }
         long processTime = System.currentTimeMillis() - time0
         if (processTime < DELAY) {
-            wait(DELAY - processTime)
+            Thread.sleep(DELAY - processTime)
         }
 
     }
+}
+boolean handleError(TimelapseResponse response, String errorMessage) {
+    if (response.isError()) {
+        println(errorMessage)
+        ErrorResponse error = response.getError()
+        println("$error.title: $error.message")
+    }
+    return false
 }
 
 void checkState() {
@@ -83,7 +92,7 @@ void checkState() {
             println('Got error while getting soonest execution')
             ErrorResponse error = commandResponse.getError()
             println("$error.title: $error.message")
-            wait(SLEEP_DELAY)
+            Thread.sleep(SLEEP_DELAY)
             continue
         }
         Command command = commandResponse.data
@@ -102,7 +111,7 @@ void checkState() {
             }
             client.putCameraState(state)
         }
-        wait(SLEEP_DELAY)
+        Thread.sleep(SLEEP_DELAY)
     }
 }
 
