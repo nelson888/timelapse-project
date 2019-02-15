@@ -125,7 +125,7 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   public void deleteExecution(int executionId, Callback<Boolean> callback) {
-    request(RestRequest.DELETE, "executions/" + executionId, Boolean.class, callback);
+    request(RestRequest.DELETE, "executions/" + executionId + "/", Boolean.class, callback);
   }
 
   public void shutdown() {
