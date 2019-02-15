@@ -6,15 +6,29 @@ public class CameraState {
   private boolean cameraWorking;
   private Execution currentExecution;
   private boolean sleeping;
+  private boolean turnedOn;
 
   public CameraState() {
   }
 
   public CameraState(boolean cameraWorking,
-      Execution currentExecution, boolean sleeping) {
+      Execution currentExecution, boolean sleeping, boolean turnedOn) {
     this.cameraWorking = cameraWorking;
     this.currentExecution = currentExecution;
     this.sleeping = sleeping;
+    this.turnedOn = turnedOn;
+  }
+
+  public void setCurrentExecution(Execution currentExecution) {
+    this.currentExecution = currentExecution;
+  }
+
+  public boolean isTurnedOn() {
+    return turnedOn;
+  }
+
+  public void setTurnedOn(boolean turnedOn) {
+    this.turnedOn = turnedOn;
   }
 
   public boolean isCameraWorking() {
