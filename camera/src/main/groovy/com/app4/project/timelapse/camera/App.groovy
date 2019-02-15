@@ -2,6 +2,7 @@ package com.app4.project.timelapse.camera
 
 import com.app4.project.timelapse.api.client.TimelapseBasicClient
 import com.app4.project.timelapse.api.client.TimelapseResponse
+import com.app4.project.timelapse.model.CameraState
 import com.app4.project.timelapse.model.Command
 import com.app4.project.timelapse.model.ErrorResponse
 import com.app4.project.timelapse.model.Execution
@@ -9,6 +10,7 @@ import com.app4.project.timelapse.model.Execution
 import uk.co.caprica.picam.ByteArrayPictureCaptureHandler
 import uk.co.caprica.picam.Camera
 import uk.co.caprica.picam.CameraConfiguration
+import uk.co.caprica.picam.FilePictureCaptureHandler
 import uk.co.caprica.picam.enums.Encoding
 
 import java.util.concurrent.Executor
@@ -20,7 +22,8 @@ DELAY = 1000
 SLEEP_DELAY = 2 * DELAY
 running = new AtomicBoolean(true)
 sleeping = new AtomicBoolean(false) //en veille
-Executor executor = Executors.newFixedThreadPool(3)
+//state = new CameraState(false, null, sleeping.get(), running.get())
+Executor executor = Executors.newFixedThreadPool(4)
 executor.submit({ -> processExecutions() })
 //executor.submit({ -> checkState() })
 
@@ -30,7 +33,14 @@ void processExecutions() {
     println('Camera built. Waiting for camera to take focus...')
     wait(5000) //wait 5s
     println('Camera ready. Starting processing executions')
+    state.cameraWorking = true
 
+    if (true) {
+        println("TEST")
+        camera.takePicture(new FilePictureCaptureHandler(new File("test.jpg")))
+        println("TEST FINI")
+        return
+    }
     long lastPictureTime = System.currentTimeMillis()
     while (running.get()) {
         if (sleeping.get()) {
@@ -66,7 +76,7 @@ void processExecutions() {
 }
 
 void checkState() {
-    TimelapseBasicClient client
+    CameraState state = new CameraState()
     while (true) {
         TimelapseResponse<Command> commandResponse = client.consumeCommand()
         if (commandResponse.isError()) {
@@ -77,7 +87,22 @@ void checkState() {
             continue
         }
         Command command = commandResponse.data
-        //TODO FAIRE JUSTE TYPE ENUMERER
+        if (command != null) {
+            switch (command) {
+                case Command.SLEEP:
+                case Command.WAKE_UP:
+                    boolean s = command == Command.WAKE_UP
+                    sleeping.set(s)
+                    state.sleeping = s
+                    break
+                case Command.TURN_OFF:
+                    running.set(false)
+                    state.turnedOn = false
+                    break
+            }
+            client.putCameraState(state)
+        }
+        wait(SLEEP_DELAY)
     }
 }
 

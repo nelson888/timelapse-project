@@ -28,7 +28,6 @@ public class TimelapseFakeClient implements TimelapseClient {
     executions.add(new Execution("Execution 3", now + eightHours * 25, now + eightHours * 26, 150));
 
 
-    commands.add(new Command("SLEEP", null));
     cameraState.setCameraWorking(true);
   }
 
