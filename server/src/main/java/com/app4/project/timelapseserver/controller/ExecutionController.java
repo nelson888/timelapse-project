@@ -6,15 +6,14 @@ import com.app4.project.timelapseserver.exception.BadRequestException;
 import com.app4.project.timelapseserver.service.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
-import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/api/executions")
@@ -23,6 +22,7 @@ public class ExecutionController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionController.class);
   private final BlockingQueue<Execution> executions;
   private final StorageService storageService;
+  private final AtomicInteger idGenerator = new AtomicInteger(0);
 
   public ExecutionController(BlockingQueue<Execution> executions, StorageService storageService) {
     this.executions = executions;
@@ -31,7 +31,7 @@ public class ExecutionController {
 
   @PostMapping("/")
   public ResponseEntity addExecution(@RequestBody Execution execution) {
-    execution.setId(executions.size());
+    execution.setId(idGenerator.getAndIncrement());
     if (!executions.offer(execution)) {
       throw new BadRequestException("Max number of executions reached");
     }
@@ -77,6 +77,15 @@ public class ExecutionController {
     return ResponseEntity.ok(executions.peek());
   }
 
+  @GetMapping("/current")
+  public ResponseEntity current() { //TODO UTILISER CETTE FONCTION DANS LE TIMELAPSE CAMERA ET L'API
+    if (executions.isEmpty()) {
+      throw new BadRequestException("There isn't any execution to get");
+    }
+    Execution execution = executions.peek();
+    return ResponseEntity.ok(execution.isRunning() ? execution : null);
+  }
+
   @GetMapping("/")
   public Execution[] allExecutions() {
     Execution[] executions = this.executions.toArray(new Execution[0]);
@@ -104,12 +113,12 @@ public class ExecutionController {
     for (int i = 0; i < titles.length; i++) {
       long startTime = now + (i + 1) * day;
       long endTime = startTime + day / 4;
-      executions.add(new Execution(titles[i], startTime, endTime, (long) (Math.random() * 100)));
+      executions.add(new Execution(titles[i], startTime, endTime, 1500 +  (long) (Math.random() * 1000)));
     }
 
-    LOGGER.info("Executions: {}", executions);
+    executions.add(new Execution("Now execution", now, now + day, 1500 +  (long) (Math.random() * 1000)));
 
-    System.out.println(ApplicationConfiguration.class.getResourceAsStream("/fakeData/image.jpg"));
+    LOGGER.info("Executions: {}", executions);
 
     /*
     Stream.of(0, 1, 2, 3)
