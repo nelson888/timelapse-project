@@ -1,5 +1,6 @@
 package com.app4.project.timelapseserver.controller;
 
+import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
@@ -22,11 +23,14 @@ public class ExecutionController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionController.class);
   private final BlockingQueue<Execution> executions;
   private final StorageService storageService;
+  private final CameraState cameraState;
   private final AtomicInteger idGenerator = new AtomicInteger(0);
 
-  public ExecutionController(BlockingQueue<Execution> executions, StorageService storageService) {
+  public ExecutionController(BlockingQueue<Execution> executions, StorageService storageService,
+                             CameraState cameraState) {
     this.executions = executions;
     this.storageService = storageService;
+    this.cameraState = cameraState;
   }
 
   @PostMapping("/")
@@ -78,12 +82,15 @@ public class ExecutionController {
   }
 
   @GetMapping("/current")
-  public ResponseEntity current() { //TODO UTILISER CETTE FONCTION DANS LE TIMELAPSE CAMERA ET L'API
+  public ResponseEntity current() {
+    Execution execution;
     if (executions.isEmpty()) {
-      throw new BadRequestException("There isn't any execution to get");
+      execution = null;
+    } else {
+      execution = executions.peek();
     }
-    Execution execution = executions.peek();
-    return ResponseEntity.ok(execution.isRunning() ? execution : null);
+    cameraState.setCurrentExecution(execution);
+    return ResponseEntity.ok(execution);
   }
 
   @GetMapping("/")

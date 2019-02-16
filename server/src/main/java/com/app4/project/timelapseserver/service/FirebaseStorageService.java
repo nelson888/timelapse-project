@@ -1,7 +1,5 @@
 package com.app4.project.timelapseserver.service;
 
-import static com.app4.project.timelapseserver.configuration.ApplicationConfiguration.MAX_EXECUTIONS;
-
 import com.app4.project.timelapse.model.FileData;
 
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
@@ -16,66 +14,70 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.StreamSupport;
 
+/**
+ * All files are stored in the following architecture:
+ *
+ * execution_executionId/fileId.jpg
+ * with 'executionId' and 'fileId' numbers.
+ * For example:
+ * execution_0/5.jpg
+ */
 public class FirebaseStorageService implements StorageService {
 
+  private static final String EXECUTION_FILENAME_TEMPLATE = "execution_%d/%d.jpg";
   private static final Logger LOGGER = LoggerFactory.getLogger(FirebaseStorageService.class);
   private final Bucket bucket;
-  private final Map<Integer, Integer> executionFileCount = new ConcurrentHashMap<>();
+  private final Map<Integer, AtomicInteger> executionFileCount = new ConcurrentHashMap<>();
 
   public FirebaseStorageService(Bucket bucket) {
     this.bucket = bucket;
     LOGGER.info("Starting Firebase Storage Service...");
-    for (int i = 0; i < MAX_EXECUTIONS; i++) {
-      executionFileCount.put(i, 0);
-    }
     //looks if there are already some files in the cloud storage
-    List<Integer> blobIds = StreamSupport.stream(bucket.list().getValues().spliterator(), false)
+    StreamSupport.stream(bucket.list().getValues().spliterator(), false)
       .map(BlobInfo::getName)
-      .map(Integer::parseInt)
-      .collect(Collectors.toList());
-    for (int executionId = 0; executionId < MAX_EXECUTIONS; executionId++) {
-      int fileId = 0;
-      while (blobIds.contains(hash(executionId, fileId))) {
-        executionFileCount.compute(executionId, (key, nb) -> nb + 1);
-        fileId++;
-      }
-    }
-    for (int i = 0; i < 4; i++) {
-      System.out.println(hash(0, i));
+      .filter(name -> name.endsWith(".jpg")) //get only images
+      .map(name -> name.replace(".jpg", "")) //to only get the number
+      .forEach(blobName -> {
+        int executionId = extractExecutionId(blobName);
+        int fileId = Integer.parseInt(blobName.substring(blobName.indexOf("/") + 1));
+        AtomicInteger fileCount = getFileCount(executionId);
+        fileCount.updateAndGet(value -> Math.max(value, fileId + 1));
+      });
+
+    for (Map.Entry<Integer, AtomicInteger> entry : executionFileCount.entrySet()) {
+      LOGGER.info("Execution {} has {} files", entry.getKey(), entry.getValue().get());
     }
     LOGGER.info("Started Firebase Storage Service successfully");
   }
 
-  @Override
-  public FileData store(int executionId, MultipartFile multipartFile) throws IOException {
-    int fileId = executionFileCount.get(executionId);
-    String fileName = String.valueOf(hash(executionId, fileId));
-    Blob blob = bucket.create(fileName,
-      multipartFile.getBytes());
-    executionFileCount.put(executionId, fileId + 1);
-    return new FileData(blob.getSize(), fileName, blob.getCreateTime(), executionId, fileId);
+  private AtomicInteger getFileCount(int executionId) {
+    return executionFileCount.computeIfAbsent(executionId, e -> new AtomicInteger(0));
   }
 
   @Override
-  public FileData store(int executionId, InputStream inputStream) throws IOException {
-    int fileId = executionFileCount.get(executionId);
-    String fileName = String.valueOf(hash(executionId, fileId));
-    Blob blob = bucket.create(fileName,
-      inputStream);
-    executionFileCount.put(executionId, fileId + 1);
-    return new FileData(blob.getSize(), fileName, blob.getCreateTime(), executionId, fileId);
+  public FileData store(int executionId, MultipartFile multipartFile) throws IOException {
+    int fileId = getFileCount(executionId).getAndIncrement();
+    Blob blob = bucket.create(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId),
+      multipartFile.getBytes());
+    return new FileData(blob.getSize(), blob.getName(), blob.getCreateTime(), executionId, fileId);
+  }
+
+  @Override
+  public FileData store(int executionId, InputStream inputStream) {
+    int fileId = getFileCount(executionId).getAndIncrement();
+    Blob blob = bucket.create(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId), inputStream);
+    return new FileData(blob.getSize(), blob.getName(), blob.getCreateTime(), executionId, fileId);
   }
 
   @Override
   public Resource loadAsResource(int executionId, int fileId) {
-    Blob blob = bucket.get(String.valueOf(hash(executionId, fileId)));
+    Blob blob = bucket.get(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId));
     if (!blob.exists()) {
       throw new FileNotFoundException(String.format("The file with id %d for execution %d doesn't exists",
         fileId, executionId));
@@ -86,26 +88,27 @@ public class FirebaseStorageService implements StorageService {
 
   @Override
   public int nbFiles(int executionId) {
-    return executionFileCount.get(executionId);
+    return getFileCount(executionId).get();
   }
 
   @Override
   public FileData getFileData(int executionId, int fileId) {
-    String h = String.valueOf(hash(executionId, fileId));
-    Blob blob = bucket.get(h);
-    return new FileData(blob.getSize(), h, blob.getCreateTime(), executionId, fileId);
+    Blob blob = bucket.get(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId));
+    return new FileData(blob.getSize(), blob.getName(), blob.getCreateTime(), executionId, fileId);
   }
 
-  private int hash(int executionId, int fileId) {
-    return Objects.hash(executionId, fileId) - 961; //so that it starts at 0
-  }
   @Override
   public void deleteForExecution(int executionId) {
-    int nbFiles = executionFileCount.get(executionId);
+    int nbFiles = executionFileCount.get(executionId).get();
     for (int i = 0; i < nbFiles; i++) {
-      Blob blob = bucket.get(String.valueOf(hash(executionId, i)));
+      Blob blob = bucket.get("execution_" + executionId + "/");
       blob.delete();
     }
-    executionFileCount.put(executionId, 0);
+    executionFileCount.remove(executionId);
+  }
+
+  private int extractExecutionId(String blobName) {
+    int beginning = blobName.indexOf("_") + 1;
+    return Integer.parseInt(blobName.substring(beginning, blobName.indexOf("/")));
   }
 }
