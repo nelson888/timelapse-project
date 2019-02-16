@@ -7,16 +7,18 @@ public class CameraState {
   private Execution currentExecution;
   private boolean sleeping;
   private boolean turnedOn;
+  private long lastTimeAlive; //last time the camera communicated with the server
 
   public CameraState() {
   }
 
   public CameraState(boolean cameraWorking,
-      Execution currentExecution, boolean sleeping, boolean turnedOn) {
+      Execution currentExecution, boolean sleeping, boolean turnedOn, long lastTimeAlive) {
     this.cameraWorking = cameraWorking;
     this.currentExecution = currentExecution;
     this.sleeping = sleeping;
     this.turnedOn = turnedOn;
+    this.lastTimeAlive = lastTimeAlive;
   }
 
   public void setCurrentExecution(Execution currentExecution) {
@@ -49,6 +51,14 @@ public class CameraState {
 
   public void setSleeping(boolean sleeping) {
     this.sleeping = sleeping;
+  }
+
+  public void setLastTimeAlive(long lastTimeAlive) {
+    this.lastTimeAlive = lastTimeAlive;
+  }
+
+  public long getLastTimeAlive() {
+    return lastTimeAlive;
   }
 
   @Override
