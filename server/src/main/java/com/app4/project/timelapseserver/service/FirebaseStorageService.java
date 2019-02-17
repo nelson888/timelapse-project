@@ -51,7 +51,7 @@ public class FirebaseStorageService implements StorageService {
       });
 
     for (Map.Entry<Integer, AtomicInteger> entry : executionFileCount.entrySet()) {
-      LOGGER.info("Execution {} has {} files", entry.getKey(), entry.getValue().get());
+      LOGGER.info("Execution {} has {} images", entry.getKey(), entry.getValue().get());
     }
     LOGGER.info("Started Firebase Storage Service successfully");
   }
@@ -99,9 +99,9 @@ public class FirebaseStorageService implements StorageService {
 
   @Override
   public void deleteForExecution(int executionId) {
-    int nbFiles = executionFileCount.get(executionId).get();
+    int nbFiles = getFileCount(executionId).get();
     for (int i = 0; i < nbFiles; i++) {
-      Blob blob = bucket.get("execution_" + executionId + "/");
+      Blob blob = bucket.get("execution_" + executionId + "/" + i + ".jpg");
       blob.delete();
     }
     executionFileCount.remove(executionId);

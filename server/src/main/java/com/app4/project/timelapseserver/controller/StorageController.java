@@ -59,7 +59,7 @@ public class StorageController {
     idCheck(executionId);
     Resource file = storageService.loadAsResource(executionId, fileId);
     return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-      "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+      "attachment; filename=\"" + fileId + ".jpg\"").body(file);
   }
 
   @GetMapping("/{executionId}/{fileId}/data")

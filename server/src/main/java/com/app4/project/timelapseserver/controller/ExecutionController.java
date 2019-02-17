@@ -61,8 +61,8 @@ public class ExecutionController {
   public ResponseEntity removeExecution(@PathVariable int id) {
     idCheck(id);
     if (executions.removeIf(e -> e.getId() == id)) {
-      LOGGER.info("Execution with id {} was removed", id);
       storageService.deleteForExecution(id);
+      LOGGER.info("Execution with id {} was removed", id);
       return ResponseEntity.ok(Boolean.TRUE);
     }
     return ResponseEntity.ok(Boolean.FALSE);
@@ -120,25 +120,13 @@ public class ExecutionController {
     for (int i = 0; i < titles.length; i++) {
       long startTime = now + (i + 1) * day;
       long endTime = startTime + day / 4;
-      executions.add(new Execution(titles[i], startTime, endTime, 1500 +  (long) (Math.random() * 1000)));
+      Execution execution = new Execution(titles[i], startTime, endTime, 1500 +  (long) (Math.random() * 1000));
+      execution.setId(i + 1);
+      executions.add(execution);
     }
 
     executions.add(new Execution("Now execution", now, now + day, 1500 +  (long) (Math.random() * 1000)));
 
     LOGGER.info("Executions: {}", executions);
-
-    /*
-    Stream.of(0, 1, 2, 3)
-      .map(String::valueOf)
-      .map(ClassPathResource::new)
-      .forEach(cImage -> {
-        try (InputStream is = cImage.getInputStream()) {
-          storageService.store(0, is);
-        } catch (Exception e) {
-          LOGGER.error("Error while uploading files!!!", e);
-        }
-      });
-*/
-    LOGGER.info("Execution 0 has 3 images");
   }
 }
