@@ -53,6 +53,12 @@ public class TimelapseBasicClient {
     return responseRef.response;
   }
 
+  public TimelapseResponse<Execution> getCurrentExecution() {
+    final ResponseRef<Execution> responseRef = new ResponseRef<>();
+    client.getCurrentExecution(callback(responseRef));
+    return responseRef.response;
+  }
+
   public TimelapseResponse<GlobalState> getGlobalState() {
     final ResponseRef<GlobalState> responseRef = new ResponseRef<>();
     client.getGlobalState(callback(responseRef));

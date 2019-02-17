@@ -14,7 +14,6 @@ import com.tambapps.http.restclient.util.ISSupplier;
 
 import java.io.File;
 
-//TODO add overides
 abstract class AbstractTimelapseClient implements TimelapseClient {
 
   private static final String API_ENDPOINT = "api/";
@@ -63,6 +62,10 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
 
   public void getSoonestExecution(Callback<Execution> callback) {
     getObject(API_ENDPOINT + "executions/soonest/", Execution.class, callback);
+  }
+
+  public void getCurrentExecution(Callback<Execution> callback) {
+    getObject(API_ENDPOINT + "executions/current/", Execution.class, callback);
   }
 
   public void getGlobalState(Callback<GlobalState> callback) {
@@ -125,7 +128,7 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   public void deleteExecution(int executionId, Callback<Boolean> callback) {
-    request(RestRequest.DELETE, "executions/" + executionId + "/", Boolean.class, callback);
+    request(RestRequest.DELETE, API_ENDPOINT + "executions/" + executionId, Boolean.class, callback);
   }
 
   public void shutdown() {
