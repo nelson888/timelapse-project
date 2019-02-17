@@ -41,8 +41,9 @@ public class StateController {
   }
 
   @PutMapping("/state")
-  public ResponseEntity updateMapping(@RequestBody CameraState state) {
+  public ResponseEntity updateState(@RequestBody CameraState state) {
     this.state = state;
+    this.state.setLastTimeAlive(System.currentTimeMillis());
     LOGGER.info("Updated camera state: {}", state);
     return ResponseEntity.ok(state);
   }

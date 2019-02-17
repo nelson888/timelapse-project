@@ -32,11 +32,10 @@ public class CommandController {
 
   @GetMapping("/consume")
   public ResponseEntity consumeCommand() {
-    if (commands.isEmpty()) {
-      throw new BadRequestException("There isn't any execution to get");
+    Command command = commands.isEmpty() ? null : commands.remove();
+    if (command != null) {
+      LOGGER.info("Consumed command {}", command);
     }
-    Command command = commands.remove();
-    LOGGER.info("Consumed command {}", command);
     return ResponseEntity.ok(command);
   }
 
