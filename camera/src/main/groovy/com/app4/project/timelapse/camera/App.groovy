@@ -53,7 +53,7 @@ void processExecutions() {
         }
         long time0 = System.currentTimeMillis()
         long delaySinceLastPicture = time0 - lastPictureTime
-        if (delaySinceLastPicture >= execution.getFrequency()) {
+        if (delaySinceLastPicture >= execution.getFrequency() * 1000) { //frequency is in ms
             println("Taking picture...")
             byte[] picture
             try {
