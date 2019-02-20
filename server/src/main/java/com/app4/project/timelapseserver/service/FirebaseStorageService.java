@@ -102,7 +102,9 @@ public class FirebaseStorageService implements StorageService {
     int nbFiles = getFileCount(executionId).get();
     for (int i = 0; i < nbFiles; i++) {
       Blob blob = bucket.get("execution_" + executionId + "/" + i + ".jpg");
-      blob.delete();
+      if (blob != null) {
+        blob.delete();
+      }
     }
     executionFileCount.remove(executionId);
   }

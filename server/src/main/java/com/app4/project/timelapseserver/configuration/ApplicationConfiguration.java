@@ -8,6 +8,7 @@ import com.app4.project.timelapseserver.repository.LocalUserRepository;
 import com.app4.project.timelapseserver.repository.UserRepository;
 import com.app4.project.timelapseserver.service.FirebaseStorageService;
 import com.app4.project.timelapseserver.service.StorageService;
+import com.app4.project.timelapseserver.utils.IdPool;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.FirebaseApp;
@@ -31,7 +32,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class ApplicationConfiguration {
 
   public static final int MAX_EXECUTIONS = 10;
-  private static final int MAX_COMMANDS = 10;
+  public static final int MAX_COMMANDS = 10;
 
   @Value("${firebase.database.url}")
   private String databaseUrl;
@@ -83,5 +84,9 @@ public class ApplicationConfiguration {
     return storageClient.bucket(storageBucket);
   }
 
+  @Bean
+  public IdPool idPool() {
+    return new IdPool(MAX_EXECUTIONS);
+  }
 
 }

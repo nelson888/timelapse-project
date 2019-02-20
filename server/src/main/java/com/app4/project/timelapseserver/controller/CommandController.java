@@ -1,6 +1,7 @@
 package com.app4.project.timelapseserver.controller;
 
 import com.app4.project.timelapse.model.Command;
+import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,10 @@ public class CommandController {
 
   @PostMapping("/")
   public ResponseEntity addCommand(@RequestBody Command command) {
-    if (!commands.offer(command)) {
+    if (commands.size() >= ApplicationConfiguration.MAX_COMMANDS) {
       throw new BadRequestException("Max number of commands reached");
     }
+    commands.offer(command);
     LOGGER.info("New command was added: {}", command);
     return ResponseEntity.ok(command);
   }

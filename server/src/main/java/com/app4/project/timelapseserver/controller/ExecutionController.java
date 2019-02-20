@@ -5,6 +5,7 @@ import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
 import com.app4.project.timelapseserver.service.StorageService;
+import com.app4.project.timelapseserver.utils.IdPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/api/executions")
@@ -24,21 +24,23 @@ public class ExecutionController {
   private final BlockingQueue<Execution> executions;
   private final StorageService storageService;
   private final CameraState cameraState;
-  private final AtomicInteger idGenerator = new AtomicInteger(0);
+  private final IdPool idPool;
 
   public ExecutionController(BlockingQueue<Execution> executions, StorageService storageService,
-                             CameraState cameraState) {
+                             CameraState cameraState, IdPool idPool) {
     this.executions = executions;
     this.storageService = storageService;
     this.cameraState = cameraState;
+    this.idPool = idPool;
   }
 
   @PostMapping("/")
   public ResponseEntity addExecution(@RequestBody Execution execution) {
-    execution.setId(idGenerator.getAndIncrement());
-    if (!executions.offer(execution)) {
+    if (executions.size() >= ApplicationConfiguration.MAX_EXECUTIONS) {
       throw new BadRequestException("Max number of executions reached");
     }
+    executions.offer(execution);
+    execution.setId(idPool.get());
     LOGGER.info("New execution was added: {}", execution);
     return ResponseEntity.ok(execution);
   }
@@ -61,11 +63,23 @@ public class ExecutionController {
   public ResponseEntity removeExecution(@PathVariable int id) {
     idCheck(id);
     if (executions.removeIf(e -> e.getId() == id)) {
+      idPool.free(id);
       storageService.deleteForExecution(id);
       LOGGER.info("Execution with id {} was removed", id);
       return ResponseEntity.ok(Boolean.TRUE);
     }
     return ResponseEntity.ok(Boolean.FALSE);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity updateExecution(@PathVariable int id, @RequestBody Execution execution) {
+    if (!executions.removeIf(e -> e.getId() == id)) {
+      throw new BadRequestException("Execution with id " + id + " doesn't exists");
+    }
+    execution.setId(id);
+    executions.offer(execution);
+
+    return ResponseEntity.ok(execution);
   }
 
   @GetMapping("/count")
@@ -121,11 +135,13 @@ public class ExecutionController {
       long startTime = now + (i + 1) * day;
       long endTime = startTime + day / 4;
       Execution execution = new Execution(titles[i], startTime, endTime, 1500 +  (long) (Math.random() * 1000));
-      execution.setId(i + 1);
+      execution.setId(idPool.get());
       executions.add(execution);
     }
 
-    executions.add(new Execution("Now execution", now, now + day, 1500 +  (long) (Math.random() * 1000)));
+    Execution e = new Execution("Now execution", now, now + day, 1500 +  (long) (Math.random() * 1000));
+    e.setId(idPool.get());
+    executions.add(e);
 
     LOGGER.info("Executions: {}", executions);
   }
