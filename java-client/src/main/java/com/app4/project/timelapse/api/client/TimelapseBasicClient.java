@@ -35,6 +35,12 @@ public class TimelapseBasicClient {
     return responseRef.response;
   }
 
+  public TimelapseResponse<Execution> putExecution(int id, Execution execution) {
+    final ResponseRef<Execution> responseRef = new ResponseRef<>();
+    client.putExecution(id, execution, callback(responseRef));
+    return responseRef.response;
+  }
+
   public TimelapseResponse<Command> consumeCommand() {
     final ResponseRef<Command> responseRef = new ResponseRef<>();
     client.consumeCommand(callback(responseRef));

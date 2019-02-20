@@ -16,6 +16,8 @@ public interface TimelapseClient {
 
   void postExecution(Execution execution, Callback<Execution> callback);
 
+  void putExecution(int executionId, Execution execution, Callback<Execution> callback);
+
   void consumeCommand(Callback<Command> callback);
 
   void getExecution(int executionId, Callback<Execution> callback);

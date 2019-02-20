@@ -98,6 +98,11 @@ public class TimelapseFakeClient implements TimelapseClient {
   }
 
   @Override
+  public void putExecution(int executionId, Execution execution, Callback<Execution> callback) {
+
+  }
+
+  @Override
   public void putImage(byte[] bytes, Callback<FileData> callback, int executionId) {
     callback.onError(23424, new ErrorResponse("Fake client", "You cannot put any images"));
   }
