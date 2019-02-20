@@ -16,6 +16,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
+verbose = args.length > 0
 client = new TimelapseBasicClient('https://timelapse-server.herokuapp.com/')
 DELAY = 1000
 STATE_DELAY = 2 * DELAY
@@ -47,7 +48,6 @@ void processExecutions() {
         }
         Execution execution = executionResponse.data
         if (!execution) {
-            //println('No execution running, waiting')
             Thread.sleep(DELAY)
             continue
         }
@@ -133,4 +133,11 @@ static Camera buildCamera() {
             .encoding(Encoding.JPEG)
             .quality(85)
     return new Camera(config)
+}
+
+@Override
+void println(def value) {
+    if (verbose) {
+        super.println(value)
+    }
 }
