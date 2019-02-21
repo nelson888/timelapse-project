@@ -55,7 +55,7 @@ void processExecutions() {
         }
         long time0 = System.currentTimeMillis()
         long delaySinceLastPicture = time0 - lastPictureTime
-        if (delaySinceLastPicture >= execution.frequency * 1000) { //frequency is in ms
+        if (delaySinceLastPicture >= execution.period * 1000) { //period is in s
             println("Taking picture...")
             byte[] picture
             try {
@@ -74,9 +74,9 @@ void processExecutions() {
             }
         }
         long processTime = System.currentTimeMillis() - time0
-        if (processTime < execution.frequency) {
-            long waitDelay = execution.frequency - processTime
-            println("Waiting ${String.format("%.2f", waitDelay.toFloat() / 1000f)}s for next picture (frequency=$execution.frequency)")
+        if (processTime < execution.period) {
+            long waitDelay = execution.period - processTime
+            println("Waiting ${String.format("%.2f", waitDelay.toFloat() / 1000f)}s for next picture (period=$execution.period)")
             Thread.sleep(waitDelay)
         }
 

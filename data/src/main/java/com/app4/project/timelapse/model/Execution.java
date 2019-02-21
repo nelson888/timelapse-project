@@ -8,18 +8,18 @@ public class Execution implements Comparable<Execution> {
   private long startTime;
   private long endTime;
   private int id;
-  private long frequency; // in seconds
+  private long period; // in seconds
 
-  public Execution(String title, long startTime, long endTime, int id, long frequency) {
+  public Execution(String title, long startTime, long endTime, int id, long period) {
     this.title = title;
     this.startTime = startTime;
     this.endTime = endTime;
     this.id = id;
-    this.frequency = frequency;
+    this.period = period;
   }
 
-  public Execution(String title, long startTime, long endTime, long frequency) {
-    this(title, startTime, endTime, 0, frequency);
+  public Execution(String title, long startTime, long endTime, long period) {
+    this(title, startTime, endTime, 0, period);
   }
 
   public Execution() { }
@@ -48,12 +48,12 @@ public class Execution implements Comparable<Execution> {
     this.id = id;
   }
 
-  public long getFrequency() {
-    return frequency;
+  public long getPeriod() {
+    return period;
   }
 
-  public void setFrequency(long frequency) {
-    this.frequency = frequency;
+  public void setPeriod(long period) {
+    this.period = period;
   }
 
   public String getTitle() {
@@ -90,7 +90,7 @@ public class Execution implements Comparable<Execution> {
       ", startTime=" + startTime +
       ", endTime=" + endTime +
       ", id=" + id +
-      ", frequency=" + frequency +
+      ", period=" + period +
       '}';
   }
 
