@@ -19,13 +19,15 @@ import java.util.concurrent.atomic.AtomicBoolean
 verbose = args.length > 0
 client = new TimelapseBasicClient('https://timelapse-server.herokuapp.com/')
 DELAY = 1000
-STATE_DELAY = 2 * DELAY
+STATE_DELAY = 10000
 running = new AtomicBoolean(true)
 sleeping = new AtomicBoolean(false) //en veille
-state = new CameraState(false, null, sleeping.get(), running.get())
+state = new CameraState(false, null, sleeping.get(), running.get(), 0)
 Executor executor = Executors.newFixedThreadPool(2)
 executor.submit({ -> processExecutions() })
 executor.submit({ -> updateState() })
+executor.shutdown()
+println('Exiting program')
 
 void processExecutions() {
     println('Building camera object...')
@@ -90,7 +92,6 @@ boolean handleError(TimelapseResponse response, String errorMessage) {
 }
 
 void updateState() {
-    CameraState state = new CameraState()
     while (running.get()) {
         TimelapseResponse<Command> commandResponse = client.consumeCommand()
         if (commandResponse.isError()) {
@@ -102,6 +103,7 @@ void updateState() {
         }
         Command command = commandResponse.data
         if (command != null) {
+            println("Received command $command")
             switch (command) {
                 case Command.SLEEP:
                 case Command.WAKE_UP:
@@ -117,7 +119,8 @@ void updateState() {
                     break
             }
         }
-        client.putCameraState(state)
+        handleError(client.putCameraState(state), 'Failed updated Camera State')
+        println('Updated camera state')
         Thread.sleep(STATE_DELAY)
     }
 }
