@@ -34,6 +34,7 @@ public class ExecutionController {
     this.idPool = idPool;
   }
 
+  //TODO AJOUTER CHECK QU'IL N'Y A PAS D'EXECUTION QUI S'OVERLAP
   @PostMapping("/")
   public ResponseEntity addExecution(@RequestBody Execution execution) {
     if (executions.size() >= ApplicationConfiguration.MAX_EXECUTIONS) {

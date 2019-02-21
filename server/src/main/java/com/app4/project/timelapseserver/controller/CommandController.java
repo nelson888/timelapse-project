@@ -37,8 +37,9 @@ public class CommandController {
     Command command = commands.isEmpty() ? null : commands.remove();
     if (command != null) {
       LOGGER.info("Consumed command {}", command);
+      return ResponseEntity.ok(command);
     }
-    return ResponseEntity.ok(command);
+    return ResponseEntity.ok("null");
   }
 
 }
