@@ -41,7 +41,7 @@ void processExecutions() {
             Thread.sleep(10 * DELAY)
             continue
         }
-        TimelapseResponse<Execution> executionResponse = client.getCurrentExecution()
+        TimelapseResponse<Execution> executionResponse = client.currentExecution
         if (handleError(executionResponse, 'Got error while getting soonest execution')) {
             Thread.sleep(DELAY)
             continue
@@ -53,7 +53,7 @@ void processExecutions() {
         }
         long time0 = System.currentTimeMillis()
         long delaySinceLastPicture = time0 - lastPictureTime
-        if (delaySinceLastPicture >= execution.getFrequency() * 1000) { //frequency is in ms
+        if (delaySinceLastPicture >= execution.frequency * 1000) { //frequency is in ms
             println("Taking picture...")
             byte[] picture
             try {
@@ -72,8 +72,10 @@ void processExecutions() {
             }
         }
         long processTime = System.currentTimeMillis() - time0
-        if (processTime < DELAY) {
-            Thread.sleep(DELAY - processTime)
+        if (processTime < execution.frequency) {
+            long waitDelay = execution.frequency - processTime
+            println("Waiting ${String.format("%.2f", waitDelay.toFloat() / 1000f)}s for next picture (frequency=$execution.frequency)")
+            Thread.sleep(waitDelay)
         }
 
     }
