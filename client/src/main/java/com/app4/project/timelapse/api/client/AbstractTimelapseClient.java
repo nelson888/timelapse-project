@@ -56,8 +56,33 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
     putObject(API_ENDPOINT + "executions/" + executionId, execution, callback);
   }
 
-  public void consumeCommand(Callback<Command> callback) {
-    getObject(API_ENDPOINT + "command/consume", Command.class, callback);
+  public void consumeCommand(final Callback<Command> callback) {
+    RestRequest request = RestRequest.builder(API_ENDPOINT + "commands/consume")
+      .method("GET")
+      .build();
+    executeRequest(client, request, ResponseHandlers.stringHandler(),
+      new RestClient.Callback<String, String>() {
+        @Override
+        public void call(RestResponse<String, String> restResponse) {
+          if (restResponse.isSuccessful()) {
+            if (restResponse.getSuccessData().trim().equalsIgnoreCase("null")) {
+              callback.onSuccess(restResponse.getResponseCode(), null);
+            } else {
+              Command command;
+              String data  = restResponse.getSuccessData().replace("\"", "");
+              try {
+                command = Command.valueOf(data);
+                callback.onSuccess(restResponse.getResponseCode(), command);
+              } catch (Exception e) {
+                callback.onError(restResponse.getResponseCode(), new ErrorResponse("Commande inconnue",  data + " is unknown"));
+              }
+            }
+          } else {
+            callback.onError(restResponse.getResponseCode(), gson.fromJson(restResponse.getErrorData(),
+              ErrorResponse.class));
+          }
+        }
+      });
   }
 
   public void getExecution(int executionId, Callback<Execution> callback) {
