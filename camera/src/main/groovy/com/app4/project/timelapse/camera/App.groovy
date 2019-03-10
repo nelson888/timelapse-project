@@ -31,7 +31,16 @@ println('Exiting program')
 
 void processExecutions() {
     println('Building camera object...')
-    Camera camera = buildCamera()
+    Camera camera = null
+    while (camera == null) {
+        try {
+            camera = buildCamera()
+        } catch (RuntimeException e) {
+            println("Failed to instanciate camera object: $e.message")
+            println('Retrying in 10 seconds')
+            Thread.sleep(10000)
+        }
+    }
     println('Camera built. Waiting 5s for camera to stabilize...')
     Thread.sleep(5000) //wait 5s
     println('Camera ready. Starting processing executions')
