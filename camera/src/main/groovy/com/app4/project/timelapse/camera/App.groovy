@@ -7,6 +7,7 @@ import com.app4.project.timelapse.model.Command
 import com.app4.project.timelapse.model.ErrorResponse
 import com.app4.project.timelapse.model.Execution
 import com.app4.project.timelapse.model.FileData
+import com.app4.project.timelapse.model.User
 import uk.co.caprica.picam.ByteArrayPictureCaptureHandler
 import uk.co.caprica.picam.Camera
 import uk.co.caprica.picam.CameraConfiguration
@@ -16,8 +17,19 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
+final User USER = new User("timelapse", "mlijmbstrhlz")
 verbose = args.length > 0
 client = new TimelapseBasicClient('https://timelapse-server.herokuapp.com/')
+while (!client.authenticated) {
+    println('Authenticated to the server')
+    TimelapseResponse response = client.authenticate(USER)
+    if (response.successful && response.data) {
+        println('Authenticated successfully')
+    } else {
+        println('Authentication failed, trying again in 5s')
+        Thread.sleep(5000)
+    }
+}
 DELAY = 1000
 STATE_DELAY = 10000
 running = new AtomicBoolean(true)
@@ -78,13 +90,18 @@ void processExecutions() {
             println("Picture took. Sending it")
             if (picture) {
                 TimelapseResponse<FileData> response = client.putImage(picture, execution.id)
+                if (handleError(response, 'Error while sending picture')) {
+                    Thread.sleep(DELAY)
+                    continue
+                } else {
+                    println('Picture took')
+                }
                 lastPictureTime = time0
-                handleError(response, 'Error while sending picture')
             }
         }
-        long processTime = System.currentTimeMillis() - time0
-        if (processTime < execution.period) {
-            long waitDelay = execution.period - processTime
+        long processTime = System.currentTimeMillis() - lastPictureTime
+        if (processTime < execution.period * 1000) {
+            long waitDelay = execution.period * 1000 - processTime
             println("Waiting ${String.format("%.2f", waitDelay.toFloat() / 1000f)}s for next picture (period=$execution.period)")
             Thread.sleep(waitDelay)
         }
@@ -96,6 +113,7 @@ boolean handleError(TimelapseResponse response, String errorMessage) {
         println(errorMessage)
         ErrorResponse error = response.getError()
         println("$error.title: $error.message")
+        return true
     }
     return false
 }
@@ -146,6 +164,7 @@ static Camera buildCamera() {
             .height(1080)
             .encoding(Encoding.JPEG)
             .quality(85)
+            .rotation(180)
     return new Camera(config)
 }
 
