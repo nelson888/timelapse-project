@@ -8,6 +8,7 @@ public class CameraState {
   private boolean sleeping;
   private boolean turnedOn;
   private long lastTimeAlive; //last time the camera communicated with the server
+  private long batteryPercentage;
 
   public CameraState() {
   }
@@ -53,12 +54,20 @@ public class CameraState {
     this.sleeping = sleeping;
   }
 
+  public void setBatteryPercentage(long batteryPercentage) {
+    this.batteryPercentage = batteryPercentage;
+  }
+
   public void setLastTimeAlive(long lastTimeAlive) {
     this.lastTimeAlive = lastTimeAlive;
   }
 
   public long getLastTimeAlive() {
     return lastTimeAlive;
+  }
+
+  public long getBatteryPercentage() {
+    return batteryPercentage;
   }
 
   @Override
@@ -68,7 +77,8 @@ public class CameraState {
     CameraState that = (CameraState) o;
     return cameraWorking == that.cameraWorking &&
             sleeping == that.sleeping &&
-            Objects.equals(currentExecution, that.currentExecution);
+            Objects.equals(currentExecution, that.currentExecution) &&
+      batteryPercentage == that.batteryPercentage;
   }
 
   @Override
@@ -82,6 +92,7 @@ public class CameraState {
             "cameraWorking=" + cameraWorking +
             ", currentExecution=" + currentExecution +
             ", sleeping=" + sleeping +
+            ", batteryPercentage=" + batteryPercentage +
             '}';
   }
 }
