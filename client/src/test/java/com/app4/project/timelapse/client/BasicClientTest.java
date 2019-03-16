@@ -4,9 +4,13 @@ import com.app4.project.timelapse.api.client.TimelapseBasicClient;
 import com.app4.project.timelapse.api.client.TimelapseResponse;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.FileData;
+import com.app4.project.timelapse.model.User;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandlers;
 import com.tambapps.http.restclient.util.ISSupplier;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -15,7 +19,7 @@ import static org.junit.Assert.*;
 
 public class BasicClientTest {
 
-  private TimelapseBasicClient client = new TimelapseBasicClient(APIClientTest.BASE_URL);
+  private final TimelapseBasicClient client = new TimelapseBasicClient(APIClientTest.BASE_URL);
 
   @Test
   public void getTest() {
@@ -71,5 +75,11 @@ public class BasicClientTest {
     String data = response.getData();
     assertNotNull("Shouldn't be null", data);
     //assertEquals("Should be equal", fileData, data);
+  }
+
+  @Before
+  public void authTest() { //first test
+    TimelapseResponse<Boolean> response = client.authenticate(new User("admin", "gsfhsghsdfdshq"));
+    assertTrue(response.getData());
   }
 }

@@ -17,6 +17,16 @@ public class TimelapseBasicClient {
     this.client = new TimelapseSyncClient(baseUrl);
   }
 
+  public TimelapseResponse<Boolean> authenticate(User user) {
+    final ResponseRef<Boolean> responseRef = new ResponseRef<>();
+    client.authenticate(user, callback(responseRef));
+    return responseRef.response;
+  }
+
+  public boolean isAuthenticated() {
+    return client.isAuthenticated();
+  }
+
   public TimelapseResponse<Command> postCommand(Command command) {
     final ResponseRef<Command> responseRef = new ResponseRef<>();
     client.postCommand(command, callback(responseRef));

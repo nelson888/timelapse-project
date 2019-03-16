@@ -4,6 +4,7 @@ import com.app4.project.timelapse.model.*;
 import com.app4.project.timelapse.model.FileData;
 import com.google.gson.Gson;
 import com.tambapps.http.restclient.RestClient;
+import com.tambapps.http.restclient.methods.HttpMethods;
 import com.tambapps.http.restclient.request.RestRequest;
 import com.tambapps.http.restclient.request.handler.output.BodyHandlers;
 import com.tambapps.http.restclient.request.handler.response.ResponseHandler;
@@ -24,20 +25,6 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   //TODO handle authentication with server and jwt
   public AbstractTimelapseClient(String baseUrl) {
     client = new RestClient(baseUrl);
-    //TODO authenticate handle jwt
-    /*
-    RestResponse<String, String> response = client.execute(RestRequest.builder()
-            .POST()
-            .endpoint(API_ENDPOINT + "/authenticate")
-            .output(BodyHandlers.json(gson.toJson(user)))
-            .build(),
-        ResponseHandlers.stringHandler());
-    if (!response.isSuccessful() || response.isErrorResponse()) {
-      throw new RuntimeException("Couldn't authenticate");
-    }
-
-    String jwt = gson.fromJson(response.getSuccessData(), AuthResponse.class).getJwt();
-    client.setJwt(jwt);*/
   }
 
   public void postCommand(Command command, Callback<Command> callback) {
@@ -64,7 +51,10 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
       new RestClient.Callback<String, String>() {
         @Override
         public void call(RestResponse<String, String> restResponse) {
-          if (restResponse.isSuccessful()) {
+          if (restResponse.getData() instanceof Exception) {
+            Exception e = restResponse.getData();
+            callback.onError(RestResponse.REQUEST_NOT_SENT, new ErrorResponse(e.getClass().getSimpleName(), e.getMessage()));
+          }  else if (restResponse.isSuccessful()) {
             if (restResponse.getSuccessData().trim().equalsIgnoreCase("null")) {
               callback.onSuccess(restResponse.getResponseCode(), null);
             } else {
@@ -142,7 +132,10 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
         new RestClient.Callback<T, String>() {
           @Override
           public void call(RestResponse<T, String> response) {
-            if (response.isSuccessful() && !response.isErrorResponse()) {
+            if (response.getData() instanceof Exception) {
+              Exception e = response.getData();
+              callback.onError(RestResponse.REQUEST_NOT_SENT, new ErrorResponse(e.getClass().getSimpleName(), e.getMessage()));
+            } else if (response.isSuccessful() && !response.isErrorResponse()) {
               callback.onSuccess(response.getResponseCode(), response.getSuccessData());
             } else {
               callback.onError(response.getResponseCode(),
@@ -153,11 +146,11 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   public void getImagesCount(int executionId, final Callback<Integer> callback) {
-    request(RestRequest.GET, FILE_STORAGE_ENDPOINT + executionId + "/count", Integer.class, callback);
+    request(HttpMethods.GET, FILE_STORAGE_ENDPOINT + executionId + "/count", Integer.class, callback);
   }
 
   public void deleteExecution(int executionId, Callback<Boolean> callback) {
-    request(RestRequest.DELETE, API_ENDPOINT + "executions/" + executionId, Boolean.class, callback);
+    request(HttpMethods.DELETE, API_ENDPOINT + "executions/" + executionId, Boolean.class, callback);
   }
 
   public void shutdown() {
@@ -165,16 +158,39 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   @Override
-  public void authenticate(User user, Callback<Boolean> callback) {
+  public void authenticate(User user, final Callback<Boolean> callback) {
+    RestRequest request = RestRequest.builder("auth/signin").method(HttpMethods.POST)
+      .output(BodyHandlers.json(gson.toJson(user)))
+      .build();
+    executeRequest(client, request, ResponseHandlers.stringHandler(),
+      new RestClient.Callback<String, String>() {
+        @Override
+        public void call(RestResponse<String, String> response) {
+          if (response.getData() instanceof Exception) {
+            Exception e = response.getData();
+            callback.onError(RestResponse.REQUEST_NOT_SENT, new ErrorResponse(e.getClass().getSimpleName(), e.getMessage()));
+          } else if (response.isSuccessful()) {
+            AuthResponse authResponse = gson.fromJson(response.getSuccessData(), AuthResponse.class);
+            client.setJwt(authResponse.getJwt());
+            callback.onSuccess(response.getResponseCode(), true);
+          } else if (response.isErrorResponse()) {
+            callback.onError(response.getResponseCode(), gson.fromJson(response.getErrorData(),
+              ErrorResponse.class));
+          } else { //has exception
+            callback.onError(RestResponse.REQUEST_NOT_SENT,
+              new ErrorResponse("Request failed to be sent", response.getException().getMessage()));
+          }
+        }
+      });
     //TODO
   }
 
   private <T> void getObject(String endpoint, Class<T> clazz, Callback<T> callback) {
-    request(RestRequest.GET, endpoint, clazz, callback);
+    request(HttpMethods.GET, endpoint, clazz, callback);
   }
 
   private <T> void deleteetObject(String endpoint, Class<T> clazz, Callback<T> callback) {
-    request(RestRequest.DELETE, endpoint, clazz, callback);
+    request(HttpMethods.DELETE, endpoint, clazz, callback);
   }
 
   private <T> void request(String method, String endpoint, Class<T> clazz, Callback<T> callback) {
@@ -186,14 +202,14 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
   }
 
   private <T> void putObject(String endpoint, T object, Callback<T> callback) {
-    requestObject(RestRequest.PUT, endpoint, object, callback);
+    requestObject(HttpMethods.PUT, endpoint, object, callback);
   }
 
   private <T> void postObject(String endpoint, T object, Callback<T> callback) {
     if (!endpoint.endsWith("/")) {
       endpoint = endpoint + "/";
     }
-    requestObject(RestRequest.POST, endpoint, object, callback);
+    requestObject(HttpMethods.POST, endpoint, object, callback);
   }
 
   private <T> void requestObject(String method, String endpoint, T object, Callback<T> callback) {
@@ -217,7 +233,10 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
     return new RestClient.Callback<String, String>() {
       @Override
       public void call(RestResponse<String, String> response) {
-        if (response.isSuccessful()) {
+        if (response.getData() instanceof Exception) {
+          Exception e = response.getData();
+          callback.onError(RestResponse.REQUEST_NOT_SENT, new ErrorResponse(e.getClass().getSimpleName(), e.getMessage()));
+        } else if (response.isSuccessful()) {
           callback.onSuccess(response.getResponseCode(),
               gson.fromJson(response.getSuccessData(), clazz));
         } else if (response.isErrorResponse()) {
@@ -231,4 +250,7 @@ abstract class AbstractTimelapseClient implements TimelapseClient {
     };
   }
 
+  public boolean isAuthenticated() {
+    return client.getJwt() != null;
+  }
 }

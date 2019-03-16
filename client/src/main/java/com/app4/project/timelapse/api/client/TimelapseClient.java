@@ -8,7 +8,7 @@ import java.io.File;
 
 public interface TimelapseClient {
 
-  void authenticate(User user, Callback<Boolean> callback); //TODO
+  void authenticate(User user, Callback<Boolean> callback);
 
   void postCommand(Command command, Callback<Command> callback);
 
