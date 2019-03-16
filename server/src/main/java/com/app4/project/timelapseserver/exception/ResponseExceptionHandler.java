@@ -3,6 +3,8 @@ package com.app4.project.timelapseserver.exception;
 import com.app4.project.timelapse.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -29,10 +31,16 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
         .body(new ErrorResponse("Bad request", ex.getMessage()));
   }
 
-  @ExceptionHandler(Exception.class)
-  public final ResponseEntity<ErrorResponse> anyOtherException(Exception ex, WebRequest request) {
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(new ErrorResponse("Internal server error", ex.getMessage()));
+  @ExceptionHandler(BadCredentialsException.class)
+  public final ResponseEntity<ErrorResponse> authenticationException(BadCredentialsException ex, WebRequest request) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+      .body(new ErrorResponse("Bad authentication", ex.getMessage()));
+  }
+
+  @ExceptionHandler(InvalidJwtAuthenticationException.class)
+  public final ResponseEntity<ErrorResponse> authenticationException(InvalidJwtAuthenticationException ex, WebRequest request) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+      .body(new ErrorResponse("Bad authentication", ex.getMessage()));
   }
 
 }

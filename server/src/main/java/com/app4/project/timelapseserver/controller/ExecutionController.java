@@ -34,7 +34,7 @@ public class ExecutionController {
     this.idPool = idPool;
   }
 
-  //TODO AJOUTER CHECK QU'IL N'Y A PAS D'EXECUTION QUI S'OVERLAP
+  //TODO AJOUTER CHECK QU'IL N'Y A PAS D'EXECUTION QUI S'OVERLAP dans le temps
   @PostMapping("/")
   public ResponseEntity addExecution(@RequestBody Execution execution) {
     if (executions.size() >= ApplicationConfiguration.MAX_EXECUTIONS) {
@@ -98,14 +98,13 @@ public class ExecutionController {
 
   @GetMapping("/current")
   public ResponseEntity current() {
-    Execution execution;
-    if (executions.isEmpty()) {
-      execution = null;
-    } else {
-      execution = executions.peek();
+    for (Execution e : executions) {
+      if (e.isRunning()) {
+        cameraState.setCurrentExecution(e);
+        return ResponseEntity.ok(e);
+      }
     }
-    cameraState.setCurrentExecution(execution);
-    return ResponseEntity.ok(execution);
+    return ResponseEntity.ok(null);
   }
 
   @GetMapping("/")

@@ -78,7 +78,7 @@ public class FirebaseStorageService implements StorageService {
   @Override
   public Resource loadAsResource(int executionId, int fileId) {
     Blob blob = bucket.get(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId));
-    if (!blob.exists()) {
+    if (blob == null || !blob.exists()) {
       throw new FileNotFoundException(String.format("The file with id %d for execution %d doesn't exists",
         fileId, executionId));
     }

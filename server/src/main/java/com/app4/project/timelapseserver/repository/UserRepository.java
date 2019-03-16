@@ -1,9 +1,9 @@
 package com.app4.project.timelapseserver.repository;
 
-import com.app4.project.timelapse.model.User;
+import com.app4.project.timelapseserver.security.UserDetailsImpl;
 
 import java.util.Optional;
 
 public interface UserRepository {
-  Optional<User> findByUsername(String username);
+  Optional<UserDetailsImpl> findByUsername(String username);
 }

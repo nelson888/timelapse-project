@@ -1,21 +1,21 @@
 package com.app4.project.timelapseserver.repository;
 
 
-import com.app4.project.timelapse.model.User;
+import com.app4.project.timelapseserver.security.UserDetailsImpl;
 
 import java.util.List;
 import java.util.Optional;
 
 public class LocalUserRepository implements UserRepository {
 
-    private final List<User> users;
+    private final List<UserDetailsImpl> users;
 
-    public LocalUserRepository(List<User> users) {
+    public LocalUserRepository(List<UserDetailsImpl> users) {
         this.users = users;
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
+    public Optional<UserDetailsImpl> findByUsername(String username) {
         return users.stream().filter(u -> u.getUsername().equals(username)).findFirst();
     }
 
