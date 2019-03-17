@@ -21,7 +21,7 @@ final User USER = new User("timelapse", "mlijmbstrhlz")
 verbose = args.length > 0
 client = new TimelapseBasicClient('https://timelapse-server.herokuapp.com/')
 while (!client.authenticated) {
-    println('Authenticated to the server')
+    println('Authenticating to the server')
     TimelapseResponse response = client.authenticate(USER)
     if (response.successful && response.data) {
         println('Authenticated successfully')
@@ -47,7 +47,7 @@ void processExecutions() {
     while (camera == null) {
         try {
             camera = buildCamera()
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | IOException e) {
             println("Failed to instanciate camera object: $e.message")
             println('Retrying in 10 seconds')
             Thread.sleep(10000)
@@ -71,6 +71,7 @@ void processExecutions() {
         }
         Execution execution = executionResponse.data
         if (!execution) {
+            println('No execution running, waiting...')
             Thread.sleep(DELAY)
             continue
         }
@@ -107,6 +108,7 @@ void processExecutions() {
         }
 
     }
+    camera.close()
 }
 boolean handleError(TimelapseResponse response, String errorMessage) {
     if (response.isError()) {
