@@ -15,12 +15,15 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/api/executions")
 public class ExecutionController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionController.class);
+  private final Executor executor = Executors.newSingleThreadExecutor();
   private final BlockingQueue<Execution> executions;
   private final StorageService storageService;
   private final CameraState cameraState;
@@ -39,6 +42,9 @@ public class ExecutionController {
   public ResponseEntity addExecution(@RequestBody Execution execution) {
     if (executions.size() >= ApplicationConfiguration.MAX_EXECUTIONS) {
       throw new BadRequestException("Max number of executions reached");
+    }
+    if (executions.stream().anyMatch(execution::overlaps)) {
+      throw new BadRequestException("Execution overlaps with another one");
     }
     executions.offer(execution);
     execution.setId(idPool.get());
@@ -64,9 +70,11 @@ public class ExecutionController {
   public ResponseEntity removeExecution(@PathVariable int id) {
     idCheck(id);
     if (executions.removeIf(e -> e.getId() == id)) {
-      idPool.free(id);
-      storageService.deleteForExecution(id);
-      LOGGER.info("Execution with id {} was removed", id);
+      executor.execute(() -> {
+        storageService.deleteForExecution(id);
+        idPool.free(id);
+        LOGGER.info("Execution with id {} was removed", id);
+      });
       return ResponseEntity.ok(Boolean.TRUE);
     }
     return ResponseEntity.ok(Boolean.FALSE);

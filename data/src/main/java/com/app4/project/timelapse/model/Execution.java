@@ -99,4 +99,9 @@ public class Execution implements Comparable<Execution> {
     return now >= startTime && now <= endTime;
   }
 
+  public boolean overlaps(Execution e) {
+    return startTime >= e.startTime && startTime < e.endTime ||
+      endTime >= e.startTime && endTime < e.endTime;
+  }
+
 }
