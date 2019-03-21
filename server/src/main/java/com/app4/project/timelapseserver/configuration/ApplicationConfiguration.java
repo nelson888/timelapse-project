@@ -3,7 +3,6 @@ package com.app4.project.timelapseserver.configuration;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.Execution;
-import com.app4.project.timelapse.model.User;
 import com.app4.project.timelapseserver.repository.LocalUserRepository;
 import com.app4.project.timelapseserver.repository.UserRepository;
 import com.app4.project.timelapseserver.security.Role;
