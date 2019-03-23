@@ -166,7 +166,6 @@ static Camera buildCamera() {
             .height(1080)
             .encoding(Encoding.JPEG)
             .quality(85)
-            .rotation(180)
     return new Camera(config)
 }
 
