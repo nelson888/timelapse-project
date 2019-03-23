@@ -58,18 +58,6 @@ public class ApplicationConfiguration {
   }
 
   @Bean
-  public List<UserDetailsImpl> users(PasswordEncoder passwordEncoder) {
-    return Arrays.asList(
-      new UserDetailsImpl("android", passwordEncoder.encode("fdshsdfmhlhdfs"), Role.ANDROID),
-      new UserDetailsImpl("timelapse", passwordEncoder.encode("mlijmbstrhlz"), Role.TIMELAPSE),
-      new UserDetailsImpl("admin", passwordEncoder.encode("gsfhsghsdfdshq"), Role.ADMIN));
-  }
-  @Bean
-  public UserRepository userRepository(List<UserDetailsImpl> users) {
-    return new LocalUserRepository(users);
-  }
-
-  @Bean
   public IdPool idPool() {
     return new IdPool(MAX_EXECUTIONS);
   }

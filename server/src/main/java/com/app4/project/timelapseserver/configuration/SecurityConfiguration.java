@@ -1,9 +1,13 @@
 package com.app4.project.timelapseserver.configuration;
 
+import com.app4.project.timelapseserver.repository.LocalUserRepository;
+import com.app4.project.timelapseserver.repository.UserRepository;
 import com.app4.project.timelapseserver.security.JwtConfigurer;
 import com.app4.project.timelapseserver.security.JwtTokenProvider;
 import com.app4.project.timelapseserver.security.Role;
+import com.app4.project.timelapseserver.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,9 +18,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
+
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+
+  @Value("${security.jwt.token.secret-key:secret}")
+  private String secretKey = "secret";
 
   @Autowired
   JwtTokenProvider jwtTokenProvider;
@@ -28,8 +39,26 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   }
 
   @Bean
+  public String secretKey() {
+    return Base64.getEncoder().encodeToString(secretKey.getBytes());
+  }
+
+  @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public List<UserDetailsImpl> users(PasswordEncoder passwordEncoder) {
+    return Arrays.asList(
+      new UserDetailsImpl("android", passwordEncoder.encode("fdshsdfmhlhdfs"), Role.ANDROID),
+      new UserDetailsImpl("timelapse", passwordEncoder.encode("mlijmbstrhlz"), Role.TIMELAPSE),
+      new UserDetailsImpl("admin", passwordEncoder.encode("gsfhsghsdfdshq"), Role.ADMIN));
+  }
+
+  @Bean
+  public UserRepository userRepository(List<UserDetailsImpl> users) {
+    return new LocalUserRepository(users);
   }
 
   @Override

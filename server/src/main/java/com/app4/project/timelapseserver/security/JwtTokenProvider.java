@@ -3,14 +3,12 @@ package com.app4.project.timelapseserver.security;
 import com.app4.project.timelapseserver.exception.InvalidJwtAuthenticationException;
 import com.app4.project.timelapseserver.repository.UserRepository;
 import io.jsonwebtoken.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
@@ -21,20 +19,14 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class JwtTokenProvider {
 
-  @Value("${security.jwt.token.secret-key:secret}")
-  private String secretKey = "secret";
-
   private static final long VALIDITY_IN_MILLISECONDS = TimeUnit.DAYS.toMillis(30); // infinite validity
 
+  private final String secretKey;
   private final UserRepository userRepository;
 
-  public JwtTokenProvider(UserRepository userRepository) {
+  public JwtTokenProvider(String secretKey, UserRepository userRepository) {
+    this.secretKey = secretKey;
     this.userRepository = userRepository;
-  }
-
-  @PostConstruct
-  protected void init() {
-    secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
   }
 
   public String createToken(String username, List<String> roles) {
