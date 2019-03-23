@@ -19,9 +19,12 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 public class LocalStorageService implements StorageService {
 
@@ -30,11 +33,11 @@ public class LocalStorageService implements StorageService {
   private static final String IMAGE_FORMAT = ".png";
 
   private final Path rootPath;
-  private final Map<Integer, Path> fileMap = new ConcurrentHashMap<>();
-  private final Map<Integer, FileData> fileDataMap = new ConcurrentHashMap<>();
+  private final Map<Integer, AtomicInteger> executionFileCount = new ConcurrentHashMap<>();
 
   public LocalStorageService(Path rootPath) {
     this.rootPath = rootPath;
+    LOGGER.info("Starting Local Storage Service...");
     File root = rootPath.toFile();
     if (!Files.exists(rootPath) && !root.mkdir()) {
       LOGGER.error("Couldn't find or create root directory");
@@ -48,7 +51,7 @@ public class LocalStorageService implements StorageService {
         throw new RuntimeException(rootPath + "couldn't create directory " + execDir.getName());
       }
     }
-    LOGGER.info("Storage Service was successfully instantiated");
+    LOGGER.info("Local Storage Service was successfully instantiated");
   }
 
   @Override
@@ -68,15 +71,14 @@ public class LocalStorageService implements StorageService {
   @Override
   public FileData store(int executionId, InputStream inputStream) {
     LOGGER.info("attempting to store file for executionId {}...", executionId);
-
     Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
     return writeInputStream(inputStream, executionId, executionPath);
   }
 
   private FileData writeInputStream(InputStream inputStream, int executionId, Path executionPath) {
+    int fileId = getFileCount(executionId).get();
     try {
-      int key = hash(executionId, fileMap.size());
-      Path filePath = executionPath.resolve("image_" + nDigitsNumber(key, 3) + IMAGE_FORMAT);
+      Path filePath = executionPath.resolve(getFileName(fileId));
       LOGGER.info("Creating file in path {}", filePath);
       File file = filePath.toFile();
       if (!file.createNewFile()) {
@@ -85,10 +87,9 @@ public class LocalStorageService implements StorageService {
       }
       Files.copy(inputStream, filePath,
         StandardCopyOption.REPLACE_EXISTING);
-      fileMap.put(key, filePath);
-      FileData fileData = new FileData(file.length(), file.getName(), System.currentTimeMillis(), executionId, key);
-      fileDataMap.put(key, fileData);
+      FileData fileData = new FileData(file.length(), file.getName(), System.currentTimeMillis(), executionId, fileId);
       LOGGER.info("Saved file successfully");
+      getFileCount(executionId).getAndIncrement();
       return fileData;
     } catch (IOException e) {
       LOGGER.error("Error while writing file", e);
@@ -96,24 +97,25 @@ public class LocalStorageService implements StorageService {
     }
   }
 
-  private int hash(int executionId, int fileId) {
-    return Objects.hash(executionId, fileId) - 961; //so that it starts at 0
+  private String getFileName(int fileId) {
+    return nDigitsNumber(fileId, 5) + IMAGE_FORMAT;
   }
 
   @Override
   public Resource loadAsResource(int executionId, int fileId) {
     try {
-      Path file = fileMap.get(hash(executionId, fileId));
-      if (file == null) {
+      Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
+      File file = executionPath.resolve(getFileName(fileId)).toFile();
+      if (!file.exists()) {
         throw new FileNotFoundException(String.format("The file with id %d for execution %d doesn't exists", fileId, executionId));
       }
-      Resource resource = new UrlResource(file.toUri());
+      Resource resource = new UrlResource(file.toURI());
       if (resource.exists() || resource.isReadable()) {
         return resource;
       }
       else {
-        LOGGER.error("Couldn't read file: " + file.getFileName().toString());
-        throw new FileStorageException("Couldn't read file: " + file.getFileName().toString());
+        LOGGER.error("Couldn't read file: {}", file.getName());
+        throw new FileStorageException("Couldn't read file: " + file.getName());
       }
     }
     catch (MalformedURLException e) {
@@ -128,12 +130,14 @@ public class LocalStorageService implements StorageService {
 
   @Override
   public FileData getFileData(int executionId, int fileId) {
-    FileData fileData =  fileDataMap.get(hash(executionId, fileId));
-    if (fileData == null) {
-      throw new FileNotFoundException(
-        String.format("The file with id %d for execution %d doesn't exists", fileId, executionId));
+    Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
+    Path filePath = executionPath.resolve(getFileName(fileId));
+    File file = filePath.toFile();
+    if (file.exists()) {
+      return new FileData(file.length(), file.getName(), file.lastModified(), executionId, fileId);
     }
-    return fileData;
+    throw new FileNotFoundException(
+      String.format("The file with id %d for execution %d doesn't exists", fileId, executionId));
   }
 
   private static String nDigitsNumber(int number, int n) {
@@ -148,12 +152,16 @@ public class LocalStorageService implements StorageService {
 
   @Override
   public void deleteForExecution(final int executionId) {
-    int h;
-    int fileId = 0;
-    while (fileMap.containsKey(h = hash(executionId, fileId))) {
-      fileMap.remove(h).toFile().delete();
-      fileDataMap.remove(h);
-      fileId++;
+    File eDir = rootPath.resolve(FOLDER_PREFIX + executionId).toFile();
+    File[] files = eDir.listFiles();
+    if (files == null) {
+      return;
     }
+    Stream.of(files).forEach(File::delete);
   }
+
+  private AtomicInteger getFileCount(int executionId) {
+    return executionFileCount.computeIfAbsent(executionId, e -> new AtomicInteger(0));
+  }
+
 }

@@ -37,11 +37,6 @@ public class ApplicationConfiguration {
   public static final int MAX_EXECUTIONS = 10;
   public static final int MAX_COMMANDS = 10;
 
-  @Value("${firebase.database.url}")
-  private String databaseUrl;
-  @Value("${firebase.storage.bucket}")
-  private String storageBucket;
-
   @Bean
   public BlockingQueue<Execution> executionsQueue() {
     return new PriorityBlockingQueue<>(MAX_EXECUTIONS);
@@ -55,11 +50,6 @@ public class ApplicationConfiguration {
   @Bean
   public CameraState cameraState() {
     return new CameraState();
-  }
-
-  @Bean
-  public StorageService storageService(Bucket bucket) {
-    return new FirebaseStorageService(bucket);
   }
 
   @Bean
@@ -80,23 +70,10 @@ public class ApplicationConfiguration {
   }
 
   @Bean
-  public StorageClient storageClient() throws IOException {
-    FirebaseOptions options = new FirebaseOptions.Builder()
-      .setCredentials(GoogleCredentials.fromStream(ApplicationConfiguration.class.getResourceAsStream("/private/firebase-adminsdk.json")))
-      .setDatabaseUrl(databaseUrl)
-      .build();
-    FirebaseApp.initializeApp(options);
-    return StorageClient.getInstance();
-  }
-
-  @Bean
-  public Bucket bucket(StorageClient storageClient) {
-    return storageClient.bucket(storageBucket);
-  }
-
-  @Bean
   public IdPool idPool() {
     return new IdPool(MAX_EXECUTIONS);
   }
+
+
 
 }

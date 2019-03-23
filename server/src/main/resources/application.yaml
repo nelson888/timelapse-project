@@ -1,8 +1,14 @@
-spring.servlet.multipart:
-  max-file-size: 100MB
-  max-request-size: 100MB
+
+spring:
+  servlet.multipart:
+    max-file-size: 100MB
+    max-request-size: 100MB
+  profiles.active: firebase
 
 # Firebase stuff
 firebase:
   database.url: https://timelapse-server.firebaseio.com
   storage.bucket: timelapse-server.appspot.com
+
+# Local stuff
+local.storage.root: /home/nelson/Téléchargements/test

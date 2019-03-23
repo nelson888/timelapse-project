@@ -47,13 +47,6 @@
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
 		</dependency>
-
-		<!-- To convert images into video -->
-		<dependency>
-			<groupId>org.jcodec</groupId>
-			<artifactId>jcodec</artifactId>
-			<version>0.2.3</version>
-		</dependency>
 	</dependencies>
 
 	<build>
