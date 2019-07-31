@@ -6,6 +6,7 @@ The software part of this project contains 3 components
 
 ### Android app
 The app where we can program photo sessions in a given time-frame with a given period (for the time-lapse to take photos). We can see the photo took by the camera, also in a form of a video.
+The github repository of the app can be found [here](https://github.com/nanileb/times_laps_app).
 
 ### Raspberry
 The camera, responsible of taken photos (if there is a photo session running)
