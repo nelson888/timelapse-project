@@ -1,5 +1,7 @@
 package com.app4.project.timelapseserver.configuration;
 
+import com.app4.project.timelapseserver.repository.ExecutionRepository;
+import com.app4.project.timelapseserver.repository.FakeExecutionRepository;
 import com.app4.project.timelapseserver.service.storage.FirebaseStorageService;
 import com.app4.project.timelapseserver.service.storage.StorageService;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -41,6 +43,11 @@ public class FirebaseConfiguration {
       .build();
     FirebaseApp.initializeApp(options);
     return StorageClient.getInstance();
+  }
+
+  @Bean
+  public ExecutionRepository executionRepository() {
+    return new FakeExecutionRepository();
   }
 
 }

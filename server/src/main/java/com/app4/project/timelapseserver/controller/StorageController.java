@@ -35,6 +35,7 @@ public class StorageController {
   @PostMapping("/{executionId}")
   public ResponseEntity uploadImage(@PathVariable int executionId,
                                     @RequestParam("image") MultipartFile multipartFile) throws IOException {
+    idCheck(executionId);
     FileData fileData = storageService.store(executionId, multipartFile);
     LOGGER.info("Uploaded new image: {}", fileData);
     return ResponseEntity.status(HttpStatus.CREATED)
