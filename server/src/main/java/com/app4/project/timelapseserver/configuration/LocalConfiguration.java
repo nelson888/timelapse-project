@@ -1,5 +1,7 @@
 package com.app4.project.timelapseserver.configuration;
 
+import com.app4.project.timelapseserver.repository.ExecutionRepository;
+import com.app4.project.timelapseserver.repository.FakeExecutionRepository;
 import com.app4.project.timelapseserver.service.storage.LocalStorageService;
 import com.app4.project.timelapseserver.service.storage.StorageService;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,5 +21,10 @@ public class LocalConfiguration {
   @Bean
   public StorageService storageService() {
     return new LocalStorageService(Paths.get(storageRoot));
+  }
+
+  @Bean
+  public ExecutionRepository executionRepository() {
+    return new FakeExecutionRepository();
   }
 }

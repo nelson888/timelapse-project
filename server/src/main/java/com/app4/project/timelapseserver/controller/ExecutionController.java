@@ -5,8 +5,8 @@ import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
 import com.app4.project.timelapseserver.exception.ConflictException;
+import com.app4.project.timelapseserver.repository.ExecutionRepository;
 import com.app4.project.timelapseserver.service.storage.StorageService;
-import com.app4.project.timelapseserver.utils.IdPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -31,30 +28,27 @@ public class ExecutionController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionController.class);
   private final Executor executor = Executors.newSingleThreadExecutor();
-  private final BlockingQueue<Execution> executions;
   private final StorageService storageService;
+  private final ExecutionRepository executionRepository;
   private final CameraState cameraState;
-  private final IdPool idPool;
 
-  public ExecutionController(BlockingQueue<Execution> executions, StorageService storageService,
-                             CameraState cameraState, IdPool idPool) {
-    this.executions = executions;
+  public ExecutionController(ExecutionRepository executionRepository, StorageService storageService,
+                             CameraState cameraState) {
+    this.executionRepository = executionRepository;
     this.storageService = storageService;
     this.cameraState = cameraState;
-    this.idPool = idPool;
   }
 
   //TODO AJOUTER CHECK QU'IL N'Y A PAS D'EXECUTION QUI S'OVERLAP dans le temps
   @PostMapping("/")
   public ResponseEntity addExecution(@RequestBody Execution execution) {
-    if (executions.size() >= ApplicationConfiguration.MAX_EXECUTIONS) {
+    if (executionRepository.count() >= ApplicationConfiguration.MAX_EXECUTIONS) {
       throw new BadRequestException("Max number of executions reached");
     }
-    if (executions.stream().anyMatch(execution::overlaps)) {
+    if (executionRepository.getAll().stream().anyMatch(execution::overlaps)) {
       throw new ConflictException("Execution overlaps with another one");
     }
-    executions.offer(execution);
-    execution.setId(idPool.get());
+    executionRepository.add(execution);
     LOGGER.info("New execution was added: {}", execution);
     return ResponseEntity.ok(execution);
   }
@@ -62,13 +56,10 @@ public class ExecutionController {
   @GetMapping("/{id}")
   public ResponseEntity getExecution(@PathVariable int id) {
     idCheck(id);
-    if (executions.isEmpty()) {
+    if (executionRepository.count() == 0) {
       throw new BadRequestException("There isn't any execution to get");
     }
-    return ResponseEntity.ok(executions
-      .stream()
-      .filter(e -> e.getId() == id)
-      .findFirst()
+    return ResponseEntity.ok(executionRepository.getById(id)
       .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"))
     );
   }
@@ -76,10 +67,9 @@ public class ExecutionController {
   @DeleteMapping("/{id}")
   public ResponseEntity removeExecution(@PathVariable int id) {
     idCheck(id);
-    if (executions.removeIf(e -> e.getId() == id)) {
+    if (executionRepository.remove(id)) {
       executor.execute(() -> {
         storageService.deleteForExecution(id);
-        idPool.free(id);
         LOGGER.info("Execution with id {} was removed", id);
       });
       return ResponseEntity.ok(Boolean.TRUE);
@@ -89,31 +79,30 @@ public class ExecutionController {
 
   @PutMapping("/{id}")
   public ResponseEntity updateExecution(@PathVariable int id, @RequestBody Execution execution) {
-    if (!executions.removeIf(e -> e.getId() == id)) {
+    // TODO do it better
+    if (!executionRepository.remove(id)) {
       throw new BadRequestException("Execution with id " + id + " doesn't exists");
     }
     execution.setId(id);
-    executions.offer(execution);
+    executionRepository.add(execution);
 
     return ResponseEntity.ok(execution);
   }
 
   @GetMapping("/count")
   public ResponseEntity nbExecutions() {
-    return ResponseEntity.ok().body(executions.size());
+    return ResponseEntity.ok().body(executionRepository.count());
   }
 
   @GetMapping("/soonest")
   public ResponseEntity soonestExecution() {
-    if (executions.isEmpty()) {
-      throw new BadRequestException("There isn't any execution to get");
-    }
-    return ResponseEntity.ok(executions.peek());
+    return ResponseEntity.ok(executionRepository.getSoonest()
+    .orElseThrow(() -> new BadRequestException("There isn't any execution to get")));
   }
 
   @GetMapping("/current")
   public ResponseEntity current() {
-    for (Execution e : executions) {
+    for (Execution e : executionRepository.getAll()) {
       if (e.isRunning()) {
         cameraState.setCurrentExecution(e);
         return ResponseEntity.ok(e);
@@ -123,10 +112,8 @@ public class ExecutionController {
   }
 
   @GetMapping("/")
-  public Execution[] allExecutions() {
-    Execution[] executions = this.executions.toArray(new Execution[0]);
-    Arrays.sort(executions); //sort in startTime order (the soon to far)
-    return executions;
+  public ResponseEntity allExecutions() {
+    return ResponseEntity.ok(executionRepository.getAll());
   }
 
   private void idCheck(int executionId) {
@@ -135,29 +122,4 @@ public class ExecutionController {
     }
   }
 
-  @PostConstruct //TODO TO REMOVE ONCE WE HAVE REAL DATA, ALSO REMOVE IMAGES IN RESSOURCES
-  public void fillWithFakeData() {
-    LOGGER.info("Filling the server with fake data");
-    long now = System.currentTimeMillis();
-    long day = 1000 * 60 * 60 * 24;
-    String[] titles = new String[]{
-      "Levee de la lune",
-      "floraison tulipe",
-      "couché de soleil"
-    };
-
-    for (int i = 0; i < titles.length; i++) {
-      long startTime = now + (i + 1) * day;
-      long endTime = startTime + day / 4;
-      Execution execution = new Execution(titles[i], startTime, endTime, 5 + (long) (Math.random() * 10));
-      execution.setId(idPool.get());
-      executions.add(execution);
-    }
-
-    Execution e = new Execution("Now execution", now, now + day, 5 + (long) (Math.random() * 10));
-    e.setId(idPool.get());
-    executions.add(e);
-
-    LOGGER.info("Executions: {}", executions);
-  }
 }

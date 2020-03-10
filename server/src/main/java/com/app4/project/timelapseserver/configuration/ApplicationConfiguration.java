@@ -3,7 +3,6 @@ package com.app4.project.timelapseserver.configuration;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.Execution;
-import com.app4.project.timelapseserver.utils.IdPool;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,11 +20,6 @@ public class ApplicationConfiguration {
   public static final int MAX_COMMANDS = 10;
 
   @Bean
-  public BlockingQueue<Execution> executionsQueue() {
-    return new PriorityBlockingQueue<>(MAX_EXECUTIONS);
-  }
-
-  @Bean
   public BlockingQueue<Command> commandsQueue() {
     return new ArrayBlockingQueue<>(MAX_COMMANDS);
   }
@@ -38,11 +32,6 @@ public class ApplicationConfiguration {
   @Bean
   public Map<Integer, Path> fileMap() {
     return new ConcurrentHashMap<>();
-  }
-
-  @Bean
-  public IdPool idPool() {
-    return new IdPool(MAX_EXECUTIONS);
   }
 
 
