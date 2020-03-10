@@ -1,7 +1,7 @@
 package com.app4.project.timelapseserver.configuration;
 
-import com.app4.project.timelapseserver.service.FirebaseStorageService;
-import com.app4.project.timelapseserver.service.StorageService;
+import com.app4.project.timelapseserver.service.storage.FirebaseStorageService;
+import com.app4.project.timelapseserver.service.storage.StorageService;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.FirebaseApp;

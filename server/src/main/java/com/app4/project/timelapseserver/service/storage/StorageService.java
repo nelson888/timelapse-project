@@ -1,4 +1,4 @@
-package com.app4.project.timelapseserver.service;
+package com.app4.project.timelapseserver.service.storage;
 
 import com.app4.project.timelapse.model.FileData;
 import org.springframework.core.io.Resource;

@@ -1,7 +1,6 @@
-package com.app4.project.timelapseserver.service;
+package com.app4.project.timelapseserver.service.storage;
 
 import com.app4.project.timelapse.model.FileData;
-
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
@@ -14,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;

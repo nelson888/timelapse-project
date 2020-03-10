@@ -1,10 +1,9 @@
-package com.app4.project.timelapseserver.service;
+package com.app4.project.timelapseserver.service.storage;
 
 import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.app4.project.timelapseserver.exception.FileStorageException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -14,12 +13,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,6 +49,16 @@ public class LocalStorageService implements StorageService {
       }
     }
     LOGGER.info("Local Storage Service was successfully instantiated");
+  }
+
+  private static String nDigitsNumber(int number, int n) {
+    StringBuilder sNumber = (new StringBuilder()).append(number);
+
+    while (sNumber.length() < n) {
+      sNumber.insert(0, '0');
+    }
+
+    return sNumber.toString();
   }
 
   @Override
@@ -112,13 +119,11 @@ public class LocalStorageService implements StorageService {
       Resource resource = new UrlResource(file.toURI());
       if (resource.exists() || resource.isReadable()) {
         return resource;
-      }
-      else {
+      } else {
         LOGGER.error("Couldn't read file: {}", file.getName());
         throw new FileStorageException("Couldn't read file: " + file.getName());
       }
-    }
-    catch (MalformedURLException e) {
+    } catch (MalformedURLException e) {
       throw new FileStorageException("Couldn't read url of requested file", e);
     }
   }
@@ -138,16 +143,6 @@ public class LocalStorageService implements StorageService {
     }
     throw new FileNotFoundException(
       String.format("The file with id %d for execution %d doesn't exists", fileId, executionId));
-  }
-
-  private static String nDigitsNumber(int number, int n) {
-    StringBuilder sNumber = (new StringBuilder()).append(number);
-
-    while(sNumber.length() < n) {
-      sNumber.insert(0, '0');
-    }
-
-    return sNumber.toString();
   }
 
   @Override

@@ -4,11 +4,9 @@ import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapse.model.GlobalState;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,18 +41,9 @@ public class StateController {
   @PutMapping("/state")
   public ResponseEntity updateState(@RequestBody CameraState state) {
     this.state = state;
-    this.state.setLastTimeAlive(System.currentTimeMillis());
+    this.state.setLastHeartBeat(System.currentTimeMillis());
     LOGGER.info("Updated camera state: {}", state);
     return ResponseEntity.ok(state);
-  }
-
-  @GetMapping("/globalState")
-  public ResponseEntity globalState() {
-    Execution[] executions = this.executions.toArray(new Execution[0]);
-    Arrays.sort(executions); //sort in startTime order (the soon to far)
-    GlobalState globalState = new GlobalState(state, executions,
-        commands.toArray(new Command[0]));
-    return ResponseEntity.ok(globalState);
   }
 
 }

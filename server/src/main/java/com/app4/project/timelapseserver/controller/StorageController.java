@@ -1,21 +1,18 @@
 package com.app4.project.timelapseserver.controller;
 
-import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
-import com.app4.project.timelapseserver.service.StorageService;
-
+import com.app4.project.timelapseserver.service.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -35,13 +32,13 @@ public class StorageController {
     this.storageService = storageService;
   }
 
-  @PutMapping("/{executionId}")
+  @PostMapping("/{executionId}")
   public ResponseEntity uploadImage(@PathVariable int executionId,
-      @RequestParam("image") MultipartFile multipartFile) throws IOException {
+                                    @RequestParam("image") MultipartFile multipartFile) throws IOException {
     FileData fileData = storageService.store(executionId, multipartFile);
     LOGGER.info("Uploaded new image: {}", fileData);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(fileData);
+      .body(fileData);
   }
 
   @GetMapping("/{executionId}/count")

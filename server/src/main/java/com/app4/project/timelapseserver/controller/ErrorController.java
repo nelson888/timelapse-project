@@ -18,10 +18,12 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
     Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
     ErrorResponse response;
     if (statusCode == HttpStatus.UNAUTHORIZED.value() ||
-    statusCode == HttpStatus.FORBIDDEN.value()) {
+      statusCode == HttpStatus.FORBIDDEN.value()) {
       response = new ErrorResponse("Not authorized", "You are not well authenticated");
+    } else if (statusCode == HttpStatus.NOT_FOUND.value()) {
+      response = new ErrorResponse("Page not found", "The requested page were not found");
     } else {
-      response = new ErrorResponse("Error", "Error");
+      response = new ErrorResponse(HttpStatus.resolve(statusCode).toString(), HttpStatus.resolve(statusCode).toString());
     }
     return ResponseEntity.status(statusCode)
       .body(response);

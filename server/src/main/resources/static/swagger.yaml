@@ -1,0 +1,428 @@
+swagger: "2.0"
+info:
+  description: '
+  Timelapse API used as an intermediate between the smartphone and camera.
+  The smartphon can
+    - get/handle executions (timeframe in which to take pictures)
+    - get the pictures took from the camera
+  The camera can take pictures if an execution is running
+  '
+  version: "1.0.0"
+  title: "Timelapse API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "tambue@hotmail.fr"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost"
+basePath: "/"
+tags:
+  - name: "Command"
+    description: "Command controller"
+  - name: "Execution"
+    description: "Execution controller"
+  - name: "Storage"
+    description: "Storage controller"
+  - name: "State"
+    description: "State controller"
+schemes:
+  - "http"
+paths:
+  /api/executions:
+    get:
+      tags:
+        - "Execution"
+      summary: "Retrieve all executions"
+      operationId: "getAllExecutions"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Execution"
+    post:
+      tags:
+        - "Execution"
+      summary: "Add a new execution"
+      operationId: "addExecution"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Execution object that needs to be added"
+          required: true
+          schema:
+            $ref: "#/definitions/Execution"
+      responses:
+        200:
+          description: "Successful operation. The created Execution is returned"
+          schema:
+            $ref: "#/definitions/Execution"
+        409:
+          description: The provided Execution overlaps an existing one
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+        400:
+          description: The maximum number of executions has been reached
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+  /api/executions/{executionId}:
+    get:
+      tags:
+        - "Execution"
+      summary: "Find execution by ID"
+      description: "Returns a single execution"
+      operationId: "getExecutionById"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "executionId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Execution"
+        404:
+          description: "Execution with the given ID was not found"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+    put:
+      tags:
+        - "Execution"
+      summary: "Updates an execution with the request's body"
+      description: ""
+      operationId: "updateExecutionById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "executionId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "name"
+          in: "body"
+          description: "The new values to put"
+          required: true
+          schema:
+            $ref: "#/definitions/Execution"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Execution"
+        404:
+          description: "Execution with the given ID was not found"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+    delete:
+      tags:
+        - "Execution"
+      summary: "Deletes an execution"
+      description: ""
+      operationId: "deleteExecutionById"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "executionId"
+          in: "path"
+          description: "execution id to delete"
+          required: true
+          type: "integer"
+          format: "int32"
+      responses:
+        200:
+          description: "Successful operation. This operation may do nothing if the provided ID doesn't exists"
+  /api/executions/count:
+    get:
+      tags:
+        - "Execution"
+      summary: "Retrieve the number of executions"
+      operationId: "getExecutionsCount"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: number
+  /api/executions/current:
+    get:
+      tags:
+        - "Execution"
+      summary: "Retrieve the current Execution if any"
+      operationId: "getCurrentExecution"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Execution"
+  /api/commands/consume:
+    get:
+      tags:
+        - "Command"
+      summary: "Retrieve and consume a command"
+      operationId: "consumeCommand"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Command"
+  /api/commands/:
+    post:
+      tags:
+        - "Command"
+      summary: "Add a new a command"
+      operationId: "addCommand"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "name"
+          in: "body"
+          description: "The command to add"
+          required: true
+          schema:
+            $ref: "#/definitions/Execution"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Command"
+  /api/state:
+    get:
+      tags:
+        - "State"
+      summary: "Retrieve the camera state"
+      operationId: "getCameraState"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/CameraState"
+    put:
+      tags:
+        - "State"
+      summary: "Retrieve the camera state"
+      operationId: "updateCameraState"
+      produces:
+        - "application/json"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "name"
+          in: "body"
+          description: "The command to update. The current Execution can be null"
+          required: true
+          schema:
+            $ref: "#/definitions/CameraState"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/CameraState"
+  /storage/{executionId}:
+    put:
+      tags:
+        - "Storage"
+      summary: "Store an image for a given execution"
+      operationId: "storeForExecution"
+      produces:
+        - "application/json"
+      consumes:
+        - "multipart/form-data"
+      parameters:
+        - name: "executionId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "image"
+          in: "formData"
+          description: "The image to add"
+          required: true
+          type: file
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/FileData"
+  /storage/{executionId}/count:
+    get:
+      tags:
+        - "Storage"
+      summary: "Get the number of images for a given execution"
+      operationId: "getExecutionImagesCount"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "executionId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: number
+        400:
+          description: "The execution with the specified id doesn't exists"
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+  /storage/{executionId}/{fileId}:
+    get:
+      tags:
+        - "Storage"
+      summary: "Get the file with the given file id for the given execution id"
+      operationId: "uploadFileForExecution"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "executionId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "fileId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref:  '#/definitions/FileData'
+        400:
+          description: "The file with the specified execution id and file id doesn't exists"
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+  /storage/{executionId}/{fileId}/data:
+    get:
+      tags:
+        - "Storage"
+      summary: "Get the data of a specific file for a given execution"
+      operationId: "getExecutionFileData"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "executionId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int32"
+        - name: "fileId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref:  '#/definitions/FileData'
+        400:
+          description: "The execution with the specified id doesn't exists"
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+definitions:
+  Execution:
+    type: object
+    properties:
+      title:
+        type: string
+      id:
+        type: integer
+        format: in32
+      startTime:
+        type: integer
+        format: int64
+      endTime:
+        type: integer
+        format: int64
+      period:
+        type: integer
+        format: int64
+  CameraState:
+    type: object
+    properties:
+      cameraWorking:
+        type: boolean
+      currentExecution:
+        $ref: "#/definitions/Execution"
+      sleeping:
+        type: boolean
+      turnedOn:
+        type: boolean
+      lastHeartBeat:
+        type: integer
+        format: int64
+      batteryPercentage:
+        type: integer
+        format: int64
+  ErrorMessage:
+    type: object
+    properties:
+      title:
+        type: string
+      message:
+        type: string
+  FileData:
+    type: object
+    properties:
+      size:
+        type: integer
+        format: int64
+      name:
+        type: string
+      uploadTimestamp:
+        type: integer
+        format: int64
+      executionId:
+        type: integer
+        format: int32
+      fileId:
+        type: integer
+        format: int64
+  Command:
+    type: string
+    enum:
+      - SLEEP
+      - WAKE_UP
+      - TURN_OFF
+externalDocs:
+  description: "Find out more Timelapse API"
+  url: "https://github.com/nelson888/timelapse-project"

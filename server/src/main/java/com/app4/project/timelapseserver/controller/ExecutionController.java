@@ -4,13 +4,20 @@ import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
-import com.app4.project.timelapseserver.service.StorageService;
+import com.app4.project.timelapseserver.exception.ConflictException;
+import com.app4.project.timelapseserver.service.storage.StorageService;
 import com.app4.project.timelapseserver.utils.IdPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
@@ -44,7 +51,7 @@ public class ExecutionController {
       throw new BadRequestException("Max number of executions reached");
     }
     if (executions.stream().anyMatch(execution::overlaps)) {
-      throw new BadRequestException("Execution overlaps with another one");
+      throw new ConflictException("Execution overlaps with another one");
     }
     executions.offer(execution);
     execution.setId(idPool.get());
@@ -76,7 +83,7 @@ public class ExecutionController {
         LOGGER.info("Execution with id {} was removed", id);
       });
       return ResponseEntity.ok(Boolean.TRUE);
-    }
+    } // TODO return not found no content
     return ResponseEntity.ok(Boolean.FALSE);
   }
 
@@ -133,7 +140,7 @@ public class ExecutionController {
     LOGGER.info("Filling the server with fake data");
     long now = System.currentTimeMillis();
     long day = 1000 * 60 * 60 * 24;
-    String[] titles = new String[] {
+    String[] titles = new String[]{
       "Levee de la lune",
       "floraison tulipe",
       "couché de soleil"
@@ -142,12 +149,12 @@ public class ExecutionController {
     for (int i = 0; i < titles.length; i++) {
       long startTime = now + (i + 1) * day;
       long endTime = startTime + day / 4;
-      Execution execution = new Execution(titles[i], startTime, endTime, 5 +  (long) (Math.random() * 10));
+      Execution execution = new Execution(titles[i], startTime, endTime, 5 + (long) (Math.random() * 10));
       execution.setId(idPool.get());
       executions.add(execution);
     }
 
-    Execution e = new Execution("Now execution", now, now + day, 5 +  (long) (Math.random() * 10));
+    Execution e = new Execution("Now execution", now, now + day, 5 + (long) (Math.random() * 10));
     e.setId(idPool.get());
     executions.add(e);
 
