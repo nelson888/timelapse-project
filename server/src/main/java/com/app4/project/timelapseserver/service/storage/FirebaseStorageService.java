@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystem;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,7 +37,8 @@ public class FirebaseStorageService extends AbstractStorage {
   private final Bucket bucket;
   private final Map<Integer, AtomicInteger> executionFileCount = new ConcurrentHashMap<>();
 
-  public FirebaseStorageService(Bucket bucket) {
+  public FirebaseStorageService(FileSystem inMemoryFileSystem, Bucket bucket) {
+    super(inMemoryFileSystem);
     this.bucket = bucket;
     LOGGER.info("Starting Firebase Storage Service...");
     //looks if there are already some files in the cloud storage
@@ -119,4 +121,13 @@ public class FirebaseStorageService extends AbstractStorage {
     executionFileCount.remove(executionId);
   }
 
+  @Override
+  void uploadVideo(int executionId, InputStream inputStream) {
+    // TODO
+  }
+
+  @Override
+  Logger getLogger() {
+    return LOGGER;
+  }
 }

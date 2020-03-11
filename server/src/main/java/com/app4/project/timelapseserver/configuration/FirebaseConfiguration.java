@@ -1,7 +1,5 @@
 package com.app4.project.timelapseserver.configuration;
 
-import com.app4.project.timelapseserver.repository.ExecutionRepository;
-import com.app4.project.timelapseserver.repository.FakeExecutionRepository;
 import com.app4.project.timelapseserver.service.storage.FirebaseStorageService;
 import com.app4.project.timelapseserver.service.storage.StorageService;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -15,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
 
 @Profile("prod")
 @Configuration
@@ -31,8 +30,8 @@ public class FirebaseConfiguration {
   }
 
   @Bean
-  public StorageService storageService(Bucket bucket) {
-    return new FirebaseStorageService(bucket);
+  public StorageService storageService(FileSystem fileSystem, Bucket bucket) {
+    return new FirebaseStorageService(fileSystem, bucket);
   }
 
   @Bean

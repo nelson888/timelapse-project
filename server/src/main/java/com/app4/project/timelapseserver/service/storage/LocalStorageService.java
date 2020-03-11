@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -30,7 +31,8 @@ public class LocalStorageService extends AbstractStorage {
   private final Path rootPath;
   private final Map<Integer, AtomicInteger> executionFileCount = new ConcurrentHashMap<>();
 
-  public LocalStorageService(Path rootPath) {
+  public LocalStorageService(FileSystem inMemoryFileSystem, Path rootPath) {
+    super(inMemoryFileSystem);
     this.rootPath = rootPath;
     LOGGER.info("Starting Local Storage Service...");
     File root = rootPath.toFile();
@@ -170,4 +172,13 @@ public class LocalStorageService extends AbstractStorage {
     return executionFileCount.computeIfAbsent(executionId, e -> new AtomicInteger(0));
   }
 
+  @Override
+  void uploadVideo(int executionId, InputStream inputStream) {
+    // TODO
+  }
+
+  @Override
+  Logger getLogger() {
+    return LOGGER;
+  }
 }

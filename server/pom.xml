@@ -57,6 +57,17 @@
 			<artifactId>jcodec</artifactId>
 			<version>0.2.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.jcodec</groupId>
+			<artifactId>jcodec-javase</artifactId>
+			<version>0.2.3</version>
+		</dependency>
+		<!-- in memory file system to avoid using physical file when writing video -->
+		<dependency>
+			<groupId>com.google.jimfs</groupId>
+			<artifactId>jimfs</artifactId>
+			<version>1.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

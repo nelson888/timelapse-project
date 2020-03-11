@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import java.nio.file.FileSystem;
 import java.nio.file.Paths;
 
 @Profile("local")
@@ -19,8 +20,8 @@ public class LocalConfiguration {
   private String storageRoot;
 
   @Bean
-  public StorageService storageService() {
-    return new LocalStorageService(Paths.get(storageRoot));
+  public StorageService storageService(FileSystem fileSystem) {
+    return new LocalStorageService(fileSystem, Paths.get(storageRoot));
   }
 
   //@Bean
