@@ -9,11 +9,18 @@ import java.io.InputStream;
 
 public interface StorageService {
 
+  String FOLDER_PREFIX = "execution_";
+  String IMAGE_FORMAT = ".jpg";
+
+
   FileData store(int executionId, MultipartFile multipartFile) throws IOException;
 
   FileData store(int executionId, InputStream inputStream) throws IOException;
 
+
   Resource loadAsResource(int executionId, int fileId);
+
+  Resource loadVideoAsResource(int executionId);
 
   int nbFiles(int executionId);
 

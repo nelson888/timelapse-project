@@ -6,6 +6,7 @@ import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
 import com.app4.project.timelapseserver.exception.ConflictException;
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
+import com.app4.project.timelapseserver.service.SaveToVideoService;
 import com.app4.project.timelapseserver.service.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +32,14 @@ public class ExecutionController {
   private final StorageService storageService;
   private final ExecutionRepository executionRepository;
   private final CameraState cameraState;
+  private final SaveToVideoService saveToVideoService;
 
   public ExecutionController(ExecutionRepository executionRepository, StorageService storageService,
-                             CameraState cameraState) {
+                             CameraState cameraState, SaveToVideoService saveToVideoService) {
     this.executionRepository = executionRepository;
     this.storageService = storageService;
     this.cameraState = cameraState;
+    this.saveToVideoService = saveToVideoService;
   }
 
   @PostMapping
@@ -61,6 +64,13 @@ public class ExecutionController {
     return ResponseEntity.ok(executionRepository.getById(id)
       .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"))
     );
+  }
+
+  @PostMapping("/{id}/saveVideo")
+  public ResponseEntity startSavingToVideo(@PathVariable int id) {
+    Execution execution = executionRepository.getById(id)
+      .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"));
+    return ResponseEntity.ok(saveToVideoService.startVideoSaving(execution));
   }
 
   @DeleteMapping("/{id}")

@@ -3,6 +3,7 @@ package com.app4.project.timelapseserver.controller;
 import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
+import com.app4.project.timelapseserver.service.SaveToVideoService;
 import com.app4.project.timelapseserver.service.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +28,11 @@ public class StorageController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StorageController.class);
   private final StorageService storageService;
+  private final SaveToVideoService saveToVideoService;
 
-  public StorageController(StorageService storageService) {
+  public StorageController(StorageService storageService, SaveToVideoService saveToVideoService) {
     this.storageService = storageService;
+    this.saveToVideoService = saveToVideoService;
   }
 
   @PostMapping("/{executionId}")
@@ -46,6 +49,14 @@ public class StorageController {
   public ResponseEntity nbImages(@PathVariable int executionId) {
     idCheck(executionId);
     return ResponseEntity.ok().body(storageService.nbFiles(executionId));
+  }
+
+  @GetMapping("/{executionId}/video")
+  public ResponseEntity saveVideo(@PathVariable int executionId) {
+    idCheck(executionId);
+    Resource file = storageService.loadVideoAsResource(executionId);
+    return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+      "attachment; filename=\"" + file.getFilename() + "\"").body(file);
   }
 
   @GetMapping("/{executionId}/{fileId}")

@@ -23,11 +23,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-public class LocalStorageService implements StorageService {
+public class LocalStorageService extends AbstractStorage {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalStorageService.class);
-  private static final String FOLDER_PREFIX = "execution_";
-  private static final String IMAGE_FORMAT = ".png";
 
   private final Path rootPath;
   private final Map<Integer, AtomicInteger> executionFileCount = new ConcurrentHashMap<>();
@@ -101,6 +99,19 @@ public class LocalStorageService implements StorageService {
     } catch (IOException e) {
       LOGGER.error("Error while writing file", e);
       throw new FileStorageException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public Resource loadVideoAsResource(int executionId) {
+    File file = rootPath.resolve(FOLDER_PREFIX + executionId + "video.mp4").toFile();
+    if (!file.exists()) {
+      throw new FileNotFoundException(String.format("There is no video for for execution %d", executionId));
+    }
+    try {
+      return new UrlResource(file.toURI());
+    } catch (MalformedURLException e) {
+      throw new FileStorageException("Couldn't read video for execution " + executionId);
     }
   }
 

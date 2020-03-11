@@ -29,7 +29,7 @@ import static com.app4.project.timelapseserver.configuration.ApplicationConfigur
  * For example:
  * execution_0/5.jpg
  */
-public class FirebaseStorageService implements StorageService {
+public class FirebaseStorageService extends AbstractStorage {
 
   private static final String EXECUTION_FILENAME_TEMPLATE = "execution_%d/%d.jpg";
   private static final Logger LOGGER = LoggerFactory.getLogger(FirebaseStorageService.class);
@@ -40,8 +40,7 @@ public class FirebaseStorageService implements StorageService {
     this.bucket = bucket;
     LOGGER.info("Starting Firebase Storage Service...");
     //looks if there are already some files in the cloud storage
-    for (int i = 0; i < MAX_EXECUTIONS; i++) {
-      final int executionId = i;
+    for (int executionId = 0; executionId < MAX_EXECUTIONS; executionId++) {
       int nextFileId = 1 + StreamSupport.stream(bucket.list(Storage.BlobListOption.prefix("execution_" + executionId),
         Storage.BlobListOption.fields(Storage.BlobField.NAME))
         .iterateAll().spliterator(), false)
@@ -88,6 +87,16 @@ public class FirebaseStorageService implements StorageService {
   }
 
   @Override
+  public Resource loadVideoAsResource(int executionId) {
+    Blob blob = bucket.get(String.format("execution_%d/video.mp4", executionId));
+    if (!blob.exists()) {
+      throw new FileNotFoundException("There is no video for execution with id " + executionId);
+    }
+    return new ByteArrayResource(blob.getContent(),
+      String.format("Video for execution %d", executionId));
+  }
+
+  @Override
   public int nbFiles(int executionId) {
     return executionFileCount.get(executionId).get();
   }
@@ -102,7 +111,7 @@ public class FirebaseStorageService implements StorageService {
   public void deleteForExecution(int executionId) {
     int nbFiles = executionFileCount.get(executionId).get();
     for (int i = 0; i < nbFiles; i++) {
-      Blob blob = bucket.get("execution_" + executionId + "/" + i + ".jpg");
+      Blob blob = bucket.get(FOLDER_PREFIX + executionId + "/" + i + ".jpg");
       if (blob != null) {
         blob.delete();
       }
