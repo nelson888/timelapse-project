@@ -4,6 +4,7 @@ import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.app4.project.timelapseserver.exception.FileStorageException;
+import com.app4.project.timelapseserver.util.IOSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -14,10 +15,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,8 +33,8 @@ public class LocalStorageService extends AbstractStorage {
   private final Path rootPath;
   private final Map<Integer, AtomicInteger> executionFileCount = new ConcurrentHashMap<>();
 
-  public LocalStorageService(FileSystem inMemoryFileSystem, Path rootPath) {
-    super(inMemoryFileSystem);
+  public LocalStorageService(Path tempDirRoot, Path rootPath) {
+    super(tempDirRoot);
     this.rootPath = rootPath;
     LOGGER.info("Starting Local Storage Service...");
     File root = rootPath.toFile();
@@ -118,7 +120,7 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   private String getFileName(int fileId) {
-    return nDigitsNumber(fileId, 5) + IMAGE_FORMAT;
+    return nDigitsNumber(fileId, 5) + IMAGE_EXTENSION;
   }
 
   @Override
@@ -144,6 +146,21 @@ public class LocalStorageService extends AbstractStorage {
   @Override
   public int nbFiles(int executionId) {
     return Objects.requireNonNull(rootPath.resolve(FOLDER_PREFIX + executionId).toFile().list()).length;
+  }
+
+  @Override
+  public Stream<IOSupplier<byte[]>> executionFiles(int executionId, long fromTimestamp) {
+    return Arrays.stream(rootPath.resolve(FOLDER_PREFIX + executionId).toFile().listFiles())
+      .filter(f -> f.getName().endsWith(IMAGE_EXTENSION) && creationTime(f) >= fromTimestamp)
+      .map(f -> (() -> Files.readAllBytes(f.toPath())));
+  }
+
+  private long creationTime(File f) {
+    try {
+      return ((FileTime) Files.getAttribute(f.toPath(), "creationTime")).toMillis();
+    } catch (IOException e) {
+      return Long.MIN_VALUE;
+    }
   }
 
   @Override

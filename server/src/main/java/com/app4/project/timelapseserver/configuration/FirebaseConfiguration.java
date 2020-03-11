@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 @Profile("prod")
 @Configuration
@@ -30,8 +30,8 @@ public class FirebaseConfiguration {
   }
 
   @Bean
-  public StorageService storageService(FileSystem fileSystem, Bucket bucket) {
-    return new FirebaseStorageService(fileSystem, bucket);
+  public StorageService storageService(Path tempDirRoot, Bucket bucket) {
+    return new FirebaseStorageService(tempDirRoot, bucket);
   }
 
   @Bean

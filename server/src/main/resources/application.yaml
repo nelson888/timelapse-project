@@ -6,3 +6,6 @@ spring:
   profiles.active: local,mongodb
 
 video.default.fps: 24
+
+temp.dir.root: ${TEMP_DIR_ROOT}
+executor.threads: 4

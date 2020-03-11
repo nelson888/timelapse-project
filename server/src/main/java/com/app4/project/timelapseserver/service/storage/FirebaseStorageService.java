@@ -2,10 +2,12 @@ package com.app4.project.timelapseserver.service.storage;
 
 import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
+import com.app4.project.timelapseserver.util.IOSupplier;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
@@ -14,10 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.app4.project.timelapseserver.configuration.ApplicationConfiguration.MAX_EXECUTIONS;
@@ -37,13 +41,13 @@ public class FirebaseStorageService extends AbstractStorage {
   private final Bucket bucket;
   private final Map<Integer, AtomicInteger> executionFileCount = new ConcurrentHashMap<>();
 
-  public FirebaseStorageService(FileSystem inMemoryFileSystem, Bucket bucket) {
-    super(inMemoryFileSystem);
+  public FirebaseStorageService(Path tempDirRoot, Bucket bucket) {
+    super(tempDirRoot);
     this.bucket = bucket;
     LOGGER.info("Starting Firebase Storage Service...");
     //looks if there are already some files in the cloud storage
     for (int executionId = 0; executionId < MAX_EXECUTIONS; executionId++) {
-      int nextFileId = 1 + StreamSupport.stream(bucket.list(Storage.BlobListOption.prefix("execution_" + executionId),
+      int nextFileId = 1 + StreamSupport.stream(bucket.list(Storage.BlobListOption.prefix(FOLDER_PREFIX + executionId),
         Storage.BlobListOption.fields(Storage.BlobField.NAME))
         .iterateAll().spliterator(), false)
         .map(BlobInfo::getName)
@@ -103,6 +107,23 @@ public class FirebaseStorageService extends AbstractStorage {
     return executionFileCount.get(executionId).get();
   }
 
+  @Override
+  public Stream<IOSupplier<byte[]>> executionFiles(int executionId, long fromTimestamp) {
+    return StreamSupport.stream(
+      bucket.list(Storage.BlobListOption.prefix(FOLDER_PREFIX + executionId),
+      Storage.BlobListOption.fields(Storage.BlobField.NAME))
+      .iterateAll().spliterator(), false)
+      .filter(b -> b.getName().endsWith(IMAGE_EXTENSION) && b.getCreateTime() >= fromTimestamp)
+      .map(b -> (() -> getContent(b)));
+  }
+
+  private byte[] getContent(Blob blob) throws IOException {
+    try {
+      return blob.getContent();
+    } catch (StorageException e) {
+      throw new IOException(e);
+    }
+  }
   @Override
   public FileData getFileData(int executionId, int fileId) {
     Blob blob = bucket.get(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId));

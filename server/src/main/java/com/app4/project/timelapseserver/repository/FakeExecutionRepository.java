@@ -60,7 +60,7 @@ public class FakeExecutionRepository implements ExecutionRepository {
     return executions.isEmpty() ? Optional.empty() : Optional.of(executions.peek());
   }
 
-  @PostConstruct //TODO TO REMOVE ONCE WE HAVE REAL DATA, ALSO REMOVE IMAGES IN RESSOURCES
+  @PostConstruct
   public void fillWithFakeData() {
     LOGGER.info("Filling the server with fake data");
     long now = System.currentTimeMillis();

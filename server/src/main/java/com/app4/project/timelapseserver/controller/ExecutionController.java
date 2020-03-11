@@ -72,11 +72,17 @@ public class ExecutionController {
     );
   }
 
-  @PostMapping("/{id}/saveVideo")
-  public ResponseEntity startSavingToVideo(@PathVariable int id, @RequestParam Optional<Integer> fps) {
+  @PostMapping("/{id}/saveVideo") // TODO add on swagger
+  public ResponseEntity startSavingToVideo(@PathVariable int id, @RequestParam Optional<Integer> fps, @RequestParam Optional<Long> fromTimestamp) {
     Execution execution = executionRepository.getById(id)
       .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"));
-    return ResponseEntity.ok(saveToVideoService.startVideoSaving(execution, fps.orElse(defaultFps)));
+    return ResponseEntity.ok(saveToVideoService.startVideoSaving(execution, fps.orElse(defaultFps), fromTimestamp.orElse(Long.MIN_VALUE)));
+  }
+
+  @GetMapping("/{id}/savingState") // TODO add on swagger
+  public ResponseEntity getExecutionSavingState(@PathVariable int id) {
+    idCheck(id);
+    return ResponseEntity.ok(saveToVideoService.getSavingState(id));
   }
 
   @DeleteMapping("/{id}")
