@@ -9,7 +9,7 @@ public class SaveToVideoService {
 
 
 
-  public SavingState startVideoSaving(Execution execution) {
+  public SavingState startVideoSaving(Execution execution, int fps) {
     return SavingState.ON_GOING;
   }
 }

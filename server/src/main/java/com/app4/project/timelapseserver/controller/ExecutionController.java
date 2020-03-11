@@ -10,6 +10,7 @@ import com.app4.project.timelapseserver.service.SaveToVideoService;
 import com.app4.project.timelapseserver.service.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +19,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -33,13 +36,16 @@ public class ExecutionController {
   private final ExecutionRepository executionRepository;
   private final CameraState cameraState;
   private final SaveToVideoService saveToVideoService;
+  private final int defaultFps;
 
   public ExecutionController(ExecutionRepository executionRepository, StorageService storageService,
-                             CameraState cameraState, SaveToVideoService saveToVideoService) {
+                             CameraState cameraState, SaveToVideoService saveToVideoService,
+                             @Value("${video.default.fps}") int defaultFps) {
     this.executionRepository = executionRepository;
     this.storageService = storageService;
     this.cameraState = cameraState;
     this.saveToVideoService = saveToVideoService;
+    this.defaultFps = defaultFps;
   }
 
   @PostMapping
@@ -67,10 +73,10 @@ public class ExecutionController {
   }
 
   @PostMapping("/{id}/saveVideo")
-  public ResponseEntity startSavingToVideo(@PathVariable int id) {
+  public ResponseEntity startSavingToVideo(@PathVariable int id, @RequestParam Optional<Integer> fps) {
     Execution execution = executionRepository.getById(id)
       .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"));
-    return ResponseEntity.ok(saveToVideoService.startVideoSaving(execution));
+    return ResponseEntity.ok(saveToVideoService.startVideoSaving(execution, fps.orElse(defaultFps)));
   }
 
   @DeleteMapping("/{id}")
