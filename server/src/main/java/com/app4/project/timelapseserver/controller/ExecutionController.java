@@ -39,8 +39,7 @@ public class ExecutionController {
     this.cameraState = cameraState;
   }
 
-  //TODO AJOUTER CHECK QU'IL N'Y A PAS D'EXECUTION QUI S'OVERLAP dans le temps
-  @PostMapping("/")
+  @PostMapping
   public ResponseEntity addExecution(@RequestBody Execution execution) {
     if (executionRepository.count() >= ApplicationConfiguration.MAX_EXECUTIONS) {
       throw new BadRequestException("Max number of executions reached");
@@ -111,7 +110,7 @@ public class ExecutionController {
     return ResponseEntity.ok(null);
   }
 
-  @GetMapping("/")
+  @GetMapping
   public ResponseEntity allExecutions() {
     return ResponseEntity.ok(executionRepository.getAll());
   }

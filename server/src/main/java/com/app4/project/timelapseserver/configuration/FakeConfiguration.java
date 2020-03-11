@@ -2,31 +2,17 @@ package com.app4.project.timelapseserver.configuration;
 
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
 import com.app4.project.timelapseserver.repository.FakeExecutionRepository;
-import com.app4.project.timelapseserver.service.storage.LocalStorageService;
-import com.app4.project.timelapseserver.service.storage.StorageService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.nio.file.Paths;
-
-@Profile("local")
+@Profile("fake")
 @Configuration
-public class LocalConfiguration {
-
-  @Value("${local.storage.root}")
-  private String storageRoot;
+public class FakeConfiguration {
 
   @Bean
-  public StorageService storageService() {
-    return new LocalStorageService(Paths.get(storageRoot));
-  }
-
-  //@Bean
   public ExecutionRepository executionRepository() {
     return new FakeExecutionRepository();
   }
-
 
 }

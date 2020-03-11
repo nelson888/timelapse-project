@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Profile;
 
 import java.io.IOException;
 
-@Profile("firebase")
+@Profile("prod")
 @Configuration
 public class FirebaseConfiguration {
 
@@ -43,11 +43,6 @@ public class FirebaseConfiguration {
       .build();
     FirebaseApp.initializeApp(options);
     return StorageClient.getInstance();
-  }
-
-  @Bean
-  public ExecutionRepository executionRepository() {
-    return new FakeExecutionRepository();
   }
 
 }
