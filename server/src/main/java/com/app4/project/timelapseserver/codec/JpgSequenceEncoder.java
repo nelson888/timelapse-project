@@ -18,7 +18,7 @@ import static org.jcodec.common.Format.MOV;
 
 public class JpgSequenceEncoder implements Closeable {
   private final SequenceEncoder sequenceEncoder;
-  private final IORunnable endRunnable; // TODO use something thzt throws an IOError instead (in case of erro while uploading)
+  private final IORunnable endRunnable;
 
   public JpgSequenceEncoder(SeekableByteChannel channel, int fps, IORunnable endRunnable) throws IOException {
     this.endRunnable = endRunnable;
