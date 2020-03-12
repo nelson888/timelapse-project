@@ -17,6 +17,12 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
       .body(new ErrorResponse("File not found", ex.getMessage()));
   }
 
+  @ExceptionHandler(NotFoundException.class)
+  public final ResponseEntity<ErrorResponse> notFoundException(FileNotFoundException ex, WebRequest request) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+      .body(new ErrorResponse("Not Found", ex.getMessage()));
+  }
+
   @ExceptionHandler(FileStorageException.class)
   public final ResponseEntity<ErrorResponse> fileStorageException(FileStorageException ex, WebRequest request) {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
