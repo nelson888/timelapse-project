@@ -3,7 +3,6 @@ package com.app4.project.timelapseserver.configuration;
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
 import com.app4.project.timelapse.model.SavingState;
-import com.google.common.jimfs.Jimfs;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,11 +37,6 @@ public class ApplicationConfiguration {
   @Bean
   public Map<Integer, Path> fileMap() {
     return new ConcurrentHashMap<>();
-  }
-
-  @Bean
-  public FileSystem inMemoryFileSystem() {
-    return Jimfs.newFileSystem();
   }
 
   @Bean
