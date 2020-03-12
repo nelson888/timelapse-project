@@ -1,4 +1,3 @@
-
 firebase:
   database.url: https://timelapse-server.firebaseio.com
   storage.bucket: timelapse-server.appspot.com

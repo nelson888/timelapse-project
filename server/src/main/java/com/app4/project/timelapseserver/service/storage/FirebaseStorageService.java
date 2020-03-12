@@ -20,7 +20,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -28,7 +27,7 @@ import static com.app4.project.timelapseserver.configuration.ApplicationConfigur
 
 /**
  * All files are stored in the following architecture:
- *
+ * <p>
  * execution_executionId/fileId.jpg
  * with 'executionId' and 'fileId' numbers.
  * For example:
@@ -111,8 +110,8 @@ public class FirebaseStorageService extends AbstractStorage {
   public Stream<IOSupplier<byte[]>> executionFiles(int executionId, long fromTimestamp) {
     return StreamSupport.stream(
       bucket.list(Storage.BlobListOption.prefix(FOLDER_PREFIX + executionId),
-      Storage.BlobListOption.fields(Storage.BlobField.NAME))
-      .iterateAll().spliterator(), false)
+        Storage.BlobListOption.fields(Storage.BlobField.NAME))
+        .iterateAll().spliterator(), false)
       .filter(b -> b.getName().endsWith(IMAGE_EXTENSION) && b.getCreateTime() >= fromTimestamp)
       .map(b -> (() -> getContent(b)));
   }
@@ -124,6 +123,7 @@ public class FirebaseStorageService extends AbstractStorage {
       throw new IOException(e);
     }
   }
+
   @Override
   public FileData getFileData(int executionId, int fileId) {
     Blob blob = bucket.get(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId));

@@ -16,10 +16,8 @@ import static com.app4.project.timelapseserver.configuration.ApplicationConfigur
 
 public class FakeExecutionRepository implements ExecutionRepository {
 
-  private final IdPool idPool = new IdPool(MAX_EXECUTIONS);
-
   private static final Logger LOGGER = LoggerFactory.getLogger(FakeExecutionRepository.class);
-
+  private final IdPool idPool = new IdPool(MAX_EXECUTIONS);
   private final BlockingQueue<Execution> executions = new PriorityBlockingQueue<>(MAX_EXECUTIONS);
 
   @Override

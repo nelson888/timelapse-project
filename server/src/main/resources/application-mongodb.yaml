@@ -1,4 +1,3 @@
-
 mongo:
   uri: ${MONGO.URI}
   database: timelapse

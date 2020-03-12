@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import java.util.List;
 import java.util.Optional;
 
-public class MongoRepository<T>  {
+public class MongoRepository<T> {
 
   protected final MongoTemplate mongoTemplate;
   private final Class<T> clazz;

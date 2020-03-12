@@ -1,8 +1,5 @@
 package com.app4.project.timelapseserver.codec;
 
-import static org.jcodec.common.Codec.H264;
-import static org.jcodec.common.Format.MOV;
-
 import org.jcodec.api.SequenceEncoder;
 import org.jcodec.common.io.SeekableByteChannel;
 import org.jcodec.common.model.ColorSpace;
@@ -14,6 +11,9 @@ import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
+
+import static org.jcodec.common.Codec.H264;
+import static org.jcodec.common.Format.MOV;
 
 public class JpgSequenceEncoder implements Closeable {
   private final SequenceEncoder sequenceEncoder;

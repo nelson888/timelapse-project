@@ -72,7 +72,8 @@ public class ExecutionController {
     );
   }
 
-  @PostMapping("/{id}/saveVideo") // TODO add on swagger
+  @PostMapping("/{id}/video/generate")
+  // TODO add on swagger todo allow to have multiple videos for one execution????????
   public ResponseEntity startSavingToVideo(@PathVariable int id, @RequestParam Optional<Integer> fps, @RequestParam Optional<Long> fromTimestamp) {
     Execution execution = executionRepository.getById(id)
       .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"));
@@ -118,7 +119,7 @@ public class ExecutionController {
   @GetMapping("/soonest")
   public ResponseEntity soonestExecution() {
     return ResponseEntity.ok(executionRepository.getSoonest()
-    .orElseThrow(() -> new BadRequestException("There isn't any execution to get")));
+      .orElseThrow(() -> new BadRequestException("There isn't any execution to get")));
   }
 
   @GetMapping("/current")

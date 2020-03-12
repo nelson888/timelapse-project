@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Supplier;
 
 @Service
 public class SaveToVideoService {
@@ -47,11 +46,11 @@ public class SaveToVideoService {
     long startTime = System.currentTimeMillis();
     try (JpgSequenceEncoder encoder = storageService.newEncoderForExecution(executionId, fps)) {
       storageService.executionFiles(executionId, fromTimestamp)
-      .forEach(supplier -> addFrame(encoder, supplier));
+        .forEach(supplier -> addFrame(encoder, supplier));
       executionSavingStateMap.put(executionId, SavingState.FINISHED);
       LOGGER.info("Finished saving video for execution {} (it took {}s)", executionId,
         (System.currentTimeMillis() - startTime) / 1000L);
-    } catch (IOException|SavingException e) {
+    } catch (IOException | SavingException e) {
       LOGGER.error("Error while saving video for execution {} (fps {})", e, fps, e);
       executionSavingStateMap.put(executionId, SavingState.ERROR);
     }
