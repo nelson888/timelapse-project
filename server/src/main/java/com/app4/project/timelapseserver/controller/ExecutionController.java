@@ -93,7 +93,7 @@ public class ExecutionController {
   @GetMapping("/{id}/video/savingState") // TODO add on swagger
   public ResponseEntity getExecutionSavingState(@PathVariable int id) {
     idCheck(id);
-    return ResponseEntity.ok(saveToVideoService.getSavingState(id));
+    return ResponseEntity.ok(saveToVideoService.getSavingProgress(id));
   }
 
   @DeleteMapping("/{id}")

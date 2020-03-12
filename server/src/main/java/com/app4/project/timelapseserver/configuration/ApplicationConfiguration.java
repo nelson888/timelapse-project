@@ -2,12 +2,11 @@ package com.app4.project.timelapseserver.configuration;
 
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
-import com.app4.project.timelapse.model.SavingState;
+import com.app4.project.timelapse.model.SavingProgress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class ApplicationConfiguration {
   }
 
   @Bean
-  public ConcurrentMap<Integer, SavingState> executionSavingStateMap() {
+  public ConcurrentMap<Integer, SavingProgress> executionSavingStateMap() {
     return new ConcurrentHashMap<>();
   }
 

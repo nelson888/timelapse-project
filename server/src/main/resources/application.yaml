@@ -2,9 +2,12 @@ spring:
   servlet.multipart:
     max-file-size: 100MB
     max-request-size: 100MB
-  profiles.active: firebase,mongodb
+  profiles.active: local,mongodb
 
 video.default.fps: 24
 
 temp.dir.root: ${TEMP_DIR_ROOT}
 executor.threads: 4
+
+logging.level:
+  com.app4.project: DEBUG

@@ -191,7 +191,7 @@ public class LocalStorageService extends AbstractStorage {
 
   @Override
   void uploadVideo(int executionId, InputStream inputStream) throws IOException {
-    File file = rootPath.resolve("video.mp4").toFile();
+    File file = rootPath.resolve(FOLDER_PREFIX + executionId).resolve("video.mp4").toFile();
     try (OutputStream os = new FileOutputStream(file)) {
       inputStream.transferTo(os);
     }

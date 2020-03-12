@@ -37,4 +37,9 @@ abstract class AbstractStorage implements StorageService {
     return new FileChannelWrapper(new FileOutputStream(path.toFile()).getChannel());
   }
 
+  @Override
+  public long executionFilesCount(int executionId, long fromTimestamp) {
+    return executionFiles(executionId, fromTimestamp).count();
+  }
+
 }

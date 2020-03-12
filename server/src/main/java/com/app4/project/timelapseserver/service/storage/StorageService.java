@@ -33,4 +33,5 @@ public interface StorageService {
 
   void deleteForExecution(int executionId);
 
+  long executionFilesCount(int executionId, long fromTimestamp);
 }
