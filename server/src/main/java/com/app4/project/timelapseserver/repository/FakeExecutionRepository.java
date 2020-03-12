@@ -1,6 +1,8 @@
 package com.app4.project.timelapseserver.repository;
 
 import com.app4.project.timelapse.model.Execution;
+import com.app4.project.timelapseserver.exception.NotFoundException;
+import com.app4.project.timelapseserver.model.request.ExecutionPatchRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +86,29 @@ public class FakeExecutionRepository implements ExecutionRepository {
     LOGGER.info("Executions: {}", executions);
   }
 
+  @Override
+  public Execution update(int id, ExecutionPatchRequest request) {
+    Execution ex = executions.stream().filter(e -> e.getId() == id).findFirst()
+      .orElseThrow(() ->
+        new NotFoundException(String.format("Execution with id %d doesn't exists", id)));
+    updateExecution(ex, request);
+    return ex;
+  }
+
+  void updateExecution(Execution ex, ExecutionPatchRequest request) {
+    if (request.getEndTime() != null) {
+      ex.setEndTime(request.getEndTime());
+    }
+    if (request.getPeriod() != null) {
+      ex.setPeriod(request.getPeriod());
+    }
+    if (request.getStartTime() != null) {
+      ex.setStartTime(request.getStartTime());
+    }
+    if (request.getTitle() != null) {
+      ex.setTitle(request.getTitle());
+    }
+  }
 
   private static class IdPool {
 

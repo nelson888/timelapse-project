@@ -10,7 +10,7 @@ import java.util.Optional;
 public class MongoRepository<T> {
 
   protected final MongoTemplate mongoTemplate;
-  private final Class<T> clazz;
+  protected final Class<T> clazz;
   private final String collectionName;
 
   public MongoRepository(MongoTemplate mongoTemplate, Class<T> clazz, String collectionName) {
@@ -42,7 +42,7 @@ public class MongoRepository<T> {
     return mongoTemplate.remove(queryById(id), clazz, collectionName).getDeletedCount() > 0;
   }
 
-  private Query queryById(int id) {
+  protected Query queryById(int id) {
     return Query.query(Criteria.where("id").is(id));
   }
 
