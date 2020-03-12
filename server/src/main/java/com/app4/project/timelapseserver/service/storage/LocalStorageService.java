@@ -12,8 +12,10 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,12 +56,10 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   private static String nDigitsNumber(int number, int n) {
-    StringBuilder sNumber = (new StringBuilder()).append(number);
-
+    StringBuilder sNumber = new StringBuilder().append(number);
     while (sNumber.length() < n) {
       sNumber.insert(0, '0');
     }
-
     return sNumber.toString();
   }
 
@@ -190,12 +190,10 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   @Override
-  void uploadVideo(int executionId, InputStream inputStream) {
-    // TODO
-  }
-
-  @Override
-  Logger getLogger() {
-    return LOGGER;
+  void uploadVideo(int executionId, InputStream inputStream) throws IOException {
+    File file = rootPath.resolve("video.mp4").toFile();
+    try (OutputStream os = new FileOutputStream(file)) {
+      inputStream.transferTo(os);
+    }
   }
 }

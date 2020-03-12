@@ -1,5 +1,6 @@
 package com.app4.project.timelapseserver.codec;
 
+import com.app4.project.timelapseserver.util.IORunnable;
 import org.jcodec.api.SequenceEncoder;
 import org.jcodec.common.io.SeekableByteChannel;
 import org.jcodec.common.model.ColorSpace;
@@ -17,9 +18,9 @@ import static org.jcodec.common.Format.MOV;
 
 public class JpgSequenceEncoder implements Closeable {
   private final SequenceEncoder sequenceEncoder;
-  private final Runnable endRunnable; // TODO use something thzt throws an IOError instead (in case of erro while uploading)
+  private final IORunnable endRunnable; // TODO use something thzt throws an IOError instead (in case of erro while uploading)
 
-  public JpgSequenceEncoder(SeekableByteChannel channel, int fps, Runnable endRunnable) throws IOException {
+  public JpgSequenceEncoder(SeekableByteChannel channel, int fps, IORunnable endRunnable) throws IOException {
     this.endRunnable = endRunnable;
     this.sequenceEncoder = new SequenceEncoder(channel, Rational.R(fps, 1), MOV, H264, null);
   }
