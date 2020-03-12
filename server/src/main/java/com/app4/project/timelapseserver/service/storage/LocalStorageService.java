@@ -149,10 +149,15 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   @Override
-  public Stream<IOSupplier<byte[]>> executionFiles(int executionId, long fromTimestamp) {
+  public Stream<IOSupplier<byte[]>> executionFiles(int executionId, long fromTimestamp, long toTimestamp) {
     return Arrays.stream(rootPath.resolve(FOLDER_PREFIX + executionId).toFile().listFiles())
-      .filter(f -> f.getName().endsWith(IMAGE_EXTENSION) && creationTime(f) >= fromTimestamp)
+      .filter(f -> f.getName().endsWith(IMAGE_EXTENSION) && isTimestampInRange(f, fromTimestamp, toTimestamp))
       .map(f -> (() -> Files.readAllBytes(f.toPath())));
+  }
+
+  private boolean isTimestampInRange(File f, long fromTimestamp, long toTimestamp) {
+    long timestamp = creationTime(f);
+    return timestamp >= fromTimestamp && timestamp<= toTimestamp;
   }
 
   private long creationTime(File f) {

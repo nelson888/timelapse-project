@@ -38,8 +38,8 @@ abstract class AbstractStorage implements StorageService {
   }
 
   @Override
-  public long executionFilesCount(int executionId, long fromTimestamp) {
-    return executionFiles(executionId, fromTimestamp).count();
+  public long executionFilesCount(int executionId, long fromTimestamp, long toTimestamp) {
+    return executionFiles(executionId, fromTimestamp, toTimestamp).count();
   }
 
 }

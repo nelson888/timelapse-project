@@ -107,12 +107,14 @@ public class FirebaseStorageService extends AbstractStorage {
   }
 
   @Override
-  public Stream<IOSupplier<byte[]>> executionFiles(int executionId, long fromTimestamp) {
+  public Stream<IOSupplier<byte[]>> executionFiles(int executionId, long fromTimestamp,
+                                                   long toTimestamp) {
     return StreamSupport.stream(
       bucket.list(Storage.BlobListOption.prefix(FOLDER_PREFIX + executionId),
-        Storage.BlobListOption.fields(Storage.BlobField.NAME))
+        Storage.BlobListOption.fields(Storage.BlobField.NAME, Storage.BlobField.METADATA))
         .iterateAll().spliterator(), false)
-      .filter(b -> b.getName().endsWith(IMAGE_EXTENSION) && b.getCreateTime() >= fromTimestamp)
+      .filter(b -> b.getName().endsWith(IMAGE_EXTENSION) &&
+        b.getCreateTime() >= fromTimestamp && b.getCreateTime() <= toTimestamp)
       .map(b -> (() -> getContent(b)));
   }
 

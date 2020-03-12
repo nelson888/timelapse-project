@@ -27,11 +27,11 @@ public interface StorageService {
 
   int nbFiles(int executionId);
 
-  Stream<IOSupplier<byte[]>> executionFiles(int executionId, long fromTimestamp);
+  Stream<IOSupplier<byte[]>> executionFiles(int executionId, long fromTimestamp, long toTimestamp);
 
   FileData getFileData(int executionId, int fileId);
 
   void deleteForExecution(int executionId);
 
-  long executionFilesCount(int executionId, long fromTimestamp);
+  long executionFilesCount(int executionId, long fromTimestamp, long toTimestamp);
 }

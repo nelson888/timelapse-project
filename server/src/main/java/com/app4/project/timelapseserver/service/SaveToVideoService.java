@@ -33,12 +33,13 @@ public class SaveToVideoService {
   }
 
   // TODO add toTimestamp?
-  public SavingState startVideoSaving(Execution execution, int fps, long fromTimestamp) {
+  public SavingState startVideoSaving(Execution execution, int fps, long fromTimestamp,
+                                      long toTimestamp) {
     if (getSavingProgress(execution.getId()).getState() != SavingState.ON_GOING) {
       LOGGER.info("Starting saving video for execution {} with fps {}", execution.getId(), fps);
       executionSavingStateMap.put(execution.getId(), SavingProgress.onGoing(0));
-      long framesCount = storageService.executionFilesCount(execution.getId(), fromTimestamp);
-      executor.submit(() -> save(execution.getId(), fps, fromTimestamp, framesCount));
+      long framesCount = storageService.executionFilesCount(execution.getId(), fromTimestamp, toTimestamp);
+      executor.submit(() -> save(execution.getId(), fps, fromTimestamp, framesCount, toTimestamp));
     }
     return SavingState.ON_GOING;
   }
@@ -47,15 +48,15 @@ public class SaveToVideoService {
     return executionSavingStateMap.getOrDefault(executionId, SavingProgress.notStarted());
   }
 
-  private void save(int executionId, int fps, long fromTimestamp, long framesCount) {
+  private void save(int executionId, int fps, long fromTimestamp, long toTimestamp, long framesCount) {
     long startTime = System.currentTimeMillis();
     AtomicLong framesProcessed = new AtomicLong(0L);
     try (JpgSequenceEncoder encoder = storageService.newEncoderForExecution(executionId, fps)) {
-      storageService.executionFiles(executionId, fromTimestamp)
+      storageService.executionFiles(executionId, fromTimestamp, toTimestamp)
         .forEach(supplier ->
           addFrame(encoder, supplier,() -> updateProgress(executionId, framesProcessed, framesCount)));
       executionSavingStateMap.put(executionId, SavingProgress.finished());
-      LOGGER.info("Finished saving  x video for execution {} (it took {}s)", executionId,
+      LOGGER.info("Finished saving video for execution {} (it took {}s)", executionId,
         (System.currentTimeMillis() - startTime) / 1000L);
     } catch (IOException | SavingException e) {
       LOGGER.error("Error while saving video for execution {} (fps {})", e, fps, e);
