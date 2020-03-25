@@ -30,7 +30,7 @@ public class SaveToVideoService {
     if (getSavingProgress(execution.getId()).getState() != SavingState.ON_GOING) {
       long framesCount = storageService.executionFilesCount(execution.getId(), fromTimestamp, toTimestamp);
       if (framesCount == 0) {
-        return SavingProgress.notStarted();
+        return SavingProgress.notStarted("There are no frames for between the timestamp(s)");
       }
       executor.submit(new SaveToVideoTask(storageService, executionSavingStateMap, execution.getId(), fps, fromTimestamp, toTimestamp, framesCount));
     }
@@ -38,7 +38,7 @@ public class SaveToVideoService {
   }
 
   public SavingProgress getSavingProgress(int executionId) {
-    return executionSavingStateMap.getOrDefault(executionId, SavingProgress.notStarted());
+    return executionSavingStateMap.getOrDefault(executionId, SavingProgress.notStarted("Doesn't exists"));
   }
 
 }

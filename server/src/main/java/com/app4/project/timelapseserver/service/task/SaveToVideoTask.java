@@ -41,7 +41,7 @@ public class SaveToVideoTask implements Runnable {
         (System.currentTimeMillis() - startTime) / 1000L);
     } catch (IOException | SavingException e) {
       LOGGER.error("Error while saving video for execution {} (fps {})", e, fps, e);
-      executionSavingStateMap.put(executionId, SavingProgress.error());
+      executionSavingStateMap.put(executionId, SavingProgress.error(e.getMessage()));
     }
   }
 
