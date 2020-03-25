@@ -15,9 +15,14 @@ public class SavingProgress {
   private int percentage;
   private SavingState state;
   private String message;
+  private Integer videoId;
 
   public SavingProgress(int taskId, int percentage, SavingState state) {
-    this(taskId, percentage, state, null);
+    this(taskId, percentage, state, null, null);
+  }
+
+  public SavingProgress(int taskId, int percentage, SavingState state, String message) {
+    this(taskId, percentage, state, message, null);
   }
 
   public static SavingProgress error(int taskId, String message) {
@@ -32,7 +37,7 @@ public class SavingProgress {
     return new SavingProgress(taskId, percentage, SavingState.ON_GOING);
   }
 
-  public static SavingProgress finished(int taskId) {
-    return new SavingProgress(taskId, 100, SavingState.FINISHED);
+  public static SavingProgress finished(int taskId, int videoId) {
+    return new SavingProgress(taskId, 100, SavingState.FINISHED, null, videoId);
   }
 }

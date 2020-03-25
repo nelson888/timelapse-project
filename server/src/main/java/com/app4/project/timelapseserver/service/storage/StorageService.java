@@ -22,7 +22,7 @@ public interface StorageService {
 
   FileChannelWrapper createTempChannel(int taskId) throws IOException;
 
-  public void uploadVideo(int executionId, Path tempVideoPath) throws IOException;
+  int uploadVideo(int executionId, Path tempVideoPath) throws IOException;
 
   Resource loadAsResource(int executionId, int fileId);
 

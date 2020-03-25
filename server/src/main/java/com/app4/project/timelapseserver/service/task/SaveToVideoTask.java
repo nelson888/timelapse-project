@@ -20,6 +20,8 @@ public class SaveToVideoTask implements Runnable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SaveToVideoTask.class);
 
+  private final AtomicLong framesProcessed = new AtomicLong(0L);
+
   private final int taskId;
   private final StorageService storageService;
   private final Consumer<SavingProgress> progressUpdater;
@@ -28,7 +30,6 @@ public class SaveToVideoTask implements Runnable {
   private final long fromTimestamp;
   private final long toTimestamp;
   private final long framesCount;
-  private final AtomicLong framesProcessed = new AtomicLong(0L);
 
   @Override
   public void run() {
@@ -49,13 +50,13 @@ public class SaveToVideoTask implements Runnable {
   private void save(JpgSequenceEncoder encoder, Path tempFilePath) throws IOException {
     storageService.executionFiles(executionId, fromTimestamp, toTimestamp)
       .forEach(supplier -> addFrame(encoder, supplier));
-    storageService.uploadVideo(taskId, tempFilePath);
-    progressUpdater.accept(SavingProgress.finished(taskId)); // TODO add video id when handling multiple videos
+    int videoId = storageService.uploadVideo(taskId, tempFilePath);
+    progressUpdater.accept(SavingProgress.finished(taskId, videoId));
   }
 
   private void addFrame(JpgSequenceEncoder encoder, IOSupplier<byte[]> bytesSupplier) {
     try {
-      LOGGER.debug("Encoding frame {} (out of {})", framesProcessed.get(), framesCount);
+      LOGGER.debug("[Task {}] Encoding frame {} (out of {})", taskId, framesProcessed.get(), framesCount);
       byte[] bytes = bytesSupplier.get();
       encoder.addFrame(bytes);
       updateProgress();

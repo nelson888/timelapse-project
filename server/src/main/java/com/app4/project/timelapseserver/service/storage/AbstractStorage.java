@@ -23,13 +23,19 @@ abstract class AbstractStorage implements StorageService {
   }
 
   @Override
-  public void uploadVideo(int executionId, Path tempVideoPath) throws IOException {
+  public int uploadVideo(int taskId, Path tempVideoPath) throws IOException {
+    int videoId = generateVideoId(taskId);
     try (InputStream inputStream = Files.newInputStream(tempVideoPath)) {
-      uploadVideo(executionId, inputStream);
+      uploadVideo(videoId, inputStream);
     }
+    return videoId;
   }
 
-  abstract void uploadVideo(int executionId, InputStream inputStream) throws IOException;
+  protected int generateVideoId(int taskId) {
+    return taskId + 250; // random operation to differentiate taskId from videoId
+  }
+
+  abstract void uploadVideo(int videoId, InputStream inputStream) throws IOException;
 
   @Override
   public long executionFilesCount(int executionId, long fromTimestamp, long toTimestamp) {

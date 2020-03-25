@@ -145,9 +145,9 @@ public class FirebaseStorageService extends AbstractStorage {
   }
 
   @Override
-  void uploadVideo(int executionId, InputStream inputStream) throws IOException {
+  void uploadVideo(int videoId, InputStream inputStream) throws IOException {
     try {
-      bucket.create(FOLDER_PREFIX + executionId + "/video.mp4", inputStream);
+      bucket.create(FOLDER_PREFIX + String.format("/video_%d.mp4", videoId), inputStream);
     } catch (StorageException e) {
       throw new IOException("Error while writing file", e);
     }
