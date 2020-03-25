@@ -25,13 +25,16 @@ public class SaveToVideoService {
     this.executionSavingStateMap = executionSavingStateMap;
   }
 
-  public SavingState startVideoSaving(Execution execution, int fps, long fromTimestamp,
+  public SavingProgress startVideoSaving(Execution execution, int fps, long fromTimestamp,
                                       long toTimestamp) {
     if (getSavingProgress(execution.getId()).getState() != SavingState.ON_GOING) {
       long framesCount = storageService.executionFilesCount(execution.getId(), fromTimestamp, toTimestamp);
+      if (framesCount == 0) {
+        return SavingProgress.notStarted();
+      }
       executor.submit(new SaveToVideoTask(storageService, executionSavingStateMap, execution.getId(), fps, fromTimestamp, toTimestamp, framesCount));
     }
-    return SavingState.ON_GOING;
+    return SavingProgress.onGoing(0);
   }
 
   public SavingProgress getSavingProgress(int executionId) {

@@ -89,6 +89,9 @@ public class ExecutionController {
                                            @RequestParam Optional<Long> fromTimestamp, @RequestParam Optional<Long> toTimestamp) {
     Execution execution = executionRepository.getById(id)
       .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"));
+    if (fps.isPresent() && fps.get() <= 0) {
+      throw new BadRequestException("fps must be positive");
+    }
     return ResponseEntity.ok(saveToVideoService.startVideoSaving(execution, fps.orElse(defaultFps),
       fromTimestamp.orElse(Long.MIN_VALUE), toTimestamp.orElse(Long.MAX_VALUE)));
   }
