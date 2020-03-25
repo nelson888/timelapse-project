@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @RestController
 @RequestMapping("/api/executions")
 public class ExecutionController {
