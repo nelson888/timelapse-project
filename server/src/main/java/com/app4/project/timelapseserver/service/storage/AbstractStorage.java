@@ -1,8 +1,6 @@
 package com.app4.project.timelapseserver.service.storage;
 
-import com.app4.project.timelapseserver.codec.JpgSequenceEncoder;
-import org.jcodec.common.io.FileChannelWrapper;
-import org.jcodec.common.io.SeekableByteChannel;
+import com.app4.project.timelapseserver.util.FileChannelWrapper;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,23 +17,19 @@ abstract class AbstractStorage implements StorageService {
   }
 
   @Override
-  public JpgSequenceEncoder newEncoderForExecution(int executionId, int fps) throws IOException {
+  public FileChannelWrapper createTempChannel(int executionId) throws IOException {
     Path path = tempDirRoot.resolve(String.format("execution_%d.mp4", executionId));
-    SeekableByteChannel channel = getChannel(path); // the JpgSequenceEncoder will close this channel
-    return new JpgSequenceEncoder(channel, fps, () -> uploadVideo(executionId, path));
+    return new FileChannelWrapper(new FileOutputStream(path.toFile()).getChannel(), path);
   }
 
-  private void uploadVideo(int executionId, Path path) throws IOException {
-    try (InputStream inputStream = Files.newInputStream(path)) {
+  @Override
+  public void uploadVideo(int executionId, Path tempVideoPath) throws IOException {
+    try (InputStream inputStream = Files.newInputStream(tempVideoPath)) {
       uploadVideo(executionId, inputStream);
     }
   }
 
   abstract void uploadVideo(int executionId, InputStream inputStream) throws IOException;
-
-  private SeekableByteChannel getChannel(Path path) throws IOException {
-    return new FileChannelWrapper(new FileOutputStream(path.toFile()).getChannel());
-  }
 
   @Override
   public long executionFilesCount(int executionId, long fromTimestamp, long toTimestamp) {

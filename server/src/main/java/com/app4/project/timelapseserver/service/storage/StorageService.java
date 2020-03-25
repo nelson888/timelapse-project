@@ -1,13 +1,14 @@
 package com.app4.project.timelapseserver.service.storage;
 
 import com.app4.project.timelapse.model.FileData;
-import com.app4.project.timelapseserver.codec.JpgSequenceEncoder;
+import com.app4.project.timelapseserver.util.FileChannelWrapper;
 import com.app4.project.timelapseserver.util.IOSupplier;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.stream.Stream;
 
 public interface StorageService {
@@ -19,7 +20,9 @@ public interface StorageService {
 
   FileData store(int executionId, InputStream inputStream) throws IOException;
 
-  JpgSequenceEncoder newEncoderForExecution(int executionId, int fps) throws IOException;
+  FileChannelWrapper createTempChannel(int executionId) throws IOException;
+
+  public void uploadVideo(int executionId, Path tempVideoPath) throws IOException;
 
   Resource loadAsResource(int executionId, int fileId);
 
