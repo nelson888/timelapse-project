@@ -2,6 +2,7 @@ package com.app4.project.timelapseserver.controller;
 
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Execution;
+import com.app4.project.timelapse.model.TasksList;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
 import com.app4.project.timelapseserver.exception.ConflictException;
@@ -92,14 +93,14 @@ public class ExecutionController {
     if (fps.isPresent() && fps.get() <= 0) {
       throw new BadRequestException("fps must be positive");
     }
-    return ResponseEntity.ok(saveToVideoService.startVideoSaving(execution, fps.orElse(defaultFps),
+    return ResponseEntity.ok(saveToVideoService.startVideoSaving(execution.getId(), fps.orElse(defaultFps),
       fromTimestamp.orElse(Long.MIN_VALUE), toTimestamp.orElse(Long.MAX_VALUE)));
   }
 
-  @GetMapping("/{id}/video/savingState") // TODO add on swagger
-  public ResponseEntity getExecutionSavingState(@PathVariable int id) {
+  @GetMapping("/{id}/video/tasks") // TODO add on swagger
+  public ResponseEntity getAllTasks(@PathVariable int id) {
     idCheck(id);
-    return ResponseEntity.ok(saveToVideoService.getSavingProgress(id));
+    return ResponseEntity.ok(new TasksList(saveToVideoService.getAllTasksForExecution(id)));
   }
 
   @DeleteMapping("/{id}")

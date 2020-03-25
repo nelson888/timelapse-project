@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,4 +54,8 @@ public class ApplicationConfiguration {
     return new ConcurrentHashMap<>();
   }
 
+  @Bean
+  public ConcurrentMap<Integer, Queue<Integer>> executionTasksMap() {
+    return new ConcurrentHashMap<>();
+  }
 }

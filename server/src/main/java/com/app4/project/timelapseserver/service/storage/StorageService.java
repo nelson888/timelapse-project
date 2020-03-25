@@ -20,7 +20,7 @@ public interface StorageService {
 
   FileData store(int executionId, InputStream inputStream) throws IOException;
 
-  FileChannelWrapper createTempChannel(int executionId) throws IOException;
+  FileChannelWrapper createTempChannel(int taskId) throws IOException;
 
   public void uploadVideo(int executionId, Path tempVideoPath) throws IOException;
 

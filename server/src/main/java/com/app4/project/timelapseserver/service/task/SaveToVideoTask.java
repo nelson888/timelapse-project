@@ -12,16 +12,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 @AllArgsConstructor
 public class SaveToVideoTask implements Runnable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SaveToVideoTask.class);
 
+  private final int taskId;
   private final StorageService storageService;
-  private final Map<Integer, SavingProgress> executionSavingStateMap;
+  private final Consumer<SavingProgress> progressUpdater;
   private final int executionId;
   private final int fps;
   private final long fromTimestamp;
@@ -32,24 +33,24 @@ public class SaveToVideoTask implements Runnable {
   @Override
   public void run() {
     LOGGER.info("Starting saving video for execution {} with fps {}", executionId, fps);
-    executionSavingStateMap.put(executionId, SavingProgress.onGoing(0));
+    progressUpdater.accept(SavingProgress.onGoing(taskId, 0));
     long startTime = System.currentTimeMillis();
-    try (FileChannelWrapper channelWrapper = storageService.createTempChannel(executionId);
+    try (FileChannelWrapper channelWrapper = storageService.createTempChannel(taskId);
       JpgSequenceEncoder encoder = new JpgSequenceEncoder(channelWrapper, fps)) {
-      save(encoder, channelWrapper.getPath());
+      save(encoder, channelWrapper.getTempFilePath());
       LOGGER.info("Finished saving video for execution {} (it took {}s)", executionId,
         (System.currentTimeMillis() - startTime) / 1000L);
     } catch (IOException | SavingException e) {
       LOGGER.error("Error while saving video for execution {} (fps {})", e, fps, e);
-      executionSavingStateMap.put(executionId, SavingProgress.error(e.getMessage()));
+      progressUpdater.accept(SavingProgress.error(taskId, e.getMessage()));
     }
   }
 
   private void save(JpgSequenceEncoder encoder, Path tempFilePath) throws IOException {
     storageService.executionFiles(executionId, fromTimestamp, toTimestamp)
       .forEach(supplier -> addFrame(encoder, supplier));
-    storageService.uploadVideo(executionId, tempFilePath);
-    executionSavingStateMap.put(executionId, SavingProgress.finished());
+    storageService.uploadVideo(taskId, tempFilePath);
+    progressUpdater.accept(SavingProgress.finished(taskId)); // TODO add video id when handling multiple videos
   }
 
   private void addFrame(JpgSequenceEncoder encoder, IOSupplier<byte[]> bytesSupplier) {
@@ -65,6 +66,6 @@ public class SaveToVideoTask implements Runnable {
 
   private void updateProgress() {
     int percentage = (int) (100L * framesProcessed.incrementAndGet() / framesCount);
-    executionSavingStateMap.put(executionId, SavingProgress.onGoing(percentage));
+    progressUpdater.accept(SavingProgress.onGoing(taskId, percentage));
   }
 }

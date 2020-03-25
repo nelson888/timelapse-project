@@ -17,8 +17,8 @@ abstract class AbstractStorage implements StorageService {
   }
 
   @Override
-  public FileChannelWrapper createTempChannel(int executionId) throws IOException {
-    Path path = tempDirRoot.resolve(String.format("execution_%d.mp4", executionId));
+  public FileChannelWrapper createTempChannel(int taskId) throws IOException {
+    Path path = tempDirRoot.resolve(String.format("video_%d.mp4", taskId));
     return new FileChannelWrapper(new FileOutputStream(path.toFile()).getChannel(), path);
   }
 
