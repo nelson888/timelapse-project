@@ -50,7 +50,7 @@ public class SaveToVideoTask implements Runnable {
   private void save(JpgSequenceEncoder encoder, Path tempFilePath) throws IOException {
     storageService.executionFiles(executionId, fromTimestamp, toTimestamp)
       .forEach(supplier -> addFrame(encoder, supplier));
-    int videoId = storageService.uploadVideo(taskId, tempFilePath);
+    int videoId = storageService.uploadVideo(tempFilePath);
     progressUpdater.accept(SavingProgress.finished(taskId, videoId));
   }
 

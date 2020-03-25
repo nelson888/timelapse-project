@@ -10,6 +10,8 @@ import java.nio.file.Path;
 
 abstract class AbstractStorage implements StorageService {
 
+  protected static final String VIDEO_FILE_PREFIX = "video_";
+  protected static final String VIDEO_FILE_EXTENSION = ".mp4";
   private final Path tempDirRoot;
 
   protected AbstractStorage(Path tempDirRoot) {
@@ -23,17 +25,15 @@ abstract class AbstractStorage implements StorageService {
   }
 
   @Override
-  public int uploadVideo(int taskId, Path tempVideoPath) throws IOException {
-    int videoId = generateVideoId(taskId);
+  public int uploadVideo(Path tempVideoPath) throws IOException {
+    int videoId = getVideoCount();
     try (InputStream inputStream = Files.newInputStream(tempVideoPath)) {
       uploadVideo(videoId, inputStream);
     }
     return videoId;
   }
 
-  protected int generateVideoId(int taskId) {
-    return taskId + 250; // random operation to differentiate taskId from videoId
-  }
+  protected abstract int getVideoCount();
 
   abstract void uploadVideo(int videoId, InputStream inputStream) throws IOException;
 

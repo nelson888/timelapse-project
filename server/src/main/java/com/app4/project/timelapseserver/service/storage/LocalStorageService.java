@@ -5,6 +5,7 @@ import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.app4.project.timelapseserver.exception.FileStorageException;
 import com.app4.project.timelapseserver.util.IOSupplier;
+import com.google.cloud.storage.StorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -195,8 +196,20 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   @Override
+  protected int getVideoCount() {
+    try {
+      return (int) Files.list(rootPath).map(Path::toFile)
+        .filter(f -> f.getName().startsWith(VIDEO_FILE_PREFIX))
+        .count();
+    } catch (IOException e) {
+      LOGGER.error("Couldn't get number of files", e);
+      throw new StorageException(e);
+    }
+  }
+
+  @Override
   void uploadVideo(int videoId, InputStream inputStream) throws IOException {
-    File file = rootPath.resolve(String.format("video_%d.mp4", videoId)).toFile();
+    File file = rootPath.resolve(VIDEO_FILE_PREFIX + videoId + VIDEO_FILE_EXTENSION).toFile();
     try (OutputStream os = new FileOutputStream(file)) {
       inputStream.transferTo(os);
     }
