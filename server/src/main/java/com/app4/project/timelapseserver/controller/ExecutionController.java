@@ -6,6 +6,7 @@ import com.app4.project.timelapse.model.TasksList;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
 import com.app4.project.timelapseserver.exception.ConflictException;
+import com.app4.project.timelapseserver.exception.NotFoundException;
 import com.app4.project.timelapseserver.model.request.ExecutionPatchRequest;
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
 import com.app4.project.timelapseserver.service.SaveToVideoService;
@@ -74,14 +75,10 @@ public class ExecutionController {
     }
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("/{id}") // TODO modify swagger (changed bad request to notfound
   public ResponseEntity getExecution(@PathVariable int id) {
-    idCheck(id);
-    if (executionRepository.count() == 0) {
-      throw new BadRequestException("There isn't any execution to get");
-    }
     return ResponseEntity.ok(executionRepository.getById(id)
-      .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"))
+      .orElseThrow(() -> new NotFoundException(String.format("Execution with id %d doesn't exists", id)))
     );
   }
 
@@ -89,7 +86,7 @@ public class ExecutionController {
   public ResponseEntity startSavingToVideo(@PathVariable int id, @RequestParam Optional<Integer> fps,
                                            @RequestParam Optional<Long> fromTimestamp, @RequestParam Optional<Long> toTimestamp) {
     Execution execution = executionRepository.getById(id)
-      .orElseThrow(() -> new BadRequestException("There isn't any execution with the specified id  get"));
+      .orElseThrow(() -> new NotFoundException("There isn't any execution with the specified id  get"));
     if (fps.isPresent() && fps.get() <= 0) {
       throw new BadRequestException("fps must be positive");
     }
@@ -99,13 +96,14 @@ public class ExecutionController {
 
   @GetMapping("/{id}/video/tasks") // TODO add on swagger
   public ResponseEntity getAllTasks(@PathVariable int id) {
-    idCheck(id);
+    if (executionRepository.getById(id).isEmpty()) {
+      throw new NotFoundException("Execution with id " + id + " was not found");
+    }
     return ResponseEntity.ok(new TasksList(saveToVideoService.getAllTasksForExecution(id)));
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity removeExecution(@PathVariable int id) {
-    idCheck(id);
     if (executionRepository.remove(id)) {
       executor.execute(() -> {
         storageService.deleteForExecution(id);
@@ -121,7 +119,7 @@ public class ExecutionController {
       throw new BadRequestException("The period must be greater than 0");
     }
     if (patchRequest.getTitle() != null && patchRequest.getTitle().isEmpty()) {
-      throw new BadRequestException("The period must be greater than 0");
+      throw new BadRequestException("The title cannot be empty");
     }
     return ResponseEntity.ok(executionRepository.update(id, patchRequest));
   }
@@ -134,7 +132,7 @@ public class ExecutionController {
   @GetMapping("/soonest")
   public ResponseEntity soonestExecution() {
     return ResponseEntity.ok(executionRepository.getSoonest()
-      .orElseThrow(() -> new BadRequestException("There isn't any execution to get")));
+      .orElseThrow(() -> new NotFoundException("There isn't any execution to get")));
   }
 
   @GetMapping("/current")
