@@ -35,18 +35,11 @@ public class MongoExecutionRepository extends MongoRepository<Execution> impleme
   @Override
   public Execution update(int id, ExecutionPatchRequest request) {
     Update update = new Update();
-    if (request.getEndTime() != null) {
-      update.set("endTime", request.getEndTime());
-    }
-    if (request.getPeriod() != null) {
-      update.set("period", request.getPeriod());
-    }
-    if (request.getStartTime() != null) {
-      update.set("startTime", request.getStartTime());
-    }
-    if (request.getTitle() != null) {
-      update.set("title", request.getTitle());
-    }
+    Optional.ofNullable(request.getTitle()).ifPresent(title -> update.set("title", title));
+    Optional.ofNullable(request.getStartTime()).ifPresent(startTime -> update.set("startTime", startTime));
+    Optional.ofNullable(request.getEndTime()).ifPresent(endTime -> update.set("endTime", endTime));
+    Optional.ofNullable(request.getPeriod()).ifPresent(period -> update.set("period", period));
+
     return mongoTemplate.findAndModify(queryById(id), update, clazz);
   }
 }
