@@ -76,7 +76,7 @@ public class SaveToVideoService {
   }
 
   // clean map every 30 minutes
-  @Scheduled(fixedDelay= 30L * 60L * 1000L)
+  @Scheduled(fixedDelay= 60L * 60L * 1000L)
   public void clean() {
     List<Integer> tasksToRemove = taskProgressMap.entrySet()
       .stream().filter(e -> e.getValue().getState() == SavingState.FINISHED)
