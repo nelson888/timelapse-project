@@ -1,8 +1,6 @@
 package com.app4.project.timelapseserver.controller;
 
 import com.app4.project.timelapse.model.FileData;
-import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
-import com.app4.project.timelapseserver.exception.BadRequestException;
 import com.app4.project.timelapseserver.exception.NotFoundException;
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
 import com.app4.project.timelapseserver.storage.StorageService;
@@ -22,15 +20,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+// TODO modify on swagger /storage -> /storage/images
 @RestController
-@RequestMapping("/storage")
-public class StorageController {
+@RequestMapping("/storage/images")
+public class ImageStorageController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(StorageController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ImageStorageController.class);
   private final StorageService storageService;
   private final ExecutionRepository executionRepository;
 
-  public StorageController(StorageService storageService, ExecutionRepository executionRepository) {
+  public ImageStorageController(StorageService storageService, ExecutionRepository executionRepository) {
     this.storageService = storageService;
     this.executionRepository = executionRepository;
   }
