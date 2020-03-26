@@ -33,9 +33,11 @@ public class MongoRepository<T> {
   }
 
   public Optional<T> getById(int id) {
-    return Optional.ofNullable(
-      mongoTemplate.findOne(queryById(id), clazz, collectionName)
-    );
+    return findOne(queryById(id));
+  }
+
+  protected Optional<T> findOne(Query query) {
+    return Optional.ofNullable(mongoTemplate.findOne(query, clazz, collectionName));
   }
 
   public boolean remove(int id) {
