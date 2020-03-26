@@ -2,7 +2,7 @@ package com.app4.project.timelapseserver.service;
 
 import com.app4.project.timelapse.model.SavingProgress;
 import com.app4.project.timelapse.model.SavingState;
-import com.app4.project.timelapseserver.service.storage.StorageService;
+import com.app4.project.timelapseserver.storage.StorageService;
 import com.app4.project.timelapseserver.service.task.SaveToVideoTask;
 
 import org.slf4j.Logger;
@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

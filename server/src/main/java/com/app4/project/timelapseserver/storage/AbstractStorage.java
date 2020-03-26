@@ -1,4 +1,4 @@
-package com.app4.project.timelapseserver.service.storage;
+package com.app4.project.timelapseserver.storage;
 
 import com.app4.project.timelapseserver.util.FileChannelWrapper;
 

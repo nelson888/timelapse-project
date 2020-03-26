@@ -1,9 +1,8 @@
-package com.app4.project.timelapseserver.service.storage;
+package com.app4.project.timelapseserver.storage;
 
 import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.app4.project.timelapseserver.util.IOSupplier;
-import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;

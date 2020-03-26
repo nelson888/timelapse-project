@@ -4,7 +4,7 @@ import com.app4.project.timelapse.model.SavingProgress;
 import com.app4.project.timelapseserver.codec.JpgSequenceEncoder;
 import com.app4.project.timelapseserver.exception.SavingException;
 import com.app4.project.timelapseserver.util.FileChannelWrapper;
-import com.app4.project.timelapseserver.service.storage.StorageService;
+import com.app4.project.timelapseserver.storage.StorageService;
 import com.app4.project.timelapseserver.util.IOSupplier;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;

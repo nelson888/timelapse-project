@@ -3,7 +3,7 @@ package com.app4.project.timelapseserver.controller;
 import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
-import com.app4.project.timelapseserver.service.storage.StorageService;
+import com.app4.project.timelapseserver.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;

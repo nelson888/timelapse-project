@@ -9,7 +9,7 @@ import com.app4.project.timelapseserver.exception.ConflictException;
 import com.app4.project.timelapseserver.model.request.ExecutionPatchRequest;
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
 import com.app4.project.timelapseserver.service.SaveToVideoService;
-import com.app4.project.timelapseserver.service.storage.StorageService;
+import com.app4.project.timelapseserver.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
