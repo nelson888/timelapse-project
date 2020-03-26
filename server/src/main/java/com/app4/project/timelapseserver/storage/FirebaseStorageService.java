@@ -84,7 +84,7 @@ public class FirebaseStorageService extends AbstractStorage {
   }
 
   @Override
-  public Resource loadAsResource(int executionId, int fileId) {
+  public Resource getImageAsResource(int executionId, int fileId) {
     Blob blob = bucket.get(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId));
     if (blob == null || !blob.exists()) {
       throw new FileNotFoundException(String.format("The file with id %d for execution %d doesn't exists",
@@ -95,13 +95,12 @@ public class FirebaseStorageService extends AbstractStorage {
   }
 
   @Override
-  public Resource loadVideoAsResource(int executionId) {
-    Blob blob = bucket.get(String.format("execution_%d/video.mp4", executionId));
+  public Resource getVideoAsResource(int videoId) {
+    Blob blob = bucket.get(VIDEO_FILE_PREFIX + videoId + VIDEO_FILE_EXTENSION);
     if (!blob.exists()) {
-      throw new FileNotFoundException("There is no video for execution with id " + executionId);
+      throw new FileNotFoundException("There is no video with id " + videoId);
     }
-    return new ByteArrayResource(blob.getContent(),
-      String.format("Video for execution %d", executionId));
+    return new ByteArrayResource(blob.getContent(), "Video with id " + videoId);
   }
 
   @Override

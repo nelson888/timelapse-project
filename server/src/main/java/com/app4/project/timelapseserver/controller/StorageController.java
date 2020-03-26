@@ -3,6 +3,8 @@ package com.app4.project.timelapseserver.controller;
 import com.app4.project.timelapse.model.FileData;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
+import com.app4.project.timelapseserver.exception.NotFoundException;
+import com.app4.project.timelapseserver.repository.ExecutionRepository;
 import com.app4.project.timelapseserver.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,9 +28,11 @@ public class StorageController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(StorageController.class);
   private final StorageService storageService;
+  private final ExecutionRepository executionRepository;
 
-  public StorageController(StorageService storageService) {
+  public StorageController(StorageService storageService, ExecutionRepository executionRepository) {
     this.storageService = storageService;
+    this.executionRepository = executionRepository;
   }
 
   @PostMapping("/{executionId}")
@@ -42,31 +45,25 @@ public class StorageController {
       .body(fileData);
   }
 
-  @GetMapping("/{executionId}/count")
+  @GetMapping("/{executionId}/imageCount")
   public ResponseEntity nbImages(@PathVariable int executionId) {
     idCheck(executionId);
     return ResponseEntity.ok().body(storageService.nbFiles(executionId));
   }
 
-  @GetMapping("/{executionId}/video") // TODO add on swagger
-  public ResponseEntity saveVideo(@PathVariable int executionId) {
-    idCheck(executionId);
-    Resource file = storageService.loadVideoAsResource(executionId);
+  private ResponseEntity multipartResponse(Resource resource) {
     return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-      "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+      "attachment; filename=\"" + resource.getFilename() + "\"").body(resource);
   }
 
   @GetMapping("/{executionId}/{fileId}")
-  @ResponseBody
-  public ResponseEntity serveFile(@PathVariable int executionId, @PathVariable int fileId) {
+  public ResponseEntity serveImage(@PathVariable int executionId, @PathVariable int fileId) {
     idCheck(executionId);
-    Resource file = storageService.loadAsResource(executionId, fileId);
-    return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-      "attachment; filename=\"" + fileId + ".jpg\"").body(file);
+    Resource file = storageService.getImageAsResource(executionId, fileId);
+    return multipartResponse(file);
   }
 
   @GetMapping("/{executionId}/{fileId}/data")
-  @ResponseBody
   public ResponseEntity getFileData(@PathVariable int executionId, @PathVariable int fileId) {
     idCheck(executionId);
     FileData fileData = storageService.getFileData(executionId, fileId);
@@ -76,8 +73,8 @@ public class StorageController {
   }
 
   private void idCheck(int executionId) {
-    if (executionId < 0 || executionId >= ApplicationConfiguration.MAX_EXECUTIONS) {
-      throw new BadRequestException("Execution with id " + executionId + " cannot exist");
+    if (executionRepository.getById(executionId).isEmpty()) {
+      throw new NotFoundException("There is no execution with id " + executionId);
     }
   }
 }

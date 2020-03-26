@@ -148,7 +148,7 @@ paths:
       responses:
         200:
           description: "Successful operation. This operation may do nothing if the provided ID doesn't exists"
-  /api/executions/count:
+  /api/executions/imageCount:
     get:
       tags:
         - "Execution"

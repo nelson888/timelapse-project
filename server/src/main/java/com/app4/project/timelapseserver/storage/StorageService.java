@@ -24,9 +24,9 @@ public interface StorageService {
 
   int uploadVideo(Path tempVideoPath) throws IOException;
 
-  Resource loadAsResource(int executionId, int fileId);
+  Resource getImageAsResource(int executionId, int fileId);
 
-  Resource loadVideoAsResource(int executionId);
+  Resource getVideoAsResource(int videoId);
 
   int nbFiles(int executionId);
 

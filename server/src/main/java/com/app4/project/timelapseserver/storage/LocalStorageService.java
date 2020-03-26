@@ -114,15 +114,15 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   @Override
-  public Resource loadVideoAsResource(int executionId) {
-    File file = rootPath.resolve(FOLDER_PREFIX + executionId + "video.mp4").toFile();
+  public Resource getVideoAsResource(int videoId) {
+    File file = getVideoFile(videoId);
     if (!file.exists()) {
-      throw new FileNotFoundException(String.format("There is no video for for execution %d", executionId));
+      throw new FileNotFoundException("There is no video with id " + videoId);
     }
     try {
       return new UrlResource(file.toURI());
     } catch (MalformedURLException e) {
-      throw new FileStorageException("Couldn't read video for execution " + executionId);
+      throw new FileStorageException("Couldn't read video with id " + videoId);
     }
   }
 
@@ -131,7 +131,7 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   @Override
-  public Resource loadAsResource(int executionId, int fileId) {
+  public Resource getImageAsResource(int executionId, int fileId) {
     try {
       Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
       File file = executionPath.resolve(getFileName(fileId)).toFile();
