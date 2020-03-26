@@ -1,7 +1,5 @@
 package com.app4.project.timelapseserver.configuration;
 
-import com.app4.project.timelapseserver.repository.ExecutionRepository;
-import com.app4.project.timelapseserver.repository.mongo.MongoExecutionRepository;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,8 +27,4 @@ public class MongoConfiguration {
     return new MongoTemplate(mongoClient, database);
   }
 
-  @Bean
-  public ExecutionRepository executionRepository(MongoTemplate mongoTemplate) {
-    return new MongoExecutionRepository(mongoTemplate);
-  }
 }

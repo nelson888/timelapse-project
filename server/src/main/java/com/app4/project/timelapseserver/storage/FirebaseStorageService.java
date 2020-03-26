@@ -10,8 +10,10 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -33,6 +35,8 @@ import static com.app4.project.timelapseserver.configuration.ApplicationConfigur
  * For example:
  * execution_0/5.jpg
  */
+@Profile("firebase")
+@Service
 public class FirebaseStorageService extends AbstractStorage {
 
   private static final String EXECUTION_FILENAME_TEMPLATE = "execution_%d/%d.jpg";

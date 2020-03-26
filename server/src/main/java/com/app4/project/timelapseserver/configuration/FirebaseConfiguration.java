@@ -30,11 +30,6 @@ public class FirebaseConfiguration {
   }
 
   @Bean
-  public StorageService storageService(Path tempDirRoot, Bucket bucket) {
-    return new FirebaseStorageService(tempDirRoot, bucket);
-  }
-
-  @Bean
   public StorageClient storageClient() throws IOException {
     FirebaseOptions options = new FirebaseOptions.Builder()
       .setCredentials(GoogleCredentials.fromStream(ApplicationConfiguration.class.getResourceAsStream("/private/firebase-adminsdk.json")))

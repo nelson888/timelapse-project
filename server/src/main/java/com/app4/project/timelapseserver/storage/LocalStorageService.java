@@ -8,8 +8,12 @@ import com.app4.project.timelapseserver.util.IOSupplier;
 import com.google.cloud.storage.StorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -29,6 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+@Profile("local")
+@Service
 public class LocalStorageService extends AbstractStorage {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalStorageService.class);
@@ -36,7 +42,7 @@ public class LocalStorageService extends AbstractStorage {
   private final Path rootPath;
   private final Map<Integer, AtomicInteger> executionFileCount = new ConcurrentHashMap<>();
 
-  public LocalStorageService(Path tempDirRoot, Path rootPath) {
+  public LocalStorageService(@Value("${local.storage.root}") Path tempDirRoot, Path rootPath) {
     super(tempDirRoot);
     this.rootPath = rootPath;
     LOGGER.info("Starting Local Storage Service...");

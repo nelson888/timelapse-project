@@ -3,13 +3,18 @@ package com.app4.project.timelapseserver.repository.mongo;
 import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapseserver.model.request.ExecutionPatchRequest;
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+
+@Profile("mongodb")
+@Component
 public class MongoExecutionRepository extends MongoRepository<Execution> implements ExecutionRepository {
 
   private static final String COLLECTION_NAME = "Execution";
