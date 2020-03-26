@@ -213,11 +213,19 @@ public class LocalStorageService extends AbstractStorage {
     }
   }
 
+  private File getVideoFile(int videoId) {
+    return rootPath.resolve(VIDEO_FILE_PREFIX + videoId + VIDEO_FILE_EXTENSION).toFile();
+  }
   @Override
   void uploadVideo(int videoId, InputStream inputStream) throws IOException {
-    File file = rootPath.resolve(VIDEO_FILE_PREFIX + videoId + VIDEO_FILE_EXTENSION).toFile();
+    File file = getVideoFile(videoId);
     try (OutputStream os = new FileOutputStream(file)) {
       inputStream.transferTo(os);
     }
+  }
+
+  @Override
+  public void deleteVideo(int videoId) {
+    getVideoFile(videoId).delete();
   }
 }

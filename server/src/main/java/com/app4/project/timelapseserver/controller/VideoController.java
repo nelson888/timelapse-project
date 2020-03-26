@@ -3,6 +3,7 @@ package com.app4.project.timelapseserver.controller;
 import com.app4.project.timelapseserver.exception.NotFoundException;
 import com.app4.project.timelapseserver.repository.VideoMetadataRepository;
 import com.app4.project.timelapseserver.service.SaveToVideoService;
+import com.app4.project.timelapseserver.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +22,13 @@ public class VideoController {
 
   private final VideoMetadataRepository videoRepository;
   private final SaveToVideoService saveToVideoService;
+  private final StorageService storageService;
 
   public VideoController(VideoMetadataRepository videoRepository,
-                         SaveToVideoService saveToVideoService) {
+                         SaveToVideoService saveToVideoService, StorageService storageService) {
     this.videoRepository = videoRepository;
     this.saveToVideoService = saveToVideoService;
+    this.storageService = storageService;
   }
 
   @GetMapping
@@ -42,7 +45,7 @@ public class VideoController {
   @DeleteMapping("/{videoId}")
   public ResponseEntity deleteVideo(@PathVariable int videoId) {
     videoRepository.remove(videoId);
-    // TODO remove on storage
+    storageService.deleteVideo(videoId);
     LOGGER.info("Deleted video {}", videoId);
     return ResponseEntity.ok().build();
   }
