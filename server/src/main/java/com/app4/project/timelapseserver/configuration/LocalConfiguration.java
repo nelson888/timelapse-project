@@ -16,7 +16,7 @@ public class LocalConfiguration {
 
   @Bean
   public StorageService storageService(Path tempDirRoot,
-                                       @Value("${local.storage.root}") String storageRoot) {
+                                       @Value("${fake.storage.root}") String storageRoot) {
     return new LocalStorageService(tempDirRoot, Paths.get(storageRoot));
   }
 

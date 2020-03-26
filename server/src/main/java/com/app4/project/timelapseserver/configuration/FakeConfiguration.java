@@ -1,7 +1,7 @@
 package com.app4.project.timelapseserver.configuration;
 
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
-import com.app4.project.timelapseserver.repository.FakeExecutionRepository;
+import com.app4.project.timelapseserver.repository.fake.FakeExecutionRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
