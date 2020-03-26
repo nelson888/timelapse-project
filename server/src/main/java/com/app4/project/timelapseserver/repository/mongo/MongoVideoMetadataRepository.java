@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Profile("mongodb")
@@ -25,4 +26,8 @@ public class MongoVideoMetadataRepository extends MongoRepository<VideoMetadata>
     return findOne(Query.query(Criteria.where("videoId").is(videoId)));
   }
 
+  @Override
+  public List<VideoMetadata> getAllByExecutionId(int executionId) {
+    return mongoTemplate.find(Query.query(Criteria.where("executionId").is(executionId)), clazz);
+  }
 }

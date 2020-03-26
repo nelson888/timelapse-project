@@ -1,8 +1,10 @@
 package com.app4.project.timelapseserver.service.task;
 
 import com.app4.project.timelapse.model.SavingProgress;
+import com.app4.project.timelapse.model.VideoMetadata;
 import com.app4.project.timelapseserver.codec.JpgSequenceEncoder;
 import com.app4.project.timelapseserver.exception.SavingException;
+import com.app4.project.timelapseserver.repository.VideoMetadataRepository;
 import com.app4.project.timelapseserver.util.FileChannelWrapper;
 import com.app4.project.timelapseserver.storage.StorageService;
 import com.app4.project.timelapseserver.util.IOSupplier;
@@ -25,6 +27,7 @@ public class SaveToVideoTask implements Runnable {
   private final int taskId;
   private final StorageService storageService;
   private final Consumer<SavingProgress> progressUpdater;
+  private final VideoMetadataRepository videoMetadataRepository;
   private final int executionId;
   private final int fps;
   private final long fromTimestamp;
@@ -51,6 +54,7 @@ public class SaveToVideoTask implements Runnable {
     storageService.executionFiles(executionId, fromTimestamp, toTimestamp)
       .forEach(supplier -> addFrame(encoder, supplier));
     int videoId = storageService.uploadVideo(tempFilePath);
+    videoMetadataRepository.add(new VideoMetadata(executionId, videoId, fps, fromTimestamp, toTimestamp, framesCount));
     progressUpdater.accept(SavingProgress.finished(taskId, videoId));
   }
 

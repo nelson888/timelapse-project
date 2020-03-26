@@ -2,6 +2,7 @@ package com.app4.project.timelapseserver.service;
 
 import com.app4.project.timelapse.model.SavingProgress;
 import com.app4.project.timelapse.model.SavingState;
+import com.app4.project.timelapseserver.repository.VideoMetadataRepository;
 import com.app4.project.timelapseserver.storage.StorageService;
 import com.app4.project.timelapseserver.service.task.SaveToVideoTask;
 
@@ -32,15 +33,18 @@ public class SaveToVideoService {
   private final StorageService storageService;
   private final ConcurrentMap<Integer, SavingProgress> taskProgressMap; // map task id -> SavingProgress
   private final ConcurrentMap<Integer, Queue<Integer>> executionTasksMap; // map execution id -> task ids
+  private final VideoMetadataRepository videoMetadataRepository;
   private final AtomicInteger idGenerator = new AtomicInteger();
 
   public SaveToVideoService(ExecutorService executor, StorageService storageService,
                             ConcurrentMap<Integer, SavingProgress> taskProgressMap,
-                            ConcurrentMap<Integer, Queue<Integer>> executionTasksMap) {
+                            ConcurrentMap<Integer, Queue<Integer>> executionTasksMap,
+                            VideoMetadataRepository videoMetadataRepository) {
     this.executor = executor;
     this.storageService = storageService;
     this.taskProgressMap = taskProgressMap;
     this.executionTasksMap = executionTasksMap;
+    this.videoMetadataRepository = videoMetadataRepository;
   }
 
   public SavingProgress startVideoSaving(int  executionId, int fps, long fromTimestamp, long toTimestamp) {
@@ -52,7 +56,7 @@ public class SaveToVideoService {
     Queue<Integer> executionTasks = executionTasksMap.computeIfAbsent(executionId, k -> new ConcurrentLinkedDeque<>());
     executionTasks.add(taskId);
 
-    executor.submit(new SaveToVideoTask(taskId, storageService, (p) -> updateState(taskId, p),
+    executor.submit(new SaveToVideoTask(taskId, storageService, (p) -> updateState(taskId, p), videoMetadataRepository,
       executionId, fps, fromTimestamp, toTimestamp, framesCount));
     return SavingProgress.onGoing(taskId, 0);
   }

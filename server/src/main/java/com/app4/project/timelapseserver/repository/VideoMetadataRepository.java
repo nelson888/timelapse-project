@@ -9,6 +9,8 @@ public interface VideoMetadataRepository {
 
   List<VideoMetadata> getAll();
 
+  List<VideoMetadata> getAllByExecutionId(int executionId);
+
   Optional<VideoMetadata> getByVideoId(int videoId);
 
   boolean remove(int videoId);
