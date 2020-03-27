@@ -207,11 +207,11 @@ paths:
           description: "One of the (optional) parameters were invalid"
           schema:
             $ref: "#/definitions/ErrorMessage"
-  /api/executions/{executionId}/video/tasks:
+  /api/executions/{executionId}/videos/tasks:
     get:
       tags:
         - "Execution"
-      summary: "Get all video generating task ids for the given execution"
+      summary: "Get all video task ids for the given execution"
       description: "Returns a single execution"
       operationId: "getVideoTaskIdsForExecution"
       produces:

@@ -9,6 +9,7 @@ import com.app4.project.timelapseserver.exception.ConflictException;
 import com.app4.project.timelapseserver.exception.NotFoundException;
 import com.app4.project.timelapseserver.model.request.ExecutionPatchRequest;
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
+import com.app4.project.timelapseserver.repository.VideoMetadataRepository;
 import com.app4.project.timelapseserver.service.SaveToVideoService;
 import com.app4.project.timelapseserver.storage.StorageService;
 import org.slf4j.Logger;
@@ -40,15 +41,18 @@ public class ExecutionController {
   private final ExecutionRepository executionRepository;
   private final CameraState cameraState;
   private final SaveToVideoService saveToVideoService;
+  private final VideoMetadataRepository videoMetadataRepository;
   private final int defaultFps;
 
   public ExecutionController(ExecutionRepository executionRepository, StorageService storageService,
-                             CameraState cameraState, SaveToVideoService saveToVideoService,
-                             @Value("${video.default.fps}") int defaultFps) {
+      CameraState cameraState, SaveToVideoService saveToVideoService,
+      VideoMetadataRepository videoMetadataRepository,
+      @Value("${video.default.fps}") int defaultFps) {
     this.executionRepository = executionRepository;
     this.storageService = storageService;
     this.cameraState = cameraState;
     this.saveToVideoService = saveToVideoService;
+    this.videoMetadataRepository = videoMetadataRepository;
     this.defaultFps = defaultFps;
   }
 
@@ -94,7 +98,12 @@ public class ExecutionController {
       fromTimestamp.orElse(Long.MIN_VALUE), toTimestamp.orElse(Long.MAX_VALUE)));
   }
 
-  @GetMapping("/{id}/video/tasks")
+  @GetMapping("/{id}/videos") // TODO add on swagger
+  public ResponseEntity getAllByExecution(@PathVariable int id) {
+    return ResponseEntity.ok(videoMetadataRepository.getAllByExecutionId(id));
+  }
+
+  @GetMapping("/{id}/videos/tasks")
   public ResponseEntity getAllTasks(@PathVariable int id) {
     if (executionRepository.getById(id).isEmpty()) {
       throw new NotFoundException("Execution with id " + id + " was not found");
