@@ -98,7 +98,7 @@ public class ExecutionController {
       fromTimestamp.orElse(Long.MIN_VALUE), toTimestamp.orElse(Long.MAX_VALUE)));
   }
 
-  @GetMapping("/{id}/videos") // TODO add on swagger
+  @GetMapping("/{id}/videos")
   public ResponseEntity getAllByExecution(@PathVariable int id) {
     return ResponseEntity.ok(videoMetadataRepository.getAllByExecutionId(id));
   }
@@ -160,9 +160,4 @@ public class ExecutionController {
     return ResponseEntity.ok(executionRepository.getAll());
   }
 
-  private void idCheck(int executionId) {
-    if (executionId < 0 || executionId >= ApplicationConfiguration.MAX_EXECUTIONS) {
-      throw new BadRequestException("Execution with id " + executionId + " cannot exist");
-    }
-  }
 }

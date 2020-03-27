@@ -178,6 +178,28 @@ paths:
           description: "Successful operation"
           schema:
             $ref: "#/definitions/Execution"
+  /api/executions/{executionId}/videos:
+    get:
+      tags:
+        - "Execution"
+      summary: "Retrieve all videos (metadata) for an execution"
+      operationId: "getVideoForExecution"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "executionId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/VideoMetadata"
   /api/executions/{executionId}/video/generate:
     post:
       tags:
@@ -211,7 +233,7 @@ paths:
     get:
       tags:
         - "Execution"
-      summary: "Get all video task ids for the given execution"
+      summary: "Get all video generating task ids for the given execution"
       description: "Returns a single execution"
       operationId: "getVideoTaskIdsForExecution"
       produces:
@@ -505,6 +527,27 @@ definitions:
         type: integer
         format: int32
       fileId:
+        type: integer
+        format: int64
+  VideoMetadata:
+    type: object
+    properties:
+      videoId:
+        type: integer
+        format: int32
+      executionId:
+        type: integer
+        format: int32
+      fps:
+        type: integer
+        format: int32
+      fromTimestamp:
+        type: integer
+        format: int64
+      toTimestamp:
+        type: integer
+        format: int64
+      framesCount:
         type: integer
         format: int64
   Command:
