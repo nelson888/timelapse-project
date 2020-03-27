@@ -98,7 +98,7 @@ paths:
           description: "Execution with the given ID was not found"
           schema:
             $ref: "#/definitions/ErrorMessage"
-    put:
+    patch:
       tags:
         - "Execution"
       summary: "Updates an execution with the request's body"
@@ -117,10 +117,10 @@ paths:
           format: "int32"
         - name: "name"
           in: "body"
-          description: "The new values to put"
+          description: "The new values to put. Only non-null set fields will be updated"
           required: true
           schema:
-            $ref: "#/definitions/Execution"
+            $ref: "#/definitions/PatchRequestBody"
       responses:
         200:
           description: "successful operation"
@@ -421,6 +421,20 @@ definitions:
       id:
         type: integer
         format: in32
+      startTime:
+        type: integer
+        format: int64
+      endTime:
+        type: integer
+        format: int64
+      period:
+        type: integer
+        format: int64
+  PatchRequestBody:
+    type: object
+    properties:
+      title:
+        type: string
       startTime:
         type: integer
         format: int64

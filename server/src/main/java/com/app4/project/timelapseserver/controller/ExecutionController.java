@@ -113,7 +113,7 @@ public class ExecutionController {
     return ResponseEntity.ok().build();
   }
 
-  @PatchMapping("/{id}") // TODO modify swagger
+  @PatchMapping("/{id}")
   public ResponseEntity updateExecution(@PathVariable int id, @RequestBody ExecutionPatchRequest patchRequest) {
     if (patchRequest.getPeriod() != null && patchRequest.getPeriod() <= 0) {
       throw new BadRequestException("The period must be greater than 0");
