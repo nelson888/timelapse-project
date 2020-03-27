@@ -301,7 +301,7 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/CameraState"
-  /storage/{executionId}:
+  /storage/images/{executionId}:
     put:
       tags:
         - "Storage"
@@ -328,7 +328,7 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/FileData"
-  /storage/{executionId}/count:
+  /storage/images/{executionId}/count:
     get:
       tags:
         - "Storage"
@@ -352,7 +352,7 @@ paths:
           description: "The execution with the specified id doesn't exists"
           schema:
             $ref: '#/definitions/ErrorMessage'
-  /storage/{executionId}/{fileId}:
+  /storage/images/{executionId}/{fileId}:
     get:
       tags:
         - "Storage"
@@ -382,7 +382,7 @@ paths:
           description: "The file with the specified execution id and file id doesn't exists"
           schema:
             $ref: '#/definitions/ErrorMessage'
-  /storage/{executionId}/{fileId}/data:
+  /storage/images/{executionId}/{fileId}/data:
     get:
       tags:
         - "Storage"

@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-// TODO modify on swagger /storage -> /storage/images
 @RestController
 @RequestMapping("/storage/images")
 public class ImageStorageController {
