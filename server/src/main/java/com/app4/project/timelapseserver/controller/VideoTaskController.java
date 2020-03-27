@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// TODO renamed video task controller and use it only for taks
-//  TODO add in swagger
-// TODO add a cancel (delete) endpoint
 @RestController
 @RequestMapping("/api/videos/tasks")
 public class VideoTaskController {

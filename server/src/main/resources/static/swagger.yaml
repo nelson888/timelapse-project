@@ -2,7 +2,7 @@ swagger: "2.0"
 info:
   description: '
   Timelapse API used as an intermediate between the smartphone and camera.
-  The smartphon can
+  The smartphone can
     - get/handle executions (timeframe in which to take pictures)
     - get the pictures took from the camera
   The camera can take pictures if an execution is running
@@ -26,6 +26,8 @@ tags:
     description: "Storage controller"
   - name: "State"
     description: "State controller"
+  - name: "Video Task"
+    description: "Video Task controller"
 schemes:
   - "http"
 paths:
@@ -496,6 +498,47 @@ paths:
           description: "The execution with the specified id doesn't exists"
           schema:
             $ref: '#/definitions/ErrorMessage'
+
+  /api/videos/tasks:
+    get:
+      tags:
+        - "Video Task"
+      summary: "Retrieve all video tasks"
+      operationId: "getAllVideoTasks"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/VideoTask"
+  /api/videos/tasks/{taskId}:
+    get:
+      tags:
+        - "Video Task"
+      summary: "Find a task by ID"
+      description: "Returns a single execution"
+      operationId: "getTaskById"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "taskId"
+          in: "path"
+          description: "ID of the task"
+          required: true
+          type: "integer"
+          format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/VideoTask"
+        404:
+          description: "Task with the given ID was not found"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
 definitions:
   Execution:
     type: object
@@ -590,12 +633,37 @@ definitions:
       framesCount:
         type: integer
         format: int64
+  VideoTask:
+    type: object
+    properties:
+      taskId:
+        type: integer
+        format: int32
+      percentage:
+        type: integer
+        format: int32
+      state:
+        $ref: "#/definitions/SavingState"
+      message:
+        type: string
+        description: 'optional error message'
+      videoId:
+        type: integer
+        description: 'the id of the created video (only present if task finished)'
+        format: int32
   Command:
     type: string
     enum:
       - SLEEP
       - WAKE_UP
       - TURN_OFF
+  SavingState:
+    type: string
+    enum:
+      - NOT_STARTED
+      - ON_GOING
+      - FINISHED
+      - ERROR
 externalDocs:
   description: "Find out more Timelapse API"
   url: "https://github.com/nelson888/timelapse-project"
