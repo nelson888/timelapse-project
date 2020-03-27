@@ -1,6 +1,6 @@
 package com.app4.project.timelapseserver.storage;
 
-import com.app4.project.timelapse.model.FileData;
+import com.app4.project.timelapse.model.FileMetadata;
 import com.app4.project.timelapseserver.util.FileChannelWrapper;
 import com.app4.project.timelapseserver.util.IOSupplier;
 import org.springframework.core.io.Resource;
@@ -16,9 +16,9 @@ public interface StorageService {
   String FOLDER_PREFIX = "execution_";
   String IMAGE_EXTENSION = ".jpg";
 
-  FileData store(int executionId, MultipartFile multipartFile) throws IOException;
+  FileMetadata store(int executionId, MultipartFile multipartFile) throws IOException;
 
-  FileData store(int executionId, InputStream inputStream) throws IOException;
+  FileMetadata store(int executionId, InputStream inputStream) throws IOException;
 
   FileChannelWrapper createTempChannel(int taskId) throws IOException;
 
@@ -32,7 +32,7 @@ public interface StorageService {
 
   Stream<IOSupplier<byte[]>> executionFiles(int executionId, long fromTimestamp, long toTimestamp);
 
-  FileData getFileData(int executionId, int fileId);
+  FileMetadata getFileData(int executionId, int fileId);
 
   void deleteForExecution(int executionId);
 

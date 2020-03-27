@@ -1,6 +1,6 @@
 package com.app4.project.timelapseserver.storage;
 
-import com.app4.project.timelapse.model.FileData;
+import com.app4.project.timelapse.model.FileMetadata;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.app4.project.timelapseserver.exception.FileStorageException;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -71,7 +70,7 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   @Override
-  public FileData store(int executionId, MultipartFile multipartFile) {
+  public FileMetadata store(int executionId, MultipartFile multipartFile) {
     LOGGER.info("attempting to store {} for executionId {}...", multipartFile.getOriginalFilename(), executionId);
 
     Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
@@ -85,13 +84,13 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   @Override
-  public FileData store(int executionId, InputStream inputStream) {
+  public FileMetadata store(int executionId, InputStream inputStream) {
     LOGGER.info("attempting to store file for executionId {}...", executionId);
     Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
     return writeInputStream(inputStream, executionId, executionPath);
   }
 
-  private FileData writeInputStream(InputStream inputStream, int executionId, Path executionPath) {
+  private FileMetadata writeInputStream(InputStream inputStream, int executionId, Path executionPath) {
     int fileId = getFileCount(executionId).get();
     try {
       Path filePath = executionPath.resolve(getFileName(fileId));
@@ -103,7 +102,7 @@ public class LocalStorageService extends AbstractStorage {
       }
       Files.copy(inputStream, filePath,
         StandardCopyOption.REPLACE_EXISTING);
-      FileData fileData = new FileData(file.length(), file.getName(), System.currentTimeMillis(), executionId, fileId);
+      FileMetadata fileData = new FileMetadata(file.length(), file.getName(), System.currentTimeMillis(), executionId, fileId);
       LOGGER.info("Saved file successfully");
       getFileCount(executionId).getAndIncrement();
       return fileData;
@@ -176,12 +175,12 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   @Override
-  public FileData getFileData(int executionId, int fileId) {
+  public FileMetadata getFileData(int executionId, int fileId) {
     Path executionPath = rootPath.resolve(FOLDER_PREFIX + executionId);
     Path filePath = executionPath.resolve(getFileName(fileId));
     File file = filePath.toFile();
     if (file.exists()) {
-      return new FileData(file.length(), file.getName(), file.lastModified(), executionId, fileId);
+      return new FileMetadata(file.length(), file.getName(), file.lastModified(), executionId, fileId);
     }
     throw new FileNotFoundException(
       String.format("The file with id %d for execution %d doesn't exists", fileId, executionId));

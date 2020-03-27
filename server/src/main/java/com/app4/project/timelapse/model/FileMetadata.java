@@ -1,6 +1,6 @@
 package com.app4.project.timelapse.model;
 
-public class FileData {
+public class FileMetadata {
 
   private Long size;
   private String name;
@@ -8,7 +8,7 @@ public class FileData {
   private int executionId;
   private int fileId;
 
-  public FileData(Long size, String name, Long uploadTimestamp, int executionId, int fileId) {
+  public FileMetadata(Long size, String name, Long uploadTimestamp, int executionId, int fileId) {
     this.size = size;
     this.name = name;
     this.uploadTimestamp = uploadTimestamp;
@@ -16,7 +16,7 @@ public class FileData {
     this.fileId = fileId;
   }
 
-  public FileData() {
+  public FileMetadata() {
   }
 
   public Long getSize() {

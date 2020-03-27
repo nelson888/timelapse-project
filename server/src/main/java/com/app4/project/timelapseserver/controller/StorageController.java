@@ -1,6 +1,6 @@
 package com.app4.project.timelapseserver.controller;
 
-import com.app4.project.timelapse.model.FileData;
+import com.app4.project.timelapse.model.FileMetadata;
 import com.app4.project.timelapseserver.exception.NotFoundException;
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
 import com.app4.project.timelapseserver.repository.VideoMetadataRepository;
@@ -42,7 +42,7 @@ public class StorageController {
   public ResponseEntity uploadImage(@PathVariable int executionId,
                                     @RequestParam("image") MultipartFile multipartFile) throws IOException {
     idCheck(executionId);
-    FileData fileData = storageService.store(executionId, multipartFile);
+    FileMetadata fileData = storageService.store(executionId, multipartFile);
     LOGGER.info("Uploaded new image: {}", fileData);
     return ResponseEntity.status(HttpStatus.CREATED)
       .body(fileData);
@@ -66,10 +66,10 @@ public class StorageController {
     return multipartResponse(file);
   }
 
-  @GetMapping("/images/{executionId}/{fileId}/data")
+  @GetMapping("/images/{executionId}/{fileId}/metadata")
   public ResponseEntity getFileData(@PathVariable int executionId, @PathVariable int fileId) {
     idCheck(executionId);
-    FileData fileData = storageService.getFileData(executionId, fileId);
+    FileMetadata fileData = storageService.getFileData(executionId, fileId);
     return ResponseEntity
       .ok()
       .body(fileData);

@@ -1,6 +1,6 @@
 package com.app4.project.timelapseserver.storage;
 
-import com.app4.project.timelapse.model.FileData;
+import com.app4.project.timelapse.model.FileMetadata;
 import com.app4.project.timelapseserver.exception.FileNotFoundException;
 import com.app4.project.timelapseserver.util.IOSupplier;
 import com.google.cloud.storage.Blob;
@@ -69,18 +69,18 @@ public class FirebaseStorageService extends AbstractStorage {
   }
 
   @Override
-  public FileData store(int executionId, MultipartFile multipartFile) throws IOException {
+  public FileMetadata store(int executionId, MultipartFile multipartFile) throws IOException {
     int fileId = executionFileCount.get(executionId).getAndIncrement();
     Blob blob = bucket.create(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId),
       multipartFile.getBytes());
-    return new FileData(blob.getSize(), blob.getName(), blob.getCreateTime(), executionId, fileId);
+    return new FileMetadata(blob.getSize(), blob.getName(), blob.getCreateTime(), executionId, fileId);
   }
 
   @Override
-  public FileData store(int executionId, InputStream inputStream) {
+  public FileMetadata store(int executionId, InputStream inputStream) {
     int fileId = executionFileCount.get(executionId).getAndIncrement();
     Blob blob = bucket.create(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId), inputStream);
-    return new FileData(blob.getSize(), blob.getName(), blob.getCreateTime(), executionId, fileId);
+    return new FileMetadata(blob.getSize(), blob.getName(), blob.getCreateTime(), executionId, fileId);
   }
 
   @Override
@@ -131,9 +131,9 @@ public class FirebaseStorageService extends AbstractStorage {
   }
 
   @Override
-  public FileData getFileData(int executionId, int fileId) {
+  public FileMetadata getFileData(int executionId, int fileId) {
     Blob blob = bucket.get(String.format(EXECUTION_FILENAME_TEMPLATE, executionId, fileId));
-    return new FileData(blob.getSize(), blob.getName(), blob.getCreateTime(), executionId, fileId);
+    return new FileMetadata(blob.getSize(), blob.getName(), blob.getCreateTime(), executionId, fileId);
   }
 
   @Override
