@@ -356,10 +356,8 @@ paths:
     get:
       tags:
         - "Storage"
-      summary: "Get the file with the given file id for the given execution id"
-      operationId: "uploadFileForExecution"
-      produces:
-        - "application/json"
+      summary: "Get the image with the given file id for the given execution id"
+      operationId: "downloadImage"
       parameters:
         - name: "executionId"
           in: "path"
@@ -375,10 +373,10 @@ paths:
           format: "int64"
       responses:
         200:
-          description: "successful operation"
+          description: "The file is returned"
           schema:
-            $ref:  '#/definitions/FileData'
-        400:
+            type: file
+        404:
           description: "The file with the specified execution id and file id doesn't exists"
           schema:
             $ref: '#/definitions/ErrorMessage'
@@ -410,6 +408,30 @@ paths:
             $ref:  '#/definitions/FileData'
         400:
           description: "The execution with the specified id doesn't exists"
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+  /storage/videos/{videoId}:
+    get:
+      tags:
+        - "Storage"
+      summary: "Get the video with the given video id"
+      operationId: "downloadVideo"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "videoId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int32"
+      responses:
+        200:
+          description: "The file is returned"
+          schema:
+            type: file
+        404:
+          description: "The file with the specified execution id and file id doesn't exists"
           schema:
             $ref: '#/definitions/ErrorMessage'
 definitions:
