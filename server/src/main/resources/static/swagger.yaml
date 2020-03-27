@@ -432,6 +432,21 @@ paths:
           description: "The execution with the specified id doesn't exists"
           schema:
             $ref: '#/definitions/ErrorMessage'
+  /storage/videos:
+    get:
+      tags:
+        - "Storage"
+      summary: "Retrieve all videos (metadata)"
+      operationId: "getAllVideos"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/VideoMetadata"
   /storage/videos/{videoId}:
     get:
       tags:

@@ -75,7 +75,6 @@ public class StorageController {
       .body(fileData);
   }
 
-  // TODO add in swagger
   @GetMapping("/videos")
   public ResponseEntity getAllVideos() {
     return ResponseEntity.ok(videoMetadataRepository.getAll());
