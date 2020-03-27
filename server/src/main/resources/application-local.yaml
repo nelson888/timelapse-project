@@ -1,1 +1,1 @@
-local.storage.root: /home/nelson/Téléchargements/timelapseStorage
+local.storage.root: ${LOCAL_STORAGE_ROOT}
