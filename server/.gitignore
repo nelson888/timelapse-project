@@ -1,6 +1,8 @@
 /target/
 !.mvn/wrapper/maven-wrapper.jar
 
+mongoSave/
+
 ### STS ###
 .apt_generated
 .classpath

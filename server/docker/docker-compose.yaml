@@ -1,0 +1,20 @@
+version: '3.1'
+services:
+  springboot:
+    build: .
+    image: timelapse-server
+    restart: always
+    container_name: timelapse-server
+    volumes:
+      - /localStorage
+      - /temp
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    container_name: springboot-mongo
+    volumes:
+      - ./mongoSave/db:/data/db # copying my mongo data to the container
+    restart: always
