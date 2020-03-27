@@ -75,7 +75,7 @@ public class ExecutionController {
     }
   }
 
-  @GetMapping("/{id}") // TODO modify swagger (changed bad request to notfound
+  @GetMapping("/{id}")
   public ResponseEntity getExecution(@PathVariable int id) {
     return ResponseEntity.ok(executionRepository.getById(id)
       .orElseThrow(() -> new NotFoundException(String.format("Execution with id %d doesn't exists", id)))
