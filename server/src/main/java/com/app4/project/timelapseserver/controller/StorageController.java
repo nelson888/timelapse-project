@@ -75,6 +75,7 @@ public class StorageController {
       .body(fileData);
   }
 
+  // TODO add in swagger
   @GetMapping("/videos")
   public ResponseEntity getAllVideos() {
     return ResponseEntity.ok(videoMetadataRepository.getAll());
@@ -89,6 +90,7 @@ public class StorageController {
     return multipartResponse(file);
   }
 
+  // TODO add in swagger
   @GetMapping("/videos/{videoId}/metadata")
   public ResponseEntity getVideoData(@PathVariable int videoId) {
     return ResponseEntity.ok(videoMetadataRepository.getByVideoId(videoId).orElseThrow(() -> new NotFoundException("Video with id " + videoId + " was not found")));
