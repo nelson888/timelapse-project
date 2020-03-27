@@ -75,6 +75,11 @@ public class StorageController {
       .body(fileData);
   }
 
+  @GetMapping("/videos")
+  public ResponseEntity getAllVideos() {
+    return ResponseEntity.ok(videoMetadataRepository.getAll());
+  }
+
   @GetMapping("/videos/{videoId}")
   public ResponseEntity serveVideo(@PathVariable int videoId) {
     if (videoMetadataRepository.getByVideoId(videoId).isEmpty()) {
@@ -82,6 +87,11 @@ public class StorageController {
     }
     Resource file = storageService.getVideoAsResource(videoId);
     return multipartResponse(file);
+  }
+
+  @GetMapping("/videos/{videoId}/metadata")
+  public ResponseEntity getVideoData(@PathVariable int videoId) {
+    return ResponseEntity.ok(videoMetadataRepository.getByVideoId(videoId).orElseThrow(() -> new NotFoundException("Video with id " + videoId + " was not found")));
   }
 
   private void idCheck(int executionId) {
