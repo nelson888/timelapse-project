@@ -178,6 +178,35 @@ paths:
           description: "Successful operation"
           schema:
             $ref: "#/definitions/Execution"
+  /api/executions/{executionId}/video/generate:
+    post:
+      tags:
+        - "Execution"
+      summary: "Start a task that will generate a video for the given execution"
+      description: "Returns a single execution"
+      operationId: "generateVideoForExecution"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "executionId"
+          in: "path"
+          description: "ID of the execution"
+          required: true
+          type: "integer"
+          format: "int32"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Execution"
+        404:
+          description: "Execution with the given ID was not found"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
+        400:
+          description: "One of the (optional) parameters were invalid"
+          schema:
+            $ref: "#/definitions/ErrorMessage"
   /api/commands/consume:
     get:
       tags:

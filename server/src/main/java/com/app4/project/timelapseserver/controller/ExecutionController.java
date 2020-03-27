@@ -82,7 +82,7 @@ public class ExecutionController {
     );
   }
 
-  @PostMapping("/{id}/video/generate") // TODO add on swagger todo allow to have multiple videos for one execution????????
+  @PostMapping("/{id}/video/generate")
   public ResponseEntity startSavingToVideo(@PathVariable int id, @RequestParam Optional<Integer> fps,
                                            @RequestParam Optional<Long> fromTimestamp, @RequestParam Optional<Long> toTimestamp) {
     Execution execution = executionRepository.getById(id)
