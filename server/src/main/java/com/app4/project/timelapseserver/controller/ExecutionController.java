@@ -94,7 +94,7 @@ public class ExecutionController {
       fromTimestamp.orElse(Long.MIN_VALUE), toTimestamp.orElse(Long.MAX_VALUE)));
   }
 
-  @GetMapping("/{id}/video/tasks") // TODO add on swagger
+  @GetMapping("/{id}/video/tasks")
   public ResponseEntity getAllTasks(@PathVariable int id) {
     if (executionRepository.getById(id).isEmpty()) {
       throw new NotFoundException("Execution with id " + id + " was not found");
