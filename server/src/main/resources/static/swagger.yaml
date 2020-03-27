@@ -402,7 +402,7 @@ paths:
           description: "The file with the specified execution id and file id doesn't exists"
           schema:
             $ref: '#/definitions/ErrorMessage'
-  /storage/images/{executionId}/{fileId}/data:
+  /storage/images/{executionId}/{fileId}/metadata:
     get:
       tags:
         - "Storage"
