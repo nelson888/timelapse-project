@@ -41,7 +41,7 @@ public class LocalStorageService extends AbstractStorage {
   private final Path rootPath;
   private final Map<Integer, AtomicInteger> executionFileCount = new ConcurrentHashMap<>();
 
-  public LocalStorageService(@Value("${local.storage.root}") Path tempDirRoot, Path rootPath) {
+  public LocalStorageService(@Value("${temp.dir.root}") Path tempDirRoot, @Value("${local.storage.root}") Path rootPath) {
     super(tempDirRoot);
     this.rootPath = rootPath;
     LOGGER.info("Starting Local Storage Service...");
