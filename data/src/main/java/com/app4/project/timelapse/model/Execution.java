@@ -17,11 +17,10 @@ public class Execution implements Comparable<Execution> {
   private long endTime;
   private long period; // in seconds
 
-  public Execution(String title, long startTime, long endTime, int id, long period) {
+  public Execution(String title, long startTime, long endTime, long period) {
     this.title = title;
     this.startTime = startTime;
     this.endTime = endTime;
-    this.id = id;
     this.period = period;
   }
 
