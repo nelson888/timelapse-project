@@ -1,6 +1,6 @@
 package com.app4.project.timelapseserver.service.task;
 
-import com.app4.project.timelapse.model.SavingProgress;
+import com.app4.project.timelapse.model.VideoTaskProgress;
 import com.app4.project.timelapse.model.VideoMetadata;
 import com.app4.project.timelapseserver.codec.JpgSequenceEncoder;
 import com.app4.project.timelapseserver.exception.SavingException;
@@ -26,7 +26,7 @@ public class SaveToVideoTask implements Runnable {
 
   private final int taskId;
   private final StorageService storageService;
-  private final Consumer<SavingProgress> progressUpdater;
+  private final Consumer<VideoTaskProgress> progressUpdater;
   private final VideoMetadataRepository videoMetadataRepository;
   private final int executionId;
   private final int fps;
@@ -37,7 +37,7 @@ public class SaveToVideoTask implements Runnable {
   @Override
   public void run() {
     LOGGER.info("Starting saving video for execution {} with fps {}", executionId, fps);
-    progressUpdater.accept(SavingProgress.onGoing(taskId, 0));
+    progressUpdater.accept(VideoTaskProgress.onGoing(taskId, 0));
     long startTime = System.currentTimeMillis();
     try (FileChannelWrapper channelWrapper = storageService.createTempChannel(taskId);
       JpgSequenceEncoder encoder = new JpgSequenceEncoder(channelWrapper, fps)) {
@@ -46,7 +46,7 @@ public class SaveToVideoTask implements Runnable {
         (System.currentTimeMillis() - startTime) / 1000L);
     } catch (IOException | SavingException e) {
       LOGGER.error("Error while saving video for execution {} (fps {})", e, fps, e);
-      progressUpdater.accept(SavingProgress.error(taskId, e.getMessage()));
+      progressUpdater.accept(VideoTaskProgress.error(taskId, e.getMessage()));
     }
   }
 
@@ -55,7 +55,7 @@ public class SaveToVideoTask implements Runnable {
       .forEach(supplier -> addFrame(encoder, supplier));
     int videoId = storageService.uploadVideo(tempFilePath);
     videoMetadataRepository.add(new VideoMetadata(executionId, videoId, fps, fromTimestamp, toTimestamp, framesCount));
-    progressUpdater.accept(SavingProgress.finished(taskId, videoId));
+    progressUpdater.accept(VideoTaskProgress.finished(taskId, videoId));
   }
 
   private void addFrame(JpgSequenceEncoder encoder, IOSupplier<byte[]> bytesSupplier) {
@@ -71,6 +71,6 @@ public class SaveToVideoTask implements Runnable {
 
   private void updateProgress() {
     int percentage = (int) (100L * framesProcessed.incrementAndGet() / framesCount);
-    progressUpdater.accept(SavingProgress.onGoing(taskId, percentage));
+    progressUpdater.accept(VideoTaskProgress.onGoing(taskId, percentage));
   }
 }

@@ -2,7 +2,7 @@ package com.app4.project.timelapseserver.configuration;
 
 import com.app4.project.timelapse.model.CameraState;
 import com.app4.project.timelapse.model.Command;
-import com.app4.project.timelapse.model.SavingProgress;
+import com.app4.project.timelapse.model.VideoTaskProgress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,7 +50,7 @@ public class ApplicationConfiguration {
   }
 
   @Bean
-  public ConcurrentMap<Integer, SavingProgress> executionSavingStateMap() {
+  public ConcurrentMap<Integer, VideoTaskProgress> executionSavingStateMap() {
     return new ConcurrentHashMap<>();
   }
 

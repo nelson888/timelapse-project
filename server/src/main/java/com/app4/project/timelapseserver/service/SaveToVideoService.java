@@ -1,7 +1,7 @@
 package com.app4.project.timelapseserver.service;
 
-import com.app4.project.timelapse.model.SavingProgress;
-import com.app4.project.timelapse.model.SavingState;
+import com.app4.project.timelapse.model.VideoTaskProgress;
+import com.app4.project.timelapse.model.TaskState;
 import com.app4.project.timelapseserver.repository.VideoMetadataRepository;
 import com.app4.project.timelapseserver.storage.StorageService;
 import com.app4.project.timelapseserver.service.task.SaveToVideoTask;
@@ -32,13 +32,13 @@ public class SaveToVideoService {
 
   private final ExecutorService executor;
   private final StorageService storageService;
-  private final ConcurrentMap<Integer, SavingProgress> taskProgressMap; // map task id -> SavingProgress
+  private final ConcurrentMap<Integer, VideoTaskProgress> taskProgressMap; // map task id -> SavingProgress
   private final ConcurrentMap<Integer, Queue<Integer>> executionTasksMap; // map execution id -> task ids
   private final VideoMetadataRepository videoMetadataRepository;
   private final AtomicInteger idGenerator = new AtomicInteger();
 
   public SaveToVideoService(ExecutorService executor, StorageService storageService,
-                            ConcurrentMap<Integer, SavingProgress> taskProgressMap,
+                            ConcurrentMap<Integer, VideoTaskProgress> taskProgressMap,
                             ConcurrentMap<Integer, Queue<Integer>> executionTasksMap,
                             VideoMetadataRepository videoMetadataRepository) {
     this.executor = executor;
@@ -48,15 +48,15 @@ public class SaveToVideoService {
     this.videoMetadataRepository = videoMetadataRepository;
   }
 
-  public SavingProgress startVideoSaving(int  executionId, int fps, long fromTimestamp, long toTimestamp) {
+  public VideoTaskProgress startVideoSaving(int  executionId, int fps, long fromTimestamp, long toTimestamp) {
     long framesCount = storageService.executionFilesCount(executionId, fromTimestamp, toTimestamp);
     if (framesCount == 0) {
-      return SavingProgress.notStarted("There are no frames for between the timestamp(s)");
+      return VideoTaskProgress.notStarted("There are no frames for between the timestamp(s)");
     }
     if (taskProgressMap.values().stream()
-      .filter(s -> s.getState() == SavingState.ON_GOING)
+      .filter(s -> s.getState() == TaskState.ON_GOING)
       .count() >= MAX_TASKS) {
-      return SavingProgress.notStarted("You cannot have more than " + MAX_TASKS + " running at the same time");
+      return VideoTaskProgress.notStarted("You cannot have more than " + MAX_TASKS + " running at the same time");
     }
     int taskId = idGenerator.getAndIncrement();
     Queue<Integer> executionTasks = executionTasksMap.computeIfAbsent(executionId, k -> new ConcurrentLinkedDeque<>());
@@ -64,10 +64,10 @@ public class SaveToVideoService {
 
     executor.submit(new SaveToVideoTask(taskId, storageService, (p) -> updateState(taskId, p), videoMetadataRepository,
       executionId, fps, fromTimestamp, toTimestamp, framesCount));
-    return SavingProgress.onGoing(taskId, 0);
+    return VideoTaskProgress.onGoing(taskId, 0);
   }
 
-  public Optional<SavingProgress> getOptionalSavingProgress(int taskId) {
+  public Optional<VideoTaskProgress> getOptionalSavingProgress(int taskId) {
     return Optional.ofNullable(taskProgressMap.get(taskId));
   }
 
@@ -76,11 +76,11 @@ public class SaveToVideoService {
     return queue == null ? Collections.emptyList() : List.copyOf(queue);
   }
 
-  public List<SavingProgress> getAllTasks() {
+  public List<VideoTaskProgress> getAllTasks() {
     return List.copyOf(taskProgressMap.values());
   }
 
-  private void updateState(int taskId, SavingProgress progress) {
+  private void updateState(int taskId, VideoTaskProgress progress) {
     taskProgressMap.put(taskId, progress);
   }
 
@@ -88,7 +88,7 @@ public class SaveToVideoService {
   @Scheduled(fixedDelay= 60L * 60L * 1000L)
   public void clean() {
     List<Integer> tasksToRemove = taskProgressMap.entrySet()
-      .stream().filter(e -> e.getValue().getState() == SavingState.FINISHED)
+      .stream().filter(e -> e.getValue().getState() == TaskState.FINISHED)
       .map(Map.Entry::getKey)
       .collect(Collectors.toList());
     for (int id : tasksToRemove) {
