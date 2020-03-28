@@ -218,6 +218,21 @@ paths:
           required: true
           type: "integer"
           format: "int32"
+        - name: "fromTimestamp"
+          in: "query"
+          description: "The timestamp from which to start getting the images"
+          type: "integer"
+          format: "int64"
+        - name: "toTimestamp"
+          in: "query"
+          description: "The timestamp from which to stop getting the images"
+          type: "integer"
+          format: "int64"
+        - name: "fps"
+          in: "query"
+          description: "The fps of the video (default is 24)"
+          type: "integer"
+          format: "int32"
       responses:
         200:
           description: "successful operation"
