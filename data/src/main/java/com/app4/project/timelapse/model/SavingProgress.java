@@ -1,11 +1,9 @@
 package com.app4.project.timelapse.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
 @Value
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @AllArgsConstructor
 public class SavingProgress {
 

@@ -7,9 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErrorResponse {
+public class FileMetadata {
 
-  private String title;
-  private String message;
+  private Long size;
+  private String name;
+  private Long uploadTimestamp;
+  private int executionId;
+  private int fileId;
 
 }

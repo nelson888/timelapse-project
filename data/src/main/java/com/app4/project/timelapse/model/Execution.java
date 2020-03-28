@@ -1,13 +1,20 @@
 package com.app4.project.timelapse.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Objects;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Execution implements Comparable<Execution> {
 
+  private int id;
   private String title;
   private long startTime;
   private long endTime;
-  private int id;
   private long period; // in seconds
 
   public Execution(String title, long startTime, long endTime, int id, long period) {
@@ -16,52 +23,6 @@ public class Execution implements Comparable<Execution> {
     this.endTime = endTime;
     this.id = id;
     this.period = period;
-  }
-
-  public Execution(String title, long startTime, long endTime, long period) {
-    this(title, startTime, endTime, 0, period);
-  }
-
-  public Execution() { }
-
-  public long getStartTime() {
-    return startTime;
-  }
-
-  public void setStartTime(long startTime) {
-    this.startTime = startTime;
-  }
-
-  public long getEndTime() {
-    return endTime;
-  }
-
-  public void setEndTime(long endTime) {
-    this.endTime = endTime;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public long getPeriod() {
-    return period;
-  }
-
-  public void setPeriod(long period) {
-    this.period = period;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
   }
 
   @Override
@@ -82,18 +43,6 @@ public class Execution implements Comparable<Execution> {
     return (int) (startTime - execution.startTime);
   }
 
-
-  @Override
-  public String toString() {
-    return "Execution{" +
-      "title='" + title + '\'' +
-      ", startTime=" + startTime +
-      ", endTime=" + endTime +
-      ", id=" + id +
-      ", period=" + period +
-      '}';
-  }
-
   public boolean isRunning() {
     long now = System.currentTimeMillis();
     return now >= startTime && now <= endTime;
@@ -101,7 +50,8 @@ public class Execution implements Comparable<Execution> {
 
   public boolean overlaps(Execution e) {
     return startTime >= e.startTime && startTime < e.endTime ||
-      endTime >= e.startTime && endTime < e.endTime;
+      endTime >= e.startTime && endTime < e.endTime ||
+      startTime <= e.startTime && endTime >= e.endTime;
   }
 
 }

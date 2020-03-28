@@ -16,45 +16,4 @@ public class FileData {
     this.fileId = fileId;
   }
 
-  public FileData() {
-  }
-
-  public Long getSize() {
-    return size;
-  }
-
-  public void setSize(Long size) {
-    this.size = size;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Long getUploadTimestamp() {
-    return uploadTimestamp;
-  }
-
-  public int getExecutionId() {
-    return executionId;
-  }
-
-  public int getFileId() {
-    return fileId;
-  }
-
-  @Override
-  public String toString() {
-    return "FileData{" +
-      "size=" + size +
-      ", name='" + name + '\'' +
-      ", uploadTimestamp=" + uploadTimestamp +
-      ", executionId=" + executionId +
-      ", fileId=" + fileId +
-      '}';
-  }
 }
