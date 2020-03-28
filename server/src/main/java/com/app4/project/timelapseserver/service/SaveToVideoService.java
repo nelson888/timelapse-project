@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class SaveToVideoService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SaveToVideoService.class);
+  private static final int MAX_TASKS = 10;
 
   private final ExecutorService executor;
   private final StorageService storageService;
@@ -51,6 +52,11 @@ public class SaveToVideoService {
     long framesCount = storageService.executionFilesCount(executionId, fromTimestamp, toTimestamp);
     if (framesCount == 0) {
       return SavingProgress.notStarted("There are no frames for between the timestamp(s)");
+    }
+    if (taskProgressMap.values().stream()
+      .filter(s -> s.getState() == SavingState.ON_GOING)
+      .count() >= MAX_TASKS) {
+      return SavingProgress.notStarted("You cannot have more than " + MAX_TASKS + " running at the same time");
     }
     int taskId = idGenerator.getAndIncrement();
     Queue<Integer> executionTasks = executionTasksMap.computeIfAbsent(executionId, k -> new ConcurrentLinkedDeque<>());
