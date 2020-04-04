@@ -38,7 +38,7 @@
                 </executions>
                 <configuration>
                     <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef> <!-- TODO change plugin?-->
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                 </configuration>
             </plugin>
