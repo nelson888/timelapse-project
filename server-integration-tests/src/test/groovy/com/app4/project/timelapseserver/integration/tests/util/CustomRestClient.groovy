@@ -44,7 +44,7 @@ class CustomRestClient extends RESTClient {
             try {
                 return super.doRequest(delegate)
             } catch (HttpResponseException e) {
-                throw new RestResponseException(e, e.response, e.response.data)
+                throw new RestResponseException(e, e.response)
             }
         }
     }

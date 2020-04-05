@@ -5,11 +5,16 @@ import groovyx.net.http.HttpResponseDecorator
 class RestResponseException extends IOException {
     final HttpResponseDecorator response
 
-    RestResponseException(Throwable e, HttpResponseDecorator response, Object responseBody) {
-        this(e, response, "[${response.status}] ${responseBody.title}: ${responseBody.message}")
+    static String getMessage(HttpResponseDecorator response) {
+        def responseBody = response.data
+        if (responseBody && responseBody.title) {
+            return "[${response.status}] ${responseBody.title}: ${responseBody.message}"
+        }
+        return responseBody
     }
-    RestResponseException(Throwable e, HttpResponseDecorator response, String message) {
-        super(message, e)
+
+    RestResponseException(Throwable e, HttpResponseDecorator response) {
+        super(getMessage(response), e)
         this.response = response
     }
 
