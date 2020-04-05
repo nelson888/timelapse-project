@@ -4,6 +4,7 @@ import com.app4.project.timelapse.model.Execution
 import com.app4.project.timelapseserver.integration.tests.util.RestResponseException
 import groovy.time.TimeCategory
 import org.apache.http.HttpStatus
+import spock.lang.Shared
 import spock.lang.Stepwise
 
 @SuppressWarnings("GroovyVariableNotAssigned")
@@ -11,6 +12,7 @@ import spock.lang.Stepwise
 class ExecutionControllerTest extends IntegrationTest {
 
     private static final String EXECUTION_ENDPOINT = '/api/executions'
+    @Shared
     private int postedExecutionId
 
     def 'get all executions'() {
@@ -22,7 +24,6 @@ class ExecutionControllerTest extends IntegrationTest {
         List<Execution> executions = response.data as List<Execution>
         println executions
         assert executions != null
-
     }
 
     def 'test post execution with no title'() {
@@ -68,15 +69,40 @@ class ExecutionControllerTest extends IntegrationTest {
         when:
         def response = client.post(path: EXECUTION_ENDPOINT, body: execution)
         postedExecutionId = response.data.id // will be used for delete test
+        println "Posted execution has id $postedExecutionId"
         then: 'server returns 200 code '
         assert response.status == HttpStatus.SC_OK
     }
 
-    // TODO add overlap test
+    def 'test post overlaping execution'() {
+        setup:
+        Execution execution = new Execution(title: "I overlaps", startTime: now(),
+                endTime: now() + 1000, period: 8)
+        when:
+        client.post(path: EXECUTION_ENDPOINT, body: execution)
+        then: 'server returns 409 code (conflict)'
+        RestResponseException e = thrown(RestResponseException)
+        assert e.statusCode == HttpStatus.SC_CONFLICT
+    }
+
     def 'test delete execution'() {
         when:
         def response = client.delete(path: "$EXECUTION_ENDPOINT/$postedExecutionId")
         then:
         assert response.status == HttpStatus.SC_OK
+    }
+
+    def 'test get execution not found'() {
+        when:
+        client.get(path: "$EXECUTION_ENDPOINT/$postedExecutionId")
+        then:
+        RestResponseException e = thrown(RestResponseException)
+        assert e.response.status == HttpStatus.SC_NOT_FOUND
+    }
+
+    def cleanupSpec() {
+        if (postedExecutionId != 0) {
+            client.delete(path: "$EXECUTION_ENDPOINT/$postedExecutionId")
+        }
     }
 }
