@@ -48,7 +48,7 @@ public class StorageController {
       .body(fileData);
   }
 
-  @GetMapping("/images/{executionId}/imageCount")
+  @GetMapping("/images/{executionId}/count")
   public ResponseEntity nbImages(@PathVariable int executionId) {
     idCheck(executionId);
     return ResponseEntity.ok().body(storageService.nbFiles(executionId));
