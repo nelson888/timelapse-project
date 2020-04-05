@@ -1,5 +1,6 @@
 package com.app4.project.timelapseserver.integration.tests.util
 
+import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.HttpResponseException
