@@ -66,8 +66,12 @@ public class ExecutionController {
       throw new BadRequestException("Max number of executions reached");
     }
     validate(execution);
-    if (executionRepository.getAll().stream().anyMatch(execution::overlaps)) {
-      throw new ConflictException("Execution overlaps with another one");
+
+    Optional<Execution> optOverlappedExecution = executionRepository.getAll().stream()
+      .filter(execution::overlaps)
+      .findFirst();
+    if (optOverlappedExecution.isPresent()) {
+      throw new ConflictException("Execution overlaps with execution with id " + optOverlappedExecution.get().getId());
     }
     executionRepository.add(execution);
     LOGGER.info("New execution was added: {}", execution);
