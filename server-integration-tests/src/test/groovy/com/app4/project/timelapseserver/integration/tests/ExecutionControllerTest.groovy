@@ -10,6 +10,7 @@ import spock.lang.Stepwise
 @Stepwise // allow to run tests in their definition order
 class ExecutionControllerTest extends IntegrationTest {
 
+    private static final String EXECUTION_ENDPOINT = '/api/executions'
     private int postedExecutionId
 
     def 'get all executions'() {
@@ -29,7 +30,7 @@ class ExecutionControllerTest extends IntegrationTest {
         Execution execution = new Execution(title: null, startTime: now(),
                 endTime: now() + 1000, period: 8)
         when:
-        client.post(path: '/api/executions', body: execution)
+        client.post(path: EXECUTION_ENDPOINT, body: execution)
         then: 'server returns 400 code (bad request)'
         RestResponseException e = thrown(RestResponseException)
         assert e.statusCode == HttpStatus.SC_BAD_REQUEST
@@ -40,7 +41,7 @@ class ExecutionControllerTest extends IntegrationTest {
         Execution execution = new Execution(title: null, startTime: now() + 5000,
                 endTime: now(), period: 8)
         when:
-        client.post(path: '/api/executions', body: execution)
+        client.post(path: EXECUTION_ENDPOINT, body: execution)
         then: 'server returns 400 code (bad request)'
         RestResponseException e = thrown(RestResponseException)
         assert e.statusCode == HttpStatus.SC_BAD_REQUEST
@@ -51,7 +52,7 @@ class ExecutionControllerTest extends IntegrationTest {
         Execution execution = new Execution(title: null, startTime: now(),
                 endTime: now() + 1000, period: 0)
         when:
-        client.post(path: '/api/executions', body: execution)
+        client.post(path: EXECUTION_ENDPOINT, body: execution)
         then: 'server returns 400 code (bad request)'
         RestResponseException e = thrown(RestResponseException)
         assert e.statusCode == HttpStatus.SC_BAD_REQUEST
@@ -65,15 +66,16 @@ class ExecutionControllerTest extends IntegrationTest {
                     endTime: now() + 5.hours.toMilliseconds(), period: 8)
         }
         when:
-        def response = client.post(path: '/api/executions', body: execution)
+        def response = client.post(path: EXECUTION_ENDPOINT, body: execution)
         postedExecutionId = response.data.id // will be used for delete test
         then: 'server returns 200 code '
         assert response.status == HttpStatus.SC_OK
     }
 
+    // TODO add overlap test
     def 'test delete execution'() {
         when:
-        def response = client.delete(path: "/api/executions/$postedExecutionId")
+        def response = client.delete(path: "$EXECUTION_ENDPOINT/$postedExecutionId")
         then:
         assert response.status == HttpStatus.SC_OK
     }
