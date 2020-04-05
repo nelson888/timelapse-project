@@ -8,7 +8,8 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 
 @SuppressWarnings("GroovyVariableNotAssigned")
-@Stepwise // allow to run tests in their definition order
+@Stepwise
+// allow to run tests in their definition order
 class ExecutionControllerTest extends IntegrationTest {
 
     private static final String EXECUTION_ENDPOINT = '/api/executions'

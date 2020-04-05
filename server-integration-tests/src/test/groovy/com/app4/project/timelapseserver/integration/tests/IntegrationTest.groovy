@@ -7,7 +7,7 @@ import spock.lang.Specification
 abstract class IntegrationTest extends Specification {
 
     @Shared
-    def client = new CustomRestClient( 'http://localhost:8080/')
+    def client = new CustomRestClient('http://localhost:8080/')
 
     static long now() {
         return System.currentTimeMillis()
