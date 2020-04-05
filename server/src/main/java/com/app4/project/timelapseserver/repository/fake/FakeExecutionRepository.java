@@ -87,4 +87,12 @@ public class FakeExecutionRepository implements ExecutionRepository {
       ex.setTitle(request.getTitle());
     }
   }
+
+  @Override
+  public void removeAll() {
+    executions.clear();
+    for (int i = 0; i < MAX_EXECUTIONS; i++) {
+      idPool.free(i);
+    }
+  }
 }

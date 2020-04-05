@@ -22,4 +22,5 @@ public interface ExecutionRepository {
 
   Execution update(int id, ExecutionPatchRequest request);
 
+  void removeAll();
 }

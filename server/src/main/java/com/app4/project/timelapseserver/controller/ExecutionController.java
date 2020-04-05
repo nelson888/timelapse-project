@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -46,17 +44,20 @@ public class ExecutionController {
   private final SaveToVideoService saveToVideoService;
   private final VideoMetadataRepository videoMetadataRepository;
   private final int defaultFps;
+  private final boolean fillFakeData;
 
   public ExecutionController(ExecutionRepository executionRepository, StorageService storageService,
-      CameraState cameraState, SaveToVideoService saveToVideoService,
-      VideoMetadataRepository videoMetadataRepository,
-      @Value("${video.default.fps}") int defaultFps) {
+                             CameraState cameraState, SaveToVideoService saveToVideoService,
+                             VideoMetadataRepository videoMetadataRepository,
+                             @Value("${video.default.fps}") int defaultFps,
+                             @Value("${executions.fill.data:false}") boolean fillFakeData) {
     this.executionRepository = executionRepository;
     this.storageService = storageService;
     this.cameraState = cameraState;
     this.saveToVideoService = saveToVideoService;
     this.videoMetadataRepository = videoMetadataRepository;
     this.defaultFps = defaultFps;
+    this.fillFakeData = fillFakeData;
   }
 
   @PostMapping
@@ -164,9 +165,13 @@ public class ExecutionController {
   }
 
 
-  //@PostConstruct for test purpose
+  @PostConstruct
   public void fillWithFakeData() {
-    LOGGER.info("Filling the server with fake data");
+    if (!fillFakeData) {
+      return;
+    }
+    executionRepository.removeAll();
+    LOGGER.info("Filling Execution Repository with fake data");
     long now = System.currentTimeMillis();
     long day = 1000 * 60 * 60 * 24;
     String[] titles = new String[]{

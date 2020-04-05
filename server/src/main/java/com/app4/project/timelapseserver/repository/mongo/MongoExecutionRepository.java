@@ -62,4 +62,12 @@ public class MongoExecutionRepository extends MongoRepository<Execution> impleme
 
     return mongoTemplate.findAndModify(queryById(id), update, clazz);
   }
+
+  @Override
+  public void removeAll() {
+    mongoTemplate.dropCollection(COLLECTION_NAME);
+    for (int i = 0; i < MAX_EXECUTIONS; i++) {
+      idPool.free(i);
+    }
+  }
 }
