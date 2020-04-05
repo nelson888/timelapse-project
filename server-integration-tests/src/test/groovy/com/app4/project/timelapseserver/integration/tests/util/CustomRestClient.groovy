@@ -33,7 +33,13 @@ class CustomRestClient extends RESTClient {
             return super.post(args)
         }
 
-        @Override
+        HttpResponseDecorator postMultipart(Map<String, ?> args) throws URISyntaxException, ClientProtocolException, IOException {
+            args.requestContentType = ContentType.BINARY
+            // TODO doesn't work
+            return super.post(args)
+        }
+
+         @Override
         HttpResponseDecorator put(Map<String, ?> args) throws URISyntaxException, ClientProtocolException, IOException {
             args.requestContentType = ContentType.JSON
             return super.put(args)
