@@ -36,7 +36,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(ConflictException.class)
-  public final ResponseEntity<ErrorResponse> conflictException(BadRequestException ex, WebRequest request) {
+  public final ResponseEntity<ErrorResponse> conflictException(ConflictException ex, WebRequest request) {
     return ResponseEntity.status(HttpStatus.CONFLICT)
       .body(new ErrorResponse("A conflict occurred", ex.getMessage()));
   }
