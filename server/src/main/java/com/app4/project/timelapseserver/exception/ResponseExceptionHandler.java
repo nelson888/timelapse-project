@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
@@ -39,6 +40,12 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
   public final ResponseEntity<ErrorResponse> conflictException(ConflictException ex, WebRequest request) {
     return ResponseEntity.status(HttpStatus.CONFLICT)
       .body(new ErrorResponse("A conflict occurred", ex.getMessage()));
+  }
+
+  @ExceptionHandler(MultipartException.class)
+  public final ResponseEntity<ErrorResponse> multipartException(MultipartException ex, WebRequest request) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+      .body(new ErrorResponse("Multipart exception", ex.getMessage()));
   }
 
 }
