@@ -7,7 +7,7 @@ import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
 import com.app4.project.timelapseserver.exception.ConflictException;
 import com.app4.project.timelapseserver.exception.NotFoundException;
-import com.app4.project.timelapseserver.model.request.ExecutionPatchRequest;
+import com.app4.project.timelapse.model.request.ExecutionPatchRequest;
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
 import com.app4.project.timelapseserver.repository.VideoMetadataRepository;
 import com.app4.project.timelapseserver.service.SaveToVideoService;

@@ -1,6 +1,7 @@
 package com.app4.project.timelapseserver.controller;
 
 import com.app4.project.timelapse.model.Command;
+import com.app4.project.timelapse.model.request.CommandPostRequest;
 import com.app4.project.timelapseserver.configuration.ApplicationConfiguration;
 import com.app4.project.timelapseserver.exception.BadRequestException;
 import org.slf4j.Logger;
@@ -26,8 +27,17 @@ public class CommandController {
     this.commands = commands;
   }
 
-  @PostMapping("/")
-  public ResponseEntity addCommand(@RequestBody Command command) {
+  @PostMapping
+  public ResponseEntity addCommand(@RequestBody CommandPostRequest commandRequest) {
+    if (commandRequest.getCommand() == null) {
+      throw new BadRequestException("You must specify a command");
+    }
+    Command command;
+    try {
+      command = Command.valueOf(commandRequest.getCommand());
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException("Unknown command " + commandRequest.getCommand());
+    }
     if (commands.size() >= ApplicationConfiguration.MAX_COMMANDS) {
       throw new BadRequestException("Max number of commands reached");
     }

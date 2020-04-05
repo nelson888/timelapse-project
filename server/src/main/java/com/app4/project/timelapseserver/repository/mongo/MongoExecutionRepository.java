@@ -1,7 +1,7 @@
 package com.app4.project.timelapseserver.repository.mongo;
 
 import com.app4.project.timelapse.model.Execution;
-import com.app4.project.timelapseserver.model.request.ExecutionPatchRequest;
+import com.app4.project.timelapse.model.request.ExecutionPatchRequest;
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
 import com.app4.project.timelapseserver.util.IdPool;
 import org.springframework.context.annotation.Profile;
