@@ -126,7 +126,7 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   private String getFileName(int fileId) {
-    return nDigitsNumber(fileId, 5) + IMAGE_EXTENSION;
+    return fileId + IMAGE_EXTENSION; // should normally use nDigits methods
   }
 
   @Override
