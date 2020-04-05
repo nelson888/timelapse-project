@@ -25,6 +25,7 @@ public class MongoExecutionRepository extends MongoRepository<Execution> impleme
 
   public MongoExecutionRepository(MongoTemplate mongoTemplate) {
     super(mongoTemplate, Execution.class, COLLECTION_NAME);
+    getAll().stream().forEach(e -> idPool.setTook(e.getId()));
   }
 
   @Override

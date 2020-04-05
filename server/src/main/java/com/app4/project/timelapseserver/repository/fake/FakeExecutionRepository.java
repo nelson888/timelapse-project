@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -63,32 +62,6 @@ public class FakeExecutionRepository implements ExecutionRepository {
   @Override
   public Optional<Execution> getSoonest() {
     return executions.isEmpty() ? Optional.empty() : Optional.of(executions.peek());
-  }
-
-  @PostConstruct
-  public void fillWithFakeData() {
-    LOGGER.info("Filling the server with fake data");
-    long now = System.currentTimeMillis();
-    long day = 1000 * 60 * 60 * 24;
-    String[] titles = new String[]{
-      "Levee de la lune",
-      "floraison tulipe",
-      "couché de soleil"
-    };
-
-    for (int i = 0; i < titles.length; i++) {
-      long startTime = now + (i + 1) * day;
-      long endTime = startTime + day / 4;
-      Execution execution = new Execution(titles[i], startTime, endTime, 5 + (long) (Math.random() * 10));
-      execution.setId(idPool.get());
-      executions.add(execution);
-    }
-
-    Execution e = new Execution("Now execution", now, now + day, 5 + (long) (Math.random() * 10));
-    e.setId(idPool.get());
-    executions.add(e);
-
-    LOGGER.info("Executions: {}", executions);
   }
 
   @Override

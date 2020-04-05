@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -61,10 +64,10 @@ public class ExecutionController {
     if (executionRepository.count() >= ApplicationConfiguration.MAX_EXECUTIONS) {
       throw new BadRequestException("Max number of executions reached");
     }
+    validate(execution);
     if (executionRepository.getAll().stream().anyMatch(execution::overlaps)) {
       throw new ConflictException("Execution overlaps with another one");
     }
-    validate(execution);
     executionRepository.add(execution);
     LOGGER.info("New execution was added: {}", execution);
     return ResponseEntity.ok(execution);
@@ -160,4 +163,26 @@ public class ExecutionController {
     return ResponseEntity.ok(executionRepository.getAll());
   }
 
+
+  //@PostConstruct for test purpose
+  public void fillWithFakeData() {
+    LOGGER.info("Filling the server with fake data");
+    long now = System.currentTimeMillis();
+    long day = 1000 * 60 * 60 * 24;
+    String[] titles = new String[]{
+      "Levee de la lune",
+      "floraison tulipe",
+      "couché de soleil",
+      "test timelapse",
+      "cours de projet"
+    };
+
+    for (int i = 0; i < titles.length; i++) {
+      long startTime = now + (i + 1) * day;
+      long endTime = startTime + day / 4;
+      Execution execution = new Execution(titles[i], startTime, endTime, 5 + (long) (Math.random() * 10));
+      executionRepository.add(execution);
+    }
+    LOGGER.info("Executions: {}", executionRepository.getAll());
+  }
 }

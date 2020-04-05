@@ -30,4 +30,11 @@ public class IdPool {
       }
       took[i] = false;
     }
+
+  public void setTook(int i) {
+    if (i < 0 || i >= took.length) {
+      return;
+    }
+    took[i] = true;
   }
+}
