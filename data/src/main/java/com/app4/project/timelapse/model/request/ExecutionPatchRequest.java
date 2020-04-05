@@ -1,4 +1,4 @@
-package com.app4.project.timelapseserver.model.request;
+package com.app4.project.timelapse.model.request;
 
 import lombok.Data;
 
