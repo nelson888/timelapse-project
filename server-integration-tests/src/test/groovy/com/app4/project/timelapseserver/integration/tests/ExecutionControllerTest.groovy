@@ -26,6 +26,14 @@ class ExecutionControllerTest extends IntegrationTest {
         assert executions != null
     }
 
+    def 'test get execution by id'() {
+        when:
+        def response = client.get(path: "$EXECUTION_ENDPOINT/0")
+        then:
+        assert response.data.id == 0
+        assert response.status == HttpStatus.SC_OK
+    }
+
     def 'test post execution with no title'() {
         setup:
         Execution execution = new Execution(title: null, startTime: now(),
@@ -72,6 +80,14 @@ class ExecutionControllerTest extends IntegrationTest {
         println "Posted execution has id $postedExecutionId"
         then: 'server returns 200 code '
         assert response.status == HttpStatus.SC_OK
+    }
+
+    def 'test get execution current execution'() {
+        when:
+        def response = client.get(path: "$EXECUTION_ENDPOINT/current")
+        then:
+        assert response.status == HttpStatus.SC_OK
+        assert response.data.id == postedExecutionId
     }
 
     def 'test post overlaping execution'() {
