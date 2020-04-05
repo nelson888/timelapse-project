@@ -150,21 +150,6 @@ paths:
       responses:
         200:
           description: "Successful operation. This operation may do nothing if the provided ID doesn't exists"
-  /api/executions/imageCount:
-    get:
-      tags:
-        - "Execution"
-      summary: "Retrieve the number of executions"
-      operationId: "getExecutionsCount"
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: number
   /api/executions/current:
     get:
       tags:
