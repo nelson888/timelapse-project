@@ -21,14 +21,13 @@ class CommandIntegrationTest extends IntegrationTest {
         when:
         def response = client.get(path: "$COMMAND_ENDPOINT/consume")
         then:
-
         assert response.data as Command == Command.SLEEP
         assert response.status == HttpStatus.SC_OK
     }
 
     def 'test add null command'() {
         when:
-        def response = client.post(path: COMMAND_ENDPOINT, body: [command: null])
+        client.post(path: COMMAND_ENDPOINT, body: [command: null])
         then:
         RestResponseException e = thrown(RestResponseException)
         assert e.response.status == HttpStatus.SC_BAD_REQUEST
@@ -36,7 +35,7 @@ class CommandIntegrationTest extends IntegrationTest {
 
     def 'test add unknown command'() {
         when:
-        def response = client.post(path: COMMAND_ENDPOINT, body: [command: "unknown"])
+        client.post(path: COMMAND_ENDPOINT, body: [command: "unknown"])
         then:
         RestResponseException e = thrown(RestResponseException)
         assert e.response.status == HttpStatus.SC_BAD_REQUEST
