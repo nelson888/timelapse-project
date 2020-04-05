@@ -3,14 +3,20 @@ package com.app4.project.timelapse.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
+// had to create same object because of annotations
+// (didn't want to add spring dependencies in 'model' module
+@Document
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Execution implements Comparable<Execution> {
 
+  @Id
   private int id;
   private String title;
   private long startTime;
