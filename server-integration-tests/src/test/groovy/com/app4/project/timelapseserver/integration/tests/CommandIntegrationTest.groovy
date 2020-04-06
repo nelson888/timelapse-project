@@ -8,6 +8,7 @@ import spock.lang.Stepwise
 
 @Stepwise // allow to run tests in their definition order
 class CommandIntegrationTest extends IntegrationTest {
+    
     private static final String COMMAND_ENDPOINT = '/api/commands'
 
     def 'test add command'() {

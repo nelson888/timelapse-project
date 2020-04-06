@@ -11,7 +11,8 @@ import spock.lang.Stepwise
 @Stepwise // allow to run tests in their definition order
 class ExecutionControllerTest extends IntegrationTest {
 
-    private static final String EXECUTION_ENDPOINT = '/api/executions'
+    static final String EXECUTION_ENDPOINT = '/api/executions'
+    
     @Shared
     private int postedExecutionId
 
