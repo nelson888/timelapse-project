@@ -4,7 +4,9 @@ import com.app4.project.timelapseserver.integration.tests.util.RestResponseExcep
 import groovyx.net.http.ContentType
 import org.apache.http.HttpStatus
 import spock.lang.Shared
+import spock.lang.Stepwise
 
+@Stepwise // allow to run tests in their definition order
 class ImageStorageIntegrationTest extends IntegrationTest {
 
     private static final String STORAGE_ENDPOINT = '/storage/images'

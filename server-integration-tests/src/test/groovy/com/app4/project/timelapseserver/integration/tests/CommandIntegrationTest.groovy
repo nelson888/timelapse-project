@@ -6,8 +6,7 @@ import com.app4.project.timelapseserver.integration.tests.util.RestResponseExcep
 import org.apache.http.HttpStatus
 import spock.lang.Stepwise
 
-@Stepwise
-// allow to run tests in their definition order
+@Stepwise // allow to run tests in their definition order
 class CommandIntegrationTest extends IntegrationTest {
     private static final String COMMAND_ENDPOINT = '/api/commands'
 
