@@ -57,6 +57,10 @@ public class LocalStorageService extends AbstractStorage {
         LOGGER.error("Couldn't create needed directory");
         throw new RuntimeException(rootPath + "couldn't create directory " + execDir.getName());
       }
+      // compute the file count for each executions
+      int fileCount;
+      for (fileCount=0; Files.exists(rootPath.resolve(FOLDER_PREFIX + i).resolve(fileCount + IMAGE_EXTENSION)); fileCount++);
+      executionFileCount.put(i, new AtomicInteger(fileCount));
     }
     LOGGER.info("Local Storage Service was successfully instantiated");
   }
