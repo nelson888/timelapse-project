@@ -27,6 +27,7 @@ class CustomRestClient extends RESTClient {
 
     @Override
     HttpResponseDecorator patch(Map<String, ?> args) throws URISyntaxException, ClientProtocolException, IOException {
+        args.requestContentType = ContentType.JSON
         return super.patch(args)
     }
 
