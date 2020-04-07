@@ -1,11 +1,10 @@
 package com.app4.project.timelapseserver.service;
 
-import com.app4.project.timelapse.model.VideoTaskProgress;
 import com.app4.project.timelapse.model.TaskState;
+import com.app4.project.timelapse.model.VideoTaskProgress;
 import com.app4.project.timelapseserver.repository.VideoMetadataRepository;
-import com.app4.project.timelapseserver.storage.StorageService;
 import com.app4.project.timelapseserver.service.task.SaveToVideoTask;
-
+import com.app4.project.timelapseserver.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -48,10 +47,11 @@ public class SaveToVideoService {
     this.videoMetadataRepository = videoMetadataRepository;
   }
 
-  public VideoTaskProgress startVideoSaving(int  executionId, int fps, long fromTimestamp, long toTimestamp) {
+  public VideoTaskProgress startVideoSaving(int executionId, int fps, long fromTimestamp, long toTimestamp) {
     long framesCount = storageService.executionFilesCount(executionId, fromTimestamp, toTimestamp);
     if (framesCount == 0) {
-      return VideoTaskProgress.notStarted("There are no frames for between the timestamp(s)");
+      return VideoTaskProgress.notStarted("There are no frames for between the timestamps " + fromTimestamp
+        + " and " + toTimestamp);
     }
     if (taskProgressMap.values().stream()
       .filter(s -> s.getState() == TaskState.ON_GOING)
@@ -85,7 +85,7 @@ public class SaveToVideoService {
   }
 
   // clean map every 30 minutes
-  @Scheduled(fixedDelay= 60L * 60L * 1000L)
+  @Scheduled(fixedDelay = 60L * 60L * 1000L)
   public void clean() {
     List<Integer> tasksToRemove = taskProgressMap.entrySet()
       .stream().filter(e -> e.getValue().getState() == TaskState.FINISHED)
@@ -93,7 +93,7 @@ public class SaveToVideoService {
       .collect(Collectors.toList());
     for (int id : tasksToRemove) {
       taskProgressMap.remove(id);
-      executionTasksMap.values().forEach( q -> q.remove(id));
+      executionTasksMap.values().forEach(q -> q.remove(id));
     }
     LOGGER.info("Cleaned finished tasks");
   }
