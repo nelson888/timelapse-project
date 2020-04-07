@@ -61,7 +61,7 @@ public class MongoExecutionRepository extends MongoRepository<Execution> impleme
     Optional.ofNullable(request.getEndTime()).ifPresent(endTime -> update.set("endTime", endTime));
     Optional.ofNullable(request.getPeriod()).ifPresent(period -> update.set("period", period));
 
-    return mongoTemplate.updateFirst(queryById(id), update, clazz).getModifiedCount() > 0;
+    return mongoTemplate.findAndModify(queryById(id), update, clazz, COLLECTION_NAME) != null;
   }
 
   @Override
