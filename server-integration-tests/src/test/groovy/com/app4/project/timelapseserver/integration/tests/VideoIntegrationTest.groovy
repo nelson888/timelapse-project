@@ -7,6 +7,7 @@ import org.apache.http.HttpStatus
 import spock.lang.Shared
 
 import static com.app4.project.timelapseserver.integration.tests.ExecutionControllerTest.EXECUTION_ENDPOINT
+import static com.app4.project.timelapseserver.integration.tests.ExecutionControllerTest.EXECUTION_ENDPOINT
 
 import spock.lang.Stepwise
 
@@ -14,7 +15,8 @@ import spock.lang.Stepwise
 @Stepwise // allow to run tests in their definition order
 class VideoIntegrationTest extends IntegrationTest {
 
-    private static final String STORAGE_ENDPOINT = '/storage/videos'
+    private static final String VIDEO_ENDPOINT = '/storage/videos'
+    private static final String IMAGE_ENDPOINT = '/storage/images'
     private static final String VIDEO_TASK_ENDPOINT = '/api/videos/tasks'
     private final int executionId = 1
 
@@ -48,22 +50,50 @@ class VideoIntegrationTest extends IntegrationTest {
         when:
         long fromTimestamp = now()
         long toTimestamp = now() - 100000L
-        client.post(path: "$VIDEO_TASK_ENDPOINT/$taskId?fromTimestamp=$fromTimestamp&toTimestamp=$toTimestamp")
+        def response = client.post(path: "$EXECUTION_ENDPOINT/$executionId/video/generate",
+        query: [fromTimestamp: fromTimestamp, toTimestamp: toTimestamp])
         then:
-        RestResponseException e = thrown(RestResponseException)
-        def response = e.response
-        assert response.status == HttpStatus.SC_BAD_REQUEST
+        def data = response.data
+        assert response.status == HttpStatus.SC_OK
+        assert data.percentage == -1
+        assert data.taskId == -1
+        assert data.state as TaskState == TaskState.NOT_STARTED
     }
 
     def 'create video task with wrong fps'() {
         when:
         long fromTimestamp = now()
         long toTimestamp = now() + 100000L
-        client.post(path: "$VIDEO_TASK_ENDPOINT/$taskId?fromTimestamp=$fromTimestamp&toTimestamp=$toTimestamp&fps=-12")
+        client.post(path: "$EXECUTION_ENDPOINT/$executionId/video/generate",
+                query: [fromTimestamp: fromTimestamp, toTimestamp: toTimestamp, fps: -12])
         then:
         RestResponseException e = thrown(RestResponseException)
         def response = e.response
         assert response.status == HttpStatus.SC_BAD_REQUEST
+    }
+
+    private long getTimestampOfImage(int imageId) {
+        return client.get(path: "$IMAGE_ENDPOINT/$executionId/$imageId/metadata")
+                .data
+                .uploadTimestamp
+    }
+
+    def 'create video task with valid timestamps frame'() {
+        setup:
+        long imagesCount = client.get(path: "$IMAGE_ENDPOINT/$executionId/count").data
+        if (imagesCount<= 10) {
+            throw new RuntimeException("We need at least 10 images to run this test")
+        }
+        long fromTimestamp = getTimestampOfImage((imagesCount * 0.2f).toInteger())
+        long toTimestamp = getTimestampOfImage((imagesCount * 0.8f).toInteger())
+        when:
+        def response = client.post(path: "$EXECUTION_ENDPOINT/$executionId/video/generate",
+                query: [fromTimestamp: fromTimestamp, toTimestamp: toTimestamp])
+        then:
+        assert response.status == HttpStatus.SC_OK
+        def data = response.data
+        assert data.state as TaskState == TaskState.ON_GOING
+        assert data.percentage >= 0
     }
 
     def 'wait for task to finish'() {
@@ -85,7 +115,7 @@ class VideoIntegrationTest extends IntegrationTest {
 
     def 'get video metadata test'() {
         when:
-        def response = client.get(path: "$STORAGE_ENDPOINT/$videoId/metadata")
+        def response = client.get(path: "$VIDEO_ENDPOINT/$videoId/metadata")
         then:
         assert response.status == HttpStatus.SC_OK
         def data = response.data
@@ -96,7 +126,7 @@ class VideoIntegrationTest extends IntegrationTest {
 
     def 'get video test'() {
         when:
-        def response = client.get(path: "$STORAGE_ENDPOINT/$videoId", contentType: ContentType.BINARY)
+        def response = client.get(path: "$VIDEO_ENDPOINT/$videoId", contentType: ContentType.BINARY)
         then:
         assert response.status == HttpStatus.SC_OK
         def data = response.data
