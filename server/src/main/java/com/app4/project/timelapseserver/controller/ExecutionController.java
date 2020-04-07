@@ -132,13 +132,22 @@ public class ExecutionController {
 
   @PatchMapping("/{id}")
   public ResponseEntity updateExecution(@PathVariable int id, @RequestBody ExecutionPatchRequest patchRequest) {
-    if (patchRequest.getPeriod() != null && patchRequest.getPeriod() <= 0) {
-      throw new BadRequestException("The period must be greater than 0");
+    Execution execution = executionRepository.getById(id).orElseThrow(() -> new NotFoundException("Execution with id " + id + " was not found"));
+
+    Optional.ofNullable(patchRequest.getTitle()).ifPresent(execution::setTitle);
+    Optional.ofNullable(patchRequest.getStartTime()).ifPresent(execution::setStartTime);
+    Optional.ofNullable(patchRequest.getEndTime()).ifPresent(execution::setEndTime);
+    Optional.ofNullable(patchRequest.getPeriod()).ifPresent(execution::setPeriod);
+    validate(execution);
+    Optional<Execution> optOverlappedExecution = executionRepository.getAll().stream()
+      .filter(e -> e.getId() != id)
+      .filter(execution::overlaps)
+      .findFirst();
+    if (optOverlappedExecution.isPresent()) {
+      throw new ConflictException("Execution overlaps with execution with id " + optOverlappedExecution.get().getId());
     }
-    if (patchRequest.getTitle() != null && patchRequest.getTitle().isEmpty()) {
-      throw new BadRequestException("The title cannot be empty");
-    }
-    return ResponseEntity.ok(executionRepository.update(id, patchRequest));
+    executionRepository.update(id, patchRequest);
+    return ResponseEntity.ok(executionRepository.getById(id));
   }
 
   @GetMapping("/count")

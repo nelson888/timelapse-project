@@ -20,7 +20,7 @@ public interface ExecutionRepository {
 
   Optional<Execution> getSoonest();
 
-  Execution update(int id, ExecutionPatchRequest request);
+  boolean update(int id, ExecutionPatchRequest request);
 
   void removeAll();
 }

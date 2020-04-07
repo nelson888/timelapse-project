@@ -65,12 +65,13 @@ public class FakeExecutionRepository implements ExecutionRepository {
   }
 
   @Override
-  public Execution update(int id, ExecutionPatchRequest request) {
-    Execution ex = executions.stream().filter(e -> e.getId() == id).findFirst()
-      .orElseThrow(() ->
-        new NotFoundException(String.format("Execution with id %d doesn't exists", id)));
-    updateExecution(ex, request);
-    return ex;
+  public boolean update(int id, ExecutionPatchRequest request) {
+    Optional<Execution> ex = executions.stream().filter(e -> e.getId() == id).findFirst();
+    if (ex.isPresent()) {
+      updateExecution(ex.get(), request);
+      return true;
+    }
+    return false;
   }
 
   void updateExecution(Execution ex, ExecutionPatchRequest request) {

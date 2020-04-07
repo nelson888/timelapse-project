@@ -2,6 +2,7 @@ package com.app4.project.timelapseserver.repository.mongo;
 
 import com.app4.project.timelapse.model.Execution;
 import com.app4.project.timelapse.model.request.ExecutionPatchRequest;
+import com.app4.project.timelapseserver.exception.NotFoundException;
 import com.app4.project.timelapseserver.repository.ExecutionRepository;
 import com.app4.project.timelapseserver.util.IdPool;
 import org.springframework.context.annotation.Profile;
@@ -53,14 +54,14 @@ public class MongoExecutionRepository extends MongoRepository<Execution> impleme
   }
 
   @Override
-  public Execution update(int id, ExecutionPatchRequest request) {
+  public boolean update(int id, ExecutionPatchRequest request) {
     Update update = new Update();
     Optional.ofNullable(request.getTitle()).ifPresent(title -> update.set("title", title));
     Optional.ofNullable(request.getStartTime()).ifPresent(startTime -> update.set("startTime", startTime));
     Optional.ofNullable(request.getEndTime()).ifPresent(endTime -> update.set("endTime", endTime));
     Optional.ofNullable(request.getPeriod()).ifPresent(period -> update.set("period", period));
 
-    return mongoTemplate.findAndModify(queryById(id), update, clazz);
+    return mongoTemplate.updateFirst(queryById(id), update, clazz).getModifiedCount() > 0;
   }
 
   @Override
