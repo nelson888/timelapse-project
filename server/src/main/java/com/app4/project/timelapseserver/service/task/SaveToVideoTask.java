@@ -52,15 +52,21 @@ public class SaveToVideoTask implements Runnable {
 
   private void save(JpgSequenceEncoder encoder, Path tempFilePath) throws IOException {
     storageService.executionFiles(executionId, fromTimestamp, toTimestamp)
-      .forEach(supplier -> addFrame(encoder, supplier));
+      .forEach(supplier -> encodeFrame(encoder, supplier));
     LOGGER.debug("[Task {}] Encoded all frames", taskId);
-    int videoId = storageService.uploadVideo(tempFilePath);
+    uploadVideo(tempFilePath);
+  }
+
+  // synchronized because we want to upload one video at a time (to avoid id overlapping)
+  private synchronized void uploadVideo(Path tempFilePath) throws IOException {
+    int videoId = videoMetadataRepository.count();
+    storageService.uploadVideo(tempFilePath, videoId);
     videoMetadataRepository.add(new VideoMetadata(videoId, executionId, fps, fromTimestamp, toTimestamp, framesCount));
     progressUpdater.accept(VideoTaskProgress.finished(taskId, videoId));
     LOGGER.info("[Task {}] Uploaded new video with id {}", taskId, videoId);
   }
 
-  private void addFrame(JpgSequenceEncoder encoder, IOSupplier<byte[]> bytesSupplier) {
+  private void encodeFrame(JpgSequenceEncoder encoder, IOSupplier<byte[]> bytesSupplier) {
     try {
       LOGGER.debug("[Task {}] Encoding frame {} (out of {})", taskId, framesProcessed.get(), framesCount);
       byte[] bytes = bytesSupplier.get();

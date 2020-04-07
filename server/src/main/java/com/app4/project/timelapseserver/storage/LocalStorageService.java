@@ -204,18 +204,6 @@ public class LocalStorageService extends AbstractStorage {
     return executionFileCount.computeIfAbsent(executionId, e -> new AtomicInteger(0));
   }
 
-  @Override
-  protected int getVideoCount() {
-    try {
-      return (int) Files.list(rootPath).map(Path::toFile)
-        .filter(f -> f.getName().startsWith(VIDEO_FILE_PREFIX))
-        .count();
-    } catch (IOException e) {
-      LOGGER.error("Couldn't get number of files", e);
-      throw new StorageException(e);
-    }
-  }
-
   private File getVideoFile(int videoId) {
     return rootPath.resolve(VIDEO_FILE_PREFIX + videoId + VIDEO_FILE_EXTENSION).toFile();
   }

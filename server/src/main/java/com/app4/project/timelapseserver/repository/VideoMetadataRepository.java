@@ -17,4 +17,6 @@ public interface VideoMetadataRepository {
 
   void add(VideoMetadata metadata);
 
+  int count();
+
 }

@@ -149,12 +149,6 @@ public class FirebaseStorageService extends AbstractStorage {
   }
 
   @Override
-  protected int getVideoCount() {
-    return (int) list(Storage.BlobListOption.prefix(VIDEO_FILE_PREFIX), Storage.BlobListOption.fields(),
-      Storage.BlobListOption.currentDirectory()).count();
-  }
-
-  @Override
   void uploadVideo(int videoId, InputStream inputStream) throws IOException {
     try {
       bucket.create(VIDEO_FILE_PREFIX + videoId + VIDEO_FILE_EXTENSION, inputStream);
