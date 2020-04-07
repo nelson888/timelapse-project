@@ -7,7 +7,6 @@ import org.apache.http.HttpStatus
 import spock.lang.Shared
 
 import static com.app4.project.timelapseserver.integration.tests.ExecutionControllerTest.EXECUTION_ENDPOINT
-import static com.app4.project.timelapseserver.integration.tests.ExecutionControllerTest.EXECUTION_ENDPOINT
 
 import spock.lang.Stepwise
 
@@ -27,7 +26,7 @@ class VideoIntegrationTest extends IntegrationTest {
 
     def 'create video task test'() {
         when:
-        def response = client.post(path: "$EXECUTION_ENDPOINT/$executionId/video/generate")
+        def response = client.post(path: "$EXECUTION_ENDPOINT/$executionId/videos/generate")
         this.taskId = response.data.taskId
         then:
         assert response.status == HttpStatus.SC_OK
@@ -46,11 +45,21 @@ class VideoIntegrationTest extends IntegrationTest {
         assert data.taskId == taskId
     }
 
+    def 'get video tasks of execution'() {
+        when:
+        def response = client.get(path: "$EXECUTION_ENDPOINT/$executionId/videos/tasks")
+        then:
+        assert response.status == HttpStatus.SC_OK
+        def data = response.data.tasks as List<Integer>
+        assert data.size() > 0
+        assert data.contains(taskId)
+    }
+
     def 'create video task with wrong timestamps'() {
         when:
         long fromTimestamp = now()
         long toTimestamp = now() - 100000L
-        def response = client.post(path: "$EXECUTION_ENDPOINT/$executionId/video/generate",
+        def response = client.post(path: "$EXECUTION_ENDPOINT/$executionId/videos/generate",
         query: [fromTimestamp: fromTimestamp, toTimestamp: toTimestamp])
         then:
         def data = response.data
@@ -64,7 +73,7 @@ class VideoIntegrationTest extends IntegrationTest {
         when:
         long fromTimestamp = now()
         long toTimestamp = now() + 100000L
-        client.post(path: "$EXECUTION_ENDPOINT/$executionId/video/generate",
+        client.post(path: "$EXECUTION_ENDPOINT/$executionId/videos/generate",
                 query: [fromTimestamp: fromTimestamp, toTimestamp: toTimestamp, fps: -12])
         then:
         RestResponseException e = thrown(RestResponseException)
@@ -87,7 +96,7 @@ class VideoIntegrationTest extends IntegrationTest {
         long fromTimestamp = getTimestampOfImage((imagesCount * 0.2f).toInteger())
         long toTimestamp = getTimestampOfImage((imagesCount * 0.8f).toInteger())
         when:
-        def response = client.post(path: "$EXECUTION_ENDPOINT/$executionId/video/generate",
+        def response = client.post(path: "$EXECUTION_ENDPOINT/$executionId/videos/generate",
                 query: [fromTimestamp: fromTimestamp, toTimestamp: toTimestamp])
         then:
         assert response.status == HttpStatus.SC_OK
