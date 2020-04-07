@@ -98,7 +98,7 @@ public class ExecutionController {
   public ResponseEntity startSavingToVideo(@PathVariable int id, @RequestParam Optional<Integer> fps,
                                            @RequestParam Optional<Long> fromTimestamp, @RequestParam Optional<Long> toTimestamp) {
     Execution execution = executionRepository.getById(id)
-      .orElseThrow(() -> new NotFoundException("There isn't any execution with the specified id  get"));
+      .orElseThrow(() -> new NotFoundException("Execution with id " + id + " was not found"));
     if (fps.isPresent() && fps.get() <= 0) {
       throw new BadRequestException("fps must be positive");
     }
