@@ -94,7 +94,7 @@ public class ExecutionController {
     );
   }
 
-  @PostMapping("/{id}/video/generate")
+  @PostMapping("/{id}/videos/generate")
   public ResponseEntity startSavingToVideo(@PathVariable int id, @RequestParam Optional<Integer> fps,
                                            @RequestParam Optional<Long> fromTimestamp, @RequestParam Optional<Long> toTimestamp) {
     Execution execution = executionRepository.getById(id)

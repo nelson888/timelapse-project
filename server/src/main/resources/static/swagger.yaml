@@ -187,7 +187,7 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/VideoMetadata"
-  /api/executions/{executionId}/video/generate:
+  /api/executions/{executionId}/videos/generate:
     post:
       tags:
         - "Execution"
