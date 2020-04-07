@@ -2,6 +2,7 @@ package com.app4.project.timelapseserver.integration.tests
 
 import com.app4.project.timelapse.model.TaskState
 import com.app4.project.timelapseserver.integration.tests.util.RestResponseException
+import groovyx.net.http.ContentType
 import org.apache.http.HttpStatus
 import spock.lang.Shared
 
@@ -47,7 +48,7 @@ class VideoIntegrationTest extends IntegrationTest {
         when:
         long fromTimestamp = now()
         long toTimestamp = now() - 100000L
-        client.get(path: "$VIDEO_TASK_ENDPOINT/$taskId?fromTimestamp=$fromTimestamp&toTimestamp=$toTimestamp")
+        client.post(path: "$VIDEO_TASK_ENDPOINT/$taskId?fromTimestamp=$fromTimestamp&toTimestamp=$toTimestamp")
         then:
         RestResponseException e = thrown(RestResponseException)
         def response = e.response
@@ -58,7 +59,7 @@ class VideoIntegrationTest extends IntegrationTest {
         when:
         long fromTimestamp = now()
         long toTimestamp = now() + 100000L
-        client.get(path: "$VIDEO_TASK_ENDPOINT/$taskId?fromTimestamp=$fromTimestamp&toTimestamp=$toTimestamp&fps=-12")
+        client.post(path: "$VIDEO_TASK_ENDPOINT/$taskId?fromTimestamp=$fromTimestamp&toTimestamp=$toTimestamp&fps=-12")
         then:
         RestResponseException e = thrown(RestResponseException)
         def response = e.response
@@ -92,4 +93,16 @@ class VideoIntegrationTest extends IntegrationTest {
         assert data.executionId == executionId
         assert  data.framesCount > 0
     }
+
+    def 'get video test'() {
+        when:
+        def response = client.get(path: "$STORAGE_ENDPOINT/$videoId", contentType: ContentType.BINARY)
+        then:
+        assert response.status == HttpStatus.SC_OK
+        def data = response.data
+        assert data instanceof InputStream
+        data.close()
+    }
+    
+    
 }
