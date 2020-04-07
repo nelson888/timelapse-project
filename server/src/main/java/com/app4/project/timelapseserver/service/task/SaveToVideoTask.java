@@ -55,7 +55,7 @@ public class SaveToVideoTask implements Runnable {
       .forEach(supplier -> addFrame(encoder, supplier));
     LOGGER.debug("[Task {}] Encoded all frames", taskId);
     int videoId = storageService.uploadVideo(tempFilePath);
-    videoMetadataRepository.add(new VideoMetadata(executionId, videoId, fps, fromTimestamp, toTimestamp, framesCount));
+    videoMetadataRepository.add(new VideoMetadata(videoId, executionId, fps, fromTimestamp, toTimestamp, framesCount));
     progressUpdater.accept(VideoTaskProgress.finished(taskId, videoId));
     LOGGER.info("[Task {}] Uploaded new video with id {}", taskId, videoId);
   }
