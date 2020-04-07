@@ -53,9 +53,11 @@ public class SaveToVideoTask implements Runnable {
   private void save(JpgSequenceEncoder encoder, Path tempFilePath) throws IOException {
     storageService.executionFiles(executionId, fromTimestamp, toTimestamp)
       .forEach(supplier -> addFrame(encoder, supplier));
+    LOGGER.debug("[Task {}] Encoded all frames", taskId);
     int videoId = storageService.uploadVideo(tempFilePath);
     videoMetadataRepository.add(new VideoMetadata(executionId, videoId, fps, fromTimestamp, toTimestamp, framesCount));
     progressUpdater.accept(VideoTaskProgress.finished(taskId, videoId));
+    LOGGER.info("[Task {}] Uploaded new video with id {}", taskId, videoId);
   }
 
   private void addFrame(JpgSequenceEncoder encoder, IOSupplier<byte[]> bytesSupplier) {
@@ -65,7 +67,8 @@ public class SaveToVideoTask implements Runnable {
       encoder.addFrame(bytes);
       updateProgress();
     } catch (IOException e) {
-      throw new SavingException("Error while adding frame", e);
+      LOGGER.debug("[Task {}] Error while encoding frame", taskId, e);
+      throw new SavingException("Error while encoding frame", e);
     }
   }
 
