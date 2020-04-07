@@ -81,6 +81,11 @@ class ExecutionControllerTest extends IntegrationTest {
         println "Posted execution has id $postedExecutionId"
         then: 'server returns 200 code '
         assert response.status == HttpStatus.SC_OK
+        def data = response.data
+        assert execution.title == data.title
+        assert execution.startTime == data.startTime
+        assert execution.endTime == data.endTime
+        assert execution.period == data.period
     }
 
     def 'test get execution current execution'() {
@@ -100,6 +105,51 @@ class ExecutionControllerTest extends IntegrationTest {
         then: 'server returns 409 code (conflict)'
         RestResponseException e = thrown(RestResponseException)
         assert e.statusCode == HttpStatus.SC_CONFLICT
+    }
+
+    def 'test patch execution 1 field'() {
+        when:
+        String newTitle = "hey new title"
+        def patchResponse = client.patch(path: "$EXECUTION_ENDPOINT/$postedExecutionId", body: [title: newTitle])
+        def getResponse = client.get(path: "$EXECUTION_ENDPOINT/$postedExecutionId")
+        then:
+        assert patchResponse.status == HttpStatus.SC_OK
+        assert getResponse.status == HttpStatus.SC_OK
+        assert getResponse.data == patchResponse.data
+        def execution = getResponse.data
+        assert execution.title == newTitle
+    }
+
+    def 'test patch execution 2 field'() {
+        when:
+        String newTitle = "This is new"
+        long startTime = now()
+        def patchResponse = client.patch(path: "$EXECUTION_ENDPOINT/$postedExecutionId",
+                body: [title: newTitle, startTime: startTime])
+        def getResponse = client.get(path: "$EXECUTION_ENDPOINT/$postedExecutionId")
+        then:
+        assert patchResponse.status == HttpStatus.SC_OK
+        assert getResponse.status == HttpStatus.SC_OK
+        def execution = getResponse.data
+        assert execution.title == newTitle
+        assert execution.startTime == startTime
+    }
+
+    def 'test patch execution 3 field'() {
+        when:
+        String newTitle = "This is reaaaaally new"
+        long startTime = now() 
+        long endTime = now() + 1000L
+        def patchResponse = client.patch(path: "$EXECUTION_ENDPOINT/$postedExecutionId",
+                body: [title: newTitle, startTime: startTime, endTime: endTime])
+        def getResponse = client.get(path: "$EXECUTION_ENDPOINT/$postedExecutionId")
+        then:
+        assert patchResponse.status == HttpStatus.SC_OK
+        assert getResponse.status == HttpStatus.SC_OK
+        def execution = getResponse.data
+        assert execution.title == newTitle
+        assert execution.startTime == startTime
+        assert execution.endTime == endTime
     }
 
     def 'test delete execution'() {
@@ -122,5 +172,4 @@ class ExecutionControllerTest extends IntegrationTest {
             client.delete(path: "$EXECUTION_ENDPOINT/$postedExecutionId")
         }
     }
-    // TODO test video process
 }
