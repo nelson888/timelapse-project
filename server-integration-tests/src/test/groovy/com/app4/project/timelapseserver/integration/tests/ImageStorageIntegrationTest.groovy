@@ -61,9 +61,16 @@ class ImageStorageIntegrationTest extends IntegrationTest {
         assert response.contentType == IMAGE_CONTENT_TYPE
         assert response.data != null
     }
-    
+
+    def 'get non existing image of execution'() {
+        when:
+        client.get(path: "$STORAGE_ENDPOINT/1/$imageCount")
+        then:
+        RestResponseException e = thrown(RestResponseException)
+        assert e.response.status == HttpStatus.SC_NOT_FOUND
+    }
+
     def 'post image test'() {
-        // TODO check if execution ongoing
         when:
         def imageBytes = ImageStorageIntegrationTest.class.getResource('/image.jpg').newInputStream().bytes
         // TODO
@@ -74,13 +81,5 @@ class ImageStorageIntegrationTest extends IntegrationTest {
         assert metadata.executionId == 1
         assert metadata.size == imageBytes.length
         assert metadata.fileId == imageCount
-    }
-
-    def 'get non existing image of execution'() {
-        when:
-        client.get(path: "$STORAGE_ENDPOINT/1/$imageCount", contentType: ContentType.BINARY)
-        then:
-        RestResponseException e = thrown(RestResponseException)
-        assert e.response.status == HttpStatus.SC_NOT_FOUND
     }
 }
