@@ -6,6 +6,8 @@ import org.apache.http.HttpStatus
 import spock.lang.Shared
 import spock.lang.Stepwise
 
+import javax.imageio.ImageIO
+
 @Stepwise // allow to run tests in their definition order
 class ImageStorageIntegrationTest extends IntegrationTest {
 
@@ -29,11 +31,14 @@ class ImageStorageIntegrationTest extends IntegrationTest {
     def 'get first image of execution'() {
         when:
         def response = client.get(path: "$STORAGE_ENDPOINT/1/0", contentType: ContentType.BINARY)
-        imageFileSize = response.data.bytes.length
+        byte[] bytes = response.data.bytes
+        imageFileSize = bytes.length
         then:
         assert response.status == HttpStatus.SC_OK
         assert response.contentType == IMAGE_CONTENT_TYPE
         assert response.data != null
+        // test that image is parsable
+        assert ImageIO.read(new ByteArrayInputStream(bytes)) != null
 
     }
 
