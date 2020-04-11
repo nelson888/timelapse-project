@@ -10,4 +10,4 @@ temp.dir.root: ${TEMP_DIR_ROOT}
 executor.threads: 4
 
 logging.level:
-  com.app4.project: DEBUG
+  com.app4.project: INFO
