@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -44,20 +43,21 @@ public class ExecutionController {
   private final SaveToVideoService saveToVideoService;
   private final VideoMetadataRepository videoMetadataRepository;
   private final int defaultFps;
-  private final boolean fillFakeData;
 
   public ExecutionController(ExecutionRepository executionRepository, StorageService storageService,
                              CameraState cameraState, SaveToVideoService saveToVideoService,
                              VideoMetadataRepository videoMetadataRepository,
                              @Value("${video.default.fps}") int defaultFps,
-                             @Value("${executions.fill.data:false}") boolean fillFakeData) {
+                               @Value("${executions.fake.data:false}") boolean fillFakeData) {
     this.executionRepository = executionRepository;
     this.storageService = storageService;
     this.cameraState = cameraState;
     this.saveToVideoService = saveToVideoService;
     this.videoMetadataRepository = videoMetadataRepository;
     this.defaultFps = defaultFps;
-    this.fillFakeData = fillFakeData;
+    if (fillFakeData) {
+      fillWithFakeData();
+    }
   }
 
   @PostMapping
@@ -178,11 +178,7 @@ public class ExecutionController {
   }
 
 
-  @PostConstruct
   public void fillWithFakeData() {
-    if (!fillFakeData) {
-      return;
-    }
     executionRepository.removeAll();
     LOGGER.info("Filling Execution Repository with fake data");
     long now = System.currentTimeMillis();
