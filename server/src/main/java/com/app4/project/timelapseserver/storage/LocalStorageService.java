@@ -39,7 +39,6 @@ public class LocalStorageService extends AbstractStorage {
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalStorageService.class);
 
   private final Path rootPath;
-  private final Map<Integer, AtomicInteger> executionFileCount = new ConcurrentHashMap<>();
 
   public LocalStorageService(@Value("${temp.dir.root}") Path tempDirRoot, @Value("${local.storage.root}") Path rootPath) {
     super(tempDirRoot);
@@ -57,10 +56,6 @@ public class LocalStorageService extends AbstractStorage {
         LOGGER.error("Couldn't create needed directory");
         throw new RuntimeException(rootPath + "couldn't create directory " + execDir.getName());
       }
-      // compute the file count for each executions
-      int fileCount;
-      for (fileCount=0; Files.exists(rootPath.resolve(FOLDER_PREFIX + i).resolve(fileCount + IMAGE_EXTENSION)); fileCount++);
-      executionFileCount.put(i, new AtomicInteger(fileCount));
     }
     LOGGER.info("Local Storage Service was successfully instantiated");
   }
@@ -95,7 +90,7 @@ public class LocalStorageService extends AbstractStorage {
   }
 
   private FileMetadata writeInputStream(InputStream inputStream, int executionId, Path executionPath) {
-    int fileId = getFileCount(executionId).get();
+    int fileId = getFileCount(executionId);
     try {
       Path filePath = executionPath.resolve(getFileName(fileId));
       LOGGER.info("Creating file in path {}", filePath);
@@ -108,7 +103,6 @@ public class LocalStorageService extends AbstractStorage {
         StandardCopyOption.REPLACE_EXISTING);
       FileMetadata fileData = new FileMetadata(file.length(), file.getName(), System.currentTimeMillis(), executionId, fileId);
       LOGGER.info("Saved file successfully");
-      getFileCount(executionId).getAndIncrement();
       return fileData;
     } catch (IOException e) {
       LOGGER.error("Error while writing file", e);
@@ -200,8 +194,11 @@ public class LocalStorageService extends AbstractStorage {
     Stream.of(files).forEach(File::delete);
   }
 
-  private AtomicInteger getFileCount(int executionId) {
-    return executionFileCount.computeIfAbsent(executionId, e -> new AtomicInteger(0));
+  private int getFileCount(int executionId) {
+    int fileCount;
+    for (fileCount=0; Files.exists(rootPath.resolve(FOLDER_PREFIX + executionId).resolve(fileCount + IMAGE_EXTENSION));
+         fileCount++);
+    return fileCount;
   }
 
   private File getVideoFile(int videoId) {
