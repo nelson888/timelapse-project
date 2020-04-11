@@ -7,5 +7,5 @@ cd ../
 mvn install -DskipTests || exit
 cd "$CURRENT_DIR" || exit
 cp ../target/timelapseserver-0.0.1-SNAPSHOT.jar  ./timelapse-server.jar || exit
-docker build . -t timelapse-server --build-arg jarfile=./timelapse-server.jar
+docker build . -t tambapps/timelapse-server --build-arg jarfile=./timelapse-server.jar
 rm ./timelapse-server.jar
