@@ -285,7 +285,7 @@ paths:
           description: "The command to add"
           required: true
           schema:
-            $ref: "#/definitions/Execution"
+            $ref: "#/definitions/CommandPostRequest"
       responses:
         200:
           description: "successful operation"
@@ -571,6 +571,11 @@ definitions:
       period:
         type: integer
         format: int64
+  CommandPostRequest:
+    type: object
+    properties:
+      command:
+        $ref: "#/definitions/Command"
   CameraState:
     type: object
     properties:
