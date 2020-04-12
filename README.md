@@ -20,7 +20,7 @@ An intermediate server between the Android app and the Raspberry, where all the 
 I was in charge of developing the program run by the Raspberry, the API (server) and the API client that would be used by the android app and the Raspberry.
 
 ### API (server)
-The server was developed in Spring Boot. It is secured by JWT Authentication. The images sent by the camera are stored in Firebase Storage, although, there is also a version where you can store them locally.
+The server was developed in Spring Boot. The images sent by the camera are stored in Firebase Storage, although, there is also a version where you can store them locally.
 
 ### API Client
 The API client uses the [HTTP client library I developed](https://github.com/tambapps/java-rest-client).
