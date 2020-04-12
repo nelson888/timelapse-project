@@ -1,10 +1,12 @@
 FROM openjdk:11
 
-ENV MONGO_URI=mongodb://localhost:27017
+ARG jarfile
+ARG mongoUri
+
+ENV MONGO_URI=$mongoUri
 ENV TEMP_DIR_ROOT=/temp
 ENV LOCAL_STORAGE_ROOT=/localStorage
 
-ARG jarfile
 COPY $jarfile /server.jar
 
 EXPOSE 8080
